@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:selawathub/core/theme/colors.dart';
-import 'package:selawathub/core/widgets/app_background.dart';
 import 'package:selawathub/core/widgets/blur_card.dart';
 
 class CounterPage extends StatelessWidget {
@@ -10,40 +9,38 @@ class CounterPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final TextTheme textTheme = Theme.of(context).textTheme;
 
-    return AppBackground(
-      child: ListView(
-        padding: const EdgeInsets.fromLTRB(20, 18, 20, 24),
-        children: [
-          Text('Tasbih Counter', style: textTheme.headlineMedium),
-          const SizedBox(height: 6),
-          Text(
-            'Tap and sync your selawat into your group daily total.',
-            style: textTheme.bodyMedium,
-          ),
-          const SizedBox(height: 22),
-          const BlurCard(child: _CounterHero()),
-          const SizedBox(height: 16),
-          const Row(
-            children: [
-              Expanded(
-                child: _StatChip(
-                  label: 'Today',
-                  value: '1,240',
-                  accent: AppColors.ocean,
-                ),
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(20, 18, 20, 24),
+      children: [
+        Text('Tasbih Counter', style: textTheme.headlineMedium),
+        const SizedBox(height: 6),
+        Text(
+          'Tap and sync your selawat into your group daily total.',
+          style: textTheme.bodyMedium,
+        ),
+        const SizedBox(height: 22),
+        const BlurCard(child: _CounterHero()),
+        const SizedBox(height: 16),
+        const Row(
+          children: [
+            Expanded(
+              child: _StatChip(
+                label: 'Today',
+                value: '1,240',
+                accent: AppColors.ocean,
               ),
-              SizedBox(width: 12),
-              Expanded(
-                child: _StatChip(
-                  label: 'Group',
-                  value: '85,121',
-                  accent: AppColors.mint,
-                ),
+            ),
+            SizedBox(width: 12),
+            Expanded(
+              child: _StatChip(
+                label: 'Group',
+                value: '85,121',
+                accent: AppColors.mint,
               ),
-            ],
-          ),
-        ],
-      ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 }

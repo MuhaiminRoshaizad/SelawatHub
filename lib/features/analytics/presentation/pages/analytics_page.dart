@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:selawathub/core/theme/colors.dart';
-import 'package:selawathub/core/widgets/app_background.dart';
 import 'package:selawathub/core/widgets/blur_card.dart';
 
 class AnalyticsPage extends StatelessWidget {
@@ -9,52 +8,50 @@ class AnalyticsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AppBackground(
-      child: ListView(
-        padding: const EdgeInsets.fromLTRB(20, 18, 20, 24),
-        children: [
-          Text('Analytics', style: Theme.of(context).textTheme.headlineMedium),
-          const SizedBox(height: 6),
-          Text(
-            'A focused dashboard for trends, streaks, and contribution quality.',
-            style: Theme.of(context).textTheme.bodyMedium,
-          ),
-          const SizedBox(height: 18),
-          const BlurCard(child: _TrendCard()),
-          const SizedBox(height: 12),
-          const Row(
-            children: [
-              Expanded(
-                child: BlurCard(
-                  child: _MiniMetric(
-                    icon: CupertinoIcons.flame_fill,
-                    label: 'Longest Streak',
-                    value: '19 days',
-                  ),
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(20, 18, 20, 24),
+      children: [
+        Text('Analytics', style: Theme.of(context).textTheme.headlineMedium),
+        const SizedBox(height: 6),
+        Text(
+          'A focused dashboard for trends, streaks, and contribution quality.',
+          style: Theme.of(context).textTheme.bodyMedium,
+        ),
+        const SizedBox(height: 18),
+        const BlurCard(child: _TrendCard()),
+        const SizedBox(height: 12),
+        const Row(
+          children: [
+            Expanded(
+              child: BlurCard(
+                child: _MiniMetric(
+                  icon: CupertinoIcons.flame_fill,
+                  label: 'Longest Streak',
+                  value: '19 days',
                 ),
               ),
-              SizedBox(width: 12),
-              Expanded(
-                child: BlurCard(
-                  child: _MiniMetric(
-                    icon: CupertinoIcons.person_2_fill,
-                    label: 'Active Members',
-                    value: '24',
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          const BlurCard(
-            child: _MiniMetric(
-              icon: CupertinoIcons.rosette,
-              label: 'Top Contributor (Today)',
-              value: 'Amin - 4,120',
             ),
+            SizedBox(width: 12),
+            Expanded(
+              child: BlurCard(
+                child: _MiniMetric(
+                  icon: CupertinoIcons.person_2_fill,
+                  label: 'Active Members',
+                  value: '24',
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        const BlurCard(
+          child: _MiniMetric(
+            icon: CupertinoIcons.rosette,
+            label: 'Top Contributor (Today)',
+            value: 'Amin - 4,120',
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

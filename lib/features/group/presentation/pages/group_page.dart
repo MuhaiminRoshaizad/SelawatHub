@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:selawathub/core/widgets/app_background.dart';
 import 'package:selawathub/core/widgets/blur_card.dart';
 
 class GroupPage extends StatelessWidget {
@@ -9,42 +8,40 @@ class GroupPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final TextTheme textTheme = Theme.of(context).textTheme;
 
-    return AppBackground(
-      child: ListView(
-        padding: const EdgeInsets.fromLTRB(20, 18, 20, 24),
-        children: [
-          Text('Group Progress', style: textTheme.headlineMedium),
-          const SizedBox(height: 6),
-          Text(
-            'Track shared momentum, member activity, and pending approvals.',
-            style: textTheme.bodyMedium,
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(20, 18, 20, 24),
+      children: [
+        Text('Group Progress', style: textTheme.headlineMedium),
+        const SizedBox(height: 6),
+        Text(
+          'Track shared momentum, member activity, and pending approvals.',
+          style: textTheme.bodyMedium,
+        ),
+        const SizedBox(height: 18),
+        const BlurCard(
+          child: _HighlightTile(
+            title: 'Today Group Total',
+            value: '85,121',
+            subtitle: '24 approved members active',
           ),
-          const SizedBox(height: 18),
-          const BlurCard(
-            child: _HighlightTile(
-              title: 'Today Group Total',
-              value: '85,121',
-              subtitle: '24 approved members active',
-            ),
+        ),
+        const SizedBox(height: 12),
+        const BlurCard(
+          child: _HighlightTile(
+            title: 'Pending Join Requests',
+            value: '6',
+            subtitle: 'Leader can approve or reject',
           ),
-          const SizedBox(height: 12),
-          const BlurCard(
-            child: _HighlightTile(
-              title: 'Pending Join Requests',
-              value: '6',
-              subtitle: 'Leader can approve or reject',
-            ),
+        ),
+        const SizedBox(height: 12),
+        const BlurCard(
+          child: _HighlightTile(
+            title: 'Your Contribution',
+            value: '1,240',
+            subtitle: '1.45% of today total',
           ),
-          const SizedBox(height: 12),
-          const BlurCard(
-            child: _HighlightTile(
-              title: 'Your Contribution',
-              value: '1,240',
-              subtitle: '1.45% of today total',
-            ),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
@@ -74,4 +71,3 @@ class _HighlightTile extends StatelessWidget {
     );
   }
 }
-

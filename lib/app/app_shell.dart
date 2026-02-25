@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:selawathub/core/theme/colors.dart';
+import 'package:selawathub/core/widgets/app_background.dart';
 import 'package:selawathub/features/analytics/presentation/pages/analytics_page.dart';
 import 'package:selawathub/features/counter/presentation/pages/counter_page.dart';
 import 'package:selawathub/features/group/presentation/pages/group_page.dart';
@@ -17,6 +18,7 @@ class AppShell extends StatefulWidget {
 
 class _AppShellState extends State<AppShell> {
   int _index = 0;
+  late final PageController _pageController;
 
   static const List<Widget> _pages = <Widget>[
     CounterPage(),
@@ -50,22 +52,42 @@ class _AppShellState extends State<AppShell> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    _pageController = PageController(initialPage: _index);
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  void _onTabTapped(int value) {
+    if (value == _index) {
+      return;
+    }
+    _pageController.animateToPage(
+      value,
+      duration: const Duration(milliseconds: 260),
+      curve: Curves.easeOutCubic,
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
       extendBody: true,
-      body: IndexedStack(index: _index, children: _pages),
-      floatingActionButton: _index == 3
-          ? _LiquidSignOutButton(
-              onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Sign out tapped')),
-                );
-              },
-            )
-          : null,
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+      body: AppBackground(
+        child: PageView(
+          controller: _pageController,
+          physics: const BouncingScrollPhysics(),
+          onPageChanged: (value) => setState(() => _index = value),
+          children: _pages,
+        ),
+      ),
       bottomNavigationBar: SafeArea(
         top: false,
         child: Padding(
@@ -74,63 +96,7 @@ class _AppShellState extends State<AppShell> {
             currentIndex: _index,
             tabs: _tabs,
             isDark: isDark,
-            onTap: (value) => setState(() => _index = value),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _LiquidSignOutButton extends StatelessWidget {
-  const _LiquidSignOutButton({required this.onPressed});
-
-  final VoidCallback onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    final bool isDark = Theme.of(context).brightness == Brightness.dark;
-
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(22),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-        child: Material(
-          color: isDark
-              ? AppColors.navGlassDark.withValues(alpha: 0.78)
-              : AppColors.navGlassLight.withValues(alpha: 0.82),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(22),
-            side: BorderSide(
-              color: AppColors.white.withValues(alpha: isDark ? 0.2 : 0.78),
-              width: 1.1,
-            ),
-          ),
-          child: InkWell(
-            onTap: onPressed,
-            borderRadius: BorderRadius.circular(22),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    CupertinoIcons.square_arrow_right,
-                    color: AppColors.danger,
-                    size: 18,
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    'Sign out',
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w700,
-                      color: isDark ? AppColors.darkInk : AppColors.ink,
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            onTap: _onTabTapped,
           ),
         ),
       ),

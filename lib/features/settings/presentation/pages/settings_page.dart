@@ -1,8 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:selawathub/core/theme/colors.dart';
 import 'package:selawathub/core/theme/theme_controller.dart';
 import 'package:selawathub/core/widgets/app_background.dart';
 import 'package:selawathub/core/widgets/blur_card.dart';
+import 'package:selawathub/features/auth/presentation/pages/auth_gate_page.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
@@ -54,10 +56,97 @@ class SettingsPage extends StatelessWidget {
                 },
               ),
             ),
+            const SizedBox(height: 12),
+            BlurCard(
+              child: InkWell(
+                borderRadius: BorderRadius.circular(16),
+                onTap: () => _onSignOutPressed(context),
+                child: Row(
+                  children: [
+                    Icon(
+                      CupertinoIcons.square_arrow_right,
+                      color: AppColors.danger,
+                      size: 18,
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        'Sign out',
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                              color: AppColors.danger,
+                            ),
+                      ),
+                    ),
+                    Icon(
+                      CupertinoIcons.chevron_right,
+                      size: 16,
+                      color: Theme.of(context).textTheme.bodyMedium?.color,
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ],
         ),
       ),
     );
   }
-}
 
+  Future<void> _onSignOutPressed(BuildContext context) async {
+    final bool confirmed = await _confirmSignOut(context);
+    if (!confirmed || !context.mounted) {
+      return;
+    }
+
+    Navigator.of(context, rootNavigator: true).pushAndRemoveUntil(
+      MaterialPageRoute<void>(
+        builder: (_) => const AuthGatePage(),
+      ),
+      (_) => false,
+    );
+  }
+
+  Future<bool> _confirmSignOut(BuildContext context) async {
+    final TargetPlatform platform = Theme.of(context).platform;
+    if (platform == TargetPlatform.iOS || platform == TargetPlatform.macOS) {
+      final bool? result = await showCupertinoDialog<bool>(
+        context: context,
+        builder: (context) => CupertinoAlertDialog(
+          title: const Text('Sign out?'),
+          content: const Text('You will need to sign in again to continue.'),
+          actions: [
+            CupertinoDialogAction(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('Cancel'),
+            ),
+            CupertinoDialogAction(
+              isDestructiveAction: true,
+              onPressed: () => Navigator.of(context).pop(true),
+              child: const Text('Sign out'),
+            ),
+          ],
+        ),
+      );
+      return result ?? false;
+    }
+
+    final bool? result = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Sign out?'),
+        content: const Text('You will need to sign in again to continue.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Sign out'),
+          ),
+        ],
+      ),
+    );
+    return result ?? false;
+  }
+}
