@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:selawathub/core/theme/app_colors.dart';
+import 'package:selawathub/core/theme/colors.dart';
 import 'package:selawathub/core/widgets/app_background.dart';
 import 'package:selawathub/core/widgets/blur_card.dart';
 
@@ -130,4 +130,3 @@ class _StatChip extends StatelessWidget {
     );
   }
 }
-

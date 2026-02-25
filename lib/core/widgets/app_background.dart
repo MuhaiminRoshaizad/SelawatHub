@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:selawathub/core/theme/app_colors.dart';
+import 'package:selawathub/core/theme/colors.dart';
 
 class AppBackground extends StatelessWidget {
   const AppBackground({super.key, required this.child});
@@ -8,8 +8,12 @@ class AppBackground extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final Brightness brightness = Theme.of(context).brightness;
+
     return DecoratedBox(
-      decoration: const BoxDecoration(gradient: AppColors.appGradient),
+      decoration: BoxDecoration(
+        gradient: AppColors.backgroundGradientFor(brightness),
+      ),
       child: Stack(
         children: [
           Positioned(
@@ -45,4 +49,3 @@ class AppBackground extends StatelessWidget {
     );
   }
 }
-

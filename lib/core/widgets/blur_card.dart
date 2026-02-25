@@ -1,7 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:selawathub/core/theme/app_colors.dart';
+import 'package:selawathub/core/theme/colors.dart';
 
 class BlurCard extends StatelessWidget {
   const BlurCard({
@@ -15,6 +15,9 @@ class BlurCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final Brightness brightness = Theme.of(context).brightness;
+    final bool isDark = brightness == Brightness.dark;
+
     return ClipRRect(
       borderRadius: BorderRadius.circular(22),
       child: BackdropFilter(
@@ -22,10 +25,12 @@ class BlurCard extends StatelessWidget {
         child: Container(
           padding: padding,
           decoration: BoxDecoration(
-            color: AppColors.white.withValues(alpha: 0.7),
+            color: (isDark ? AppColors.darkCard : AppColors.white)
+                .withValues(alpha: isDark ? 0.76 : 0.7),
             borderRadius: BorderRadius.circular(22),
             border: Border.all(
-              color: AppColors.white.withValues(alpha: 0.9),
+              color: (isDark ? AppColors.darkSlate : AppColors.white)
+                  .withValues(alpha: isDark ? 0.34 : 0.9),
               width: 1.1,
             ),
           ),
@@ -35,4 +40,3 @@ class BlurCard extends StatelessWidget {
     );
   }
 }
-

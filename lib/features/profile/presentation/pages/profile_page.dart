@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:selawathub/core/widgets/app_background.dart';
 import 'package:selawathub/core/widgets/blur_card.dart';
+import 'package:selawathub/features/settings/presentation/pages/settings_page.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
@@ -12,7 +13,27 @@ class ProfilePage extends StatelessWidget {
       child: ListView(
         padding: const EdgeInsets.fromLTRB(20, 18, 20, 24),
         children: [
-          Text('Profile', style: Theme.of(context).textTheme.headlineMedium),
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  'Profile',
+                  style: Theme.of(context).textTheme.headlineMedium,
+                ),
+              ),
+              IconButton(
+                onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute<void>(
+                      builder: (_) => const SettingsPage(),
+                    ),
+                  );
+                },
+                icon: const Icon(CupertinoIcons.settings),
+                tooltip: 'Settings',
+              ),
+            ],
+          ),
           const SizedBox(height: 18),
           const BlurCard(
             child: Row(

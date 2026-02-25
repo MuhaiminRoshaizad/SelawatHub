@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:selawathub/core/theme/colors.dart';
 import 'package:selawathub/core/widgets/app_background.dart';
 import 'package:selawathub/core/widgets/blur_card.dart';
 
@@ -63,6 +64,8 @@ class _TrendCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -79,7 +82,8 @@ class _TrendCard extends StatelessWidget {
           height: 74,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(16),
-            color: Colors.white.withValues(alpha: 0.7),
+            color: (isDark ? AppColors.darkCard : AppColors.white)
+                .withValues(alpha: 0.7),
           ),
           alignment: Alignment.center,
           child: Text(
@@ -117,4 +121,3 @@ class _MiniMetric extends StatelessWidget {
     );
   }
 }
-

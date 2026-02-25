@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:selawathub/core/theme/app_colors.dart';
+import 'package:selawathub/core/theme/colors.dart';
 
 class AppTheme {
   static ThemeData light() {
@@ -14,7 +14,7 @@ class AppTheme {
       scaffoldBackgroundColor: AppColors.white,
       fontFamily: '.SF Pro Text',
       appBarTheme: const AppBarTheme(
-        backgroundColor: Colors.transparent,
+        backgroundColor: AppColors.transparent,
         elevation: 0,
         centerTitle: false,
         foregroundColor: AppColors.ink,
@@ -65,5 +65,68 @@ class AppTheme {
       ),
     );
   }
-}
 
+  static ThemeData dark() {
+    final ColorScheme colorScheme = ColorScheme.fromSeed(
+      seedColor: AppColors.mint,
+      brightness: Brightness.dark,
+    );
+
+    return ThemeData(
+      useMaterial3: true,
+      colorScheme: colorScheme,
+      scaffoldBackgroundColor: AppColors.darkSurface,
+      fontFamily: '.SF Pro Text',
+      appBarTheme: const AppBarTheme(
+        backgroundColor: AppColors.transparent,
+        elevation: 0,
+        centerTitle: false,
+        foregroundColor: AppColors.darkInk,
+      ),
+      navigationBarTheme: NavigationBarThemeData(
+        height: 72,
+        elevation: 0,
+        backgroundColor: AppColors.darkCard.withValues(alpha: 0.95),
+        indicatorColor: AppColors.mint.withValues(alpha: 0.22),
+        labelTextStyle: WidgetStateProperty.resolveWith((states) {
+          final bool selected = states.contains(WidgetState.selected);
+          return TextStyle(
+            fontSize: 12,
+            fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+            color: selected ? AppColors.darkInk : AppColors.darkSlate,
+          );
+        }),
+      ),
+      textTheme: const TextTheme(
+        headlineMedium: TextStyle(
+          fontSize: 30,
+          fontWeight: FontWeight.w700,
+          color: AppColors.darkInk,
+          letterSpacing: -0.5,
+        ),
+        titleLarge: TextStyle(
+          fontSize: 22,
+          fontWeight: FontWeight.w700,
+          color: AppColors.darkInk,
+          letterSpacing: -0.2,
+        ),
+        titleMedium: TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.w700,
+          color: AppColors.darkInk,
+        ),
+        bodyMedium: TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+          color: AppColors.darkSlate,
+          height: 1.4,
+        ),
+      ),
+      cardTheme: CardThemeData(
+        elevation: 0,
+        color: AppColors.darkCard,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      ),
+    );
+  }
+}
