@@ -1,47 +1,73 @@
 # SelawatHub
 
-SelawatHub is a Flutter app for tracking selawat in groups. Members can join a group, use a built‑in counter, and contribute to a shared daily total. Leaders can view group progress and (later) manage approvals.
+SelawatHub is a Flutter app for group selawat tracking. Members contribute daily counts through a built-in counter, and leaders can monitor group progress.
 
-## ✨ Features (MVP)
-- User accounts (Firebase Auth)
-- Create or join a group with a join code
-- Built‑in tasbih counter
+## MVP Features
+- Firebase Auth
+- Create group or join with code
+- Built-in tasbih counter
 - Personal daily counts
 - Group daily totals
+- Basic analytics cards
 
-## 🧭 Planned Features
-- Join request approval (leader control)
+## Planned Features
+- Join request approval workflow (leader)
 - Public/private group settings
-- Analytics dashboard
+- Full analytics dashboard
 - Notifications
 
-## 🛠 Tech Stack
-- Flutter (mobile)
-- Firebase Auth
-- Cloud Firestore
+## Current App Structure
 
-## 🚀 Getting Started
-1. Install Flutter: https://flutter.dev/docs/get-started/install  
-2. Clone the repo:
-   ```bash
-   git clone https://github.com/MuhaiminRoshaizad/SelawatHub.git
-   ```
-3. Install dependencies:
+```text
+lib/
+  app/
+    app.dart
+    app_shell.dart
+  core/
+    theme/
+      app_colors.dart
+      app_theme.dart
+    widgets/
+      app_background.dart
+      blur_card.dart
+  features/
+    auth/presentation/pages/auth_gate_page.dart
+    counter/presentation/pages/counter_page.dart
+    group/presentation/pages/group_page.dart
+    analytics/presentation/pages/analytics_page.dart
+    profile/presentation/pages/profile_page.dart
+  main.dart
+```
+
+## UX Flow (Current Scaffold)
+1. App loads into a bottom-tab shell.
+2. Tabs: Counter, Group, Analytics, Profile.
+3. Counter is the primary action surface.
+4. Group tab shows daily total and membership-related sections.
+5. Analytics tab holds trends, streaks, and contribution insights.
+6. Profile tab holds account and group identity settings.
+
+## Design Direction
+- Modern iOS-style visual language
+- Soft gradients and light glass cards
+- Clean spacing and rounded surfaces
+- Cupertino iconography with Material 3 foundation
+
+## Next Build Steps
+1. Wire Firebase Auth in `auth_gate_page.dart`.
+2. Implement Firestore group + member schema.
+3. Connect counter writes to daily entries.
+4. Aggregate group totals and analytics from Firestore.
+5. Add leader-only approval actions in Group tab.
+
+## Getting Started
+1. Install Flutter: https://flutter.dev/docs/get-started/install
+2. Install dependencies:
    ```bash
    flutter pub get
    ```
-4. Run the app:
+3. Run the app:
    ```bash
    flutter run
    ```
 
-## 🔐 Firebase Setup
-1. Create a Firebase project  
-2. Add Android/iOS apps  
-3. Download config files:
-   - `google-services.json` (Android)
-   - `GoogleService-Info.plist` (iOS)
-4. Enable Auth + Firestore in Firebase console
-
-## 📄 License
-This project is open for learning and community benefit. Add a license if you plan to distribute.
