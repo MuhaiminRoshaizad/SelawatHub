@@ -94,11 +94,11 @@ class _LiquidSignOutButton extends StatelessWidget {
     return ClipRRect(
       borderRadius: BorderRadius.circular(22),
       child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
+        filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
         child: Material(
           color: isDark
-              ? AppColors.darkCard.withValues(alpha: 0.7)
-              : AppColors.white.withValues(alpha: 0.76),
+              ? AppColors.navGlassDark.withValues(alpha: 0.78)
+              : AppColors.navGlassLight.withValues(alpha: 0.82),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(22),
             side: BorderSide(
@@ -156,11 +156,13 @@ class _LiquidTabBar extends StatelessWidget {
     return ClipRRect(
       borderRadius: BorderRadius.circular(30),
       child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+        filter: ImageFilter.blur(sigmaX: 28, sigmaY: 28),
         child: Container(
           height: 76,
           decoration: BoxDecoration(
-            color: isDark ? AppColors.navGlassDark : AppColors.navGlassLight,
+            color: isDark
+                ? AppColors.navGlassDark.withValues(alpha: 0.86)
+                : AppColors.navGlassLight.withValues(alpha: 0.86),
             borderRadius: BorderRadius.circular(30),
             border: Border.all(
               color: isDark ? AppColors.navBorderDark : AppColors.navBorderLight,
@@ -175,58 +177,92 @@ class _LiquidTabBar extends StatelessWidget {
               ),
             ],
           ),
-          child: Row(
+          child: Stack(
             children: [
-              for (int i = 0; i < tabs.length; i++)
-                Expanded(
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(24),
-                    onTap: () => onTap(i),
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 220),
-                      curve: Curves.easeOutCubic,
-                      margin: const EdgeInsets.symmetric(
-                        horizontal: 6,
-                        vertical: 9,
+              Positioned(
+                left: 0,
+                right: 0,
+                top: 0,
+                child: IgnorePointer(
+                  child: Container(
+                    height: 26,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.vertical(
+                        top: Radius.circular(30),
                       ),
-                      decoration: BoxDecoration(
-                        color: i == currentIndex
-                            ? AppColors.ocean.withValues(alpha: 0.16)
-                            : AppColors.transparent,
-                        borderRadius: BorderRadius.circular(22),
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            i == currentIndex ? tabs[i].activeIcon : tabs[i].icon,
-                            size: 20,
-                            color: i == currentIndex
-                                ? (isDark ? AppColors.darkInk : AppColors.ink)
-                                : (isDark
-                                    ? AppColors.darkSlate
-                                    : AppColors.slate),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            tabs[i].label,
-                            style: TextStyle(
-                              fontSize: 11,
-                              fontWeight: i == currentIndex
-                                  ? FontWeight.w700
-                                  : FontWeight.w500,
-                              color: i == currentIndex
-                                  ? (isDark ? AppColors.darkInk : AppColors.ink)
-                                  : (isDark
-                                      ? AppColors.darkSlate
-                                      : AppColors.slate),
-                            ),
-                          ),
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          AppColors.white
+                              .withValues(alpha: isDark ? 0.14 : 0.36),
+                          AppColors.transparent,
                         ],
                       ),
                     ),
                   ),
                 ),
+              ),
+              Row(
+                children: [
+                  for (int i = 0; i < tabs.length; i++)
+                    Expanded(
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(24),
+                        onTap: () => onTap(i),
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 220),
+                          curve: Curves.easeOutCubic,
+                          margin: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 9,
+                          ),
+                          decoration: BoxDecoration(
+                            color: i == currentIndex
+                                ? AppColors.ocean.withValues(alpha: 0.2)
+                                : AppColors.transparent,
+                            borderRadius: BorderRadius.circular(22),
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                i == currentIndex
+                                    ? tabs[i].activeIcon
+                                    : tabs[i].icon,
+                                size: 20,
+                                color: i == currentIndex
+                                    ? (isDark
+                                        ? AppColors.darkInk
+                                        : AppColors.ink)
+                                    : (isDark
+                                        ? AppColors.darkSlate
+                                        : AppColors.slate),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                tabs[i].label,
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: i == currentIndex
+                                      ? FontWeight.w700
+                                      : FontWeight.w500,
+                                  color: i == currentIndex
+                                      ? (isDark
+                                          ? AppColors.darkInk
+                                          : AppColors.ink)
+                                      : (isDark
+                                          ? AppColors.darkSlate
+                                          : AppColors.slate),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              ),
             ],
           ),
         ),

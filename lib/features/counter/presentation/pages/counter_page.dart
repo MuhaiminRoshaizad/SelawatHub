@@ -55,42 +55,52 @@ class _CounterHero extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       height: 430,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            'Today Count',
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
-          const SizedBox(height: 8),
-          Text(
-            '1,240',
-            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                  fontSize: 42,
-                ),
-          ),
-          const SizedBox(height: 24),
-          SizedBox(
-            width: 210,
-            height: 210,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                shape: const CircleBorder(),
-                backgroundColor: AppColors.mint,
-                foregroundColor: AppColors.white,
-                elevation: 0,
-              ),
-              onPressed: () {},
-              child: const Icon(Icons.add, size: 54),
+      child: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Text(
+              'Today Count',
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.titleMedium,
             ),
-          ),
-          const SizedBox(height: 18),
-          TextButton.icon(
-            onPressed: () {},
-            icon: const Icon(Icons.refresh_rounded),
-            label: const Text('Reset with confirmation'),
-          ),
-        ],
+            const SizedBox(height: 8),
+            Text(
+              '1,240',
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                    fontSize: 42,
+                  ),
+            ),
+            const SizedBox(height: 24),
+            SizedBox(
+              width: 210,
+              height: 210,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  shape: const CircleBorder(),
+                  backgroundColor: AppColors.mint,
+                  foregroundColor: AppColors.white,
+                  elevation: 0,
+                ),
+                onPressed: () {},
+                child: const Icon(Icons.add, size: 54),
+              ),
+            ),
+            const SizedBox(height: 18),
+            SizedBox(
+              width: 220,
+              child: Center(
+                child: TextButton.icon(
+                  onPressed: () {},
+                  icon: const Icon(Icons.refresh_rounded),
+                  label: const Text('Reset with confirmation'),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
