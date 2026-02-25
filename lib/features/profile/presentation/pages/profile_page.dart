@@ -11,7 +11,7 @@ class ProfilePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return AppBackground(
       child: ListView(
-        padding: const EdgeInsets.fromLTRB(20, 18, 20, 24),
+        padding: const EdgeInsets.fromLTRB(20, 18, 20, 120),
         children: [
           Row(
             children: [
@@ -68,14 +68,6 @@ class ProfilePage extends StatelessWidget {
             child: _ProfileRow(
               title: 'Join Code',
               subtitle: 'SLWT-7861',
-            ),
-          ),
-          const SizedBox(height: 12),
-          BlurCard(
-            child: FilledButton.tonalIcon(
-              onPressed: () {},
-              icon: const Icon(CupertinoIcons.square_arrow_right),
-              label: const Text('Sign out'),
             ),
           ),
         ],
