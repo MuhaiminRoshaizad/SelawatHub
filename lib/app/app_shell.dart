@@ -57,15 +57,12 @@ class _AppShellState extends State<AppShell> {
       extendBody: true,
       body: IndexedStack(index: _index, children: _pages),
       floatingActionButton: _index == 3
-          ? FloatingActionButton(
+          ? _LiquidSignOutButton(
               onPressed: () {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Sign out tapped')),
                 );
               },
-              backgroundColor: AppColors.danger,
-              foregroundColor: AppColors.white,
-              child: const Icon(CupertinoIcons.square_arrow_right),
             )
           : null,
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
@@ -78,6 +75,62 @@ class _AppShellState extends State<AppShell> {
             tabs: _tabs,
             isDark: isDark,
             onTap: (value) => setState(() => _index = value),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _LiquidSignOutButton extends StatelessWidget {
+  const _LiquidSignOutButton({required this.onPressed});
+
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(22),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
+        child: Material(
+          color: isDark
+              ? AppColors.darkCard.withValues(alpha: 0.7)
+              : AppColors.white.withValues(alpha: 0.76),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(22),
+            side: BorderSide(
+              color: AppColors.white.withValues(alpha: isDark ? 0.2 : 0.78),
+              width: 1.1,
+            ),
+          ),
+          child: InkWell(
+            onTap: onPressed,
+            borderRadius: BorderRadius.circular(22),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    CupertinoIcons.square_arrow_right,
+                    color: AppColors.danger,
+                    size: 18,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Sign out',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                      color: isDark ? AppColors.darkInk : AppColors.ink,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
         ),
       ),

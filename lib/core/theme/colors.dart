@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
-  static const Color mint = Color();
+  static const Color mint = Color(0xFFE5B93D);
   static const Color sky = Color(0xFFF6DE95);
   static const Color ocean = Color(0xFFC7921F);
   static const Color ink = Color(0xFF0A1222);
