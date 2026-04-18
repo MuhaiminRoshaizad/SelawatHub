@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:selawathub/core/animations/fade_in.dart';
 import 'package:selawathub/core/constants.dart';
 import 'package:selawathub/core/theme/colors.dart';
+import 'package:selawathub/core/widgets/app_bottom_sheet.dart';
 import 'package:selawathub/features/hadith/models/doa.dart';
 
 // ─────────────────────────────────────────────────────────
@@ -64,6 +65,14 @@ class DoaCategoryPage extends StatelessWidget {
               style: tt.titleLarge?.copyWith(fontWeight: FontWeight.w600),
             ),
             actions: [
+              IconButton(
+                icon: Icon(
+                  CupertinoIcons.info_circle,
+                  size: 20,
+                  color: dark ? C.onDark2 : C.onLight2,
+                ),
+                onPressed: () => _showDoaSourceSheet(context, dark),
+              ),
               Padding(
                 padding: const EdgeInsets.only(right: S.s16),
                 child: Container(
@@ -250,3 +259,129 @@ class _DoaCard extends StatelessWidget {
 
 String _capitalize(String s) =>
     s.isEmpty ? s : '${s[0].toUpperCase()}${s.substring(1)}';
+
+// ─────────────────────────────────────────────────────────
+//  Doa source info bottom sheet
+// ─────────────────────────────────────────────────────────
+
+void _showDoaSourceSheet(BuildContext context, bool dark) {
+  final tt = Theme.of(context).textTheme;
+
+  showAppBottomSheet(
+    context: context,
+    initialSize: 0.4,
+    minSize: 0.25,
+    maxSize: 0.65,
+    headerChildren: [
+      Expanded(
+        child: Text(
+          'Source Info',
+          style: tt.titleLarge?.copyWith(
+            fontWeight: FontWeight.w700,
+            color: dark ? C.primarySoft : C.primary,
+          ),
+        ),
+      ),
+    ],
+    bodyChildren: [
+      // Source name
+      Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(S.s16),
+        decoration: BoxDecoration(
+          color: C.primaryGlow,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: dark
+                ? C.primarySoft.withValues(alpha: 0.12)
+                : C.primary.withValues(alpha: 0.08),
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Source',
+              style: tt.labelSmall?.copyWith(
+                fontWeight: FontWeight.w700,
+                color: dark ? C.onDark3 : C.onLight3,
+              ),
+            ),
+            const SizedBox(height: S.s4),
+            Text(
+              'Useful Duas Collection',
+              style: tt.titleSmall?.copyWith(
+                fontWeight: FontWeight.w600,
+                color: dark ? C.onDark1 : C.onLight1,
+              ),
+            ),
+          ],
+        ),
+      ),
+
+      const SizedBox(height: S.s12),
+
+      // Description
+      Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(S.s16),
+        decoration: BoxDecoration(
+          color: dark ? C.dark3 : C.light3,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Description',
+              style: tt.labelSmall?.copyWith(
+                fontWeight: FontWeight.w700,
+                color: dark ? C.onDark3 : C.onLight3,
+              ),
+            ),
+            const SizedBox(height: S.s4),
+            Text(
+              '102 supplications from Quran & Sunnah, categorized by topic.',
+              style: tt.bodyMedium?.copyWith(
+                height: 1.5,
+                color: dark ? C.onDark2 : C.onLight2,
+              ),
+            ),
+          ],
+        ),
+      ),
+
+      const SizedBox(height: S.s12),
+
+      // Endpoint
+      Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(S.s16),
+        decoration: BoxDecoration(
+          color: dark
+              ? C.dark4.withValues(alpha: 0.5)
+              : C.light3.withValues(alpha: 0.7),
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              CupertinoIcons.link,
+              size: 14,
+              color: dark ? C.onDark2 : C.onLight2,
+            ),
+            const SizedBox(width: S.s8),
+            Text(
+              '/usefulDuas',
+              style: tt.bodyMedium?.copyWith(
+                fontFamily: 'monospace',
+                fontWeight: FontWeight.w500,
+                color: dark ? C.onDark2 : C.onLight2,
+              ),
+            ),
+          ],
+        ),
+      ),
+    ],
+  );
+}

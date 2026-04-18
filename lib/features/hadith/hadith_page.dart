@@ -5,8 +5,10 @@ import 'package:selawathub/core/animations/fade_in.dart';
 import 'package:selawathub/core/constants.dart';
 import 'package:selawathub/core/services/doa_api_service.dart';
 import 'package:selawathub/core/theme/colors.dart';
+import 'package:selawathub/core/widgets/app_bottom_sheet.dart';
 import 'package:selawathub/core/widgets/frosted_bar.dart';
 import 'package:selawathub/features/hadith/doa_category_page.dart';
+import 'package:selawathub/features/hadith/sources_page.dart';
 import 'package:selawathub/features/hadith/models/doa.dart';
 
 // ─────────────────────────────────────────────────────────
@@ -130,7 +132,29 @@ class _HadithPageState extends State<HadithPage> {
                   if (_adkar.isNotEmpty) ...[
                     FadeIn(
                       delay: const Duration(milliseconds: 240),
-                      child: Text('Daily Adkar', style: tt.titleLarge),
+                      child: Row(
+                        children: [
+                          Text('Daily Adkar', style: tt.titleLarge),
+                          const SizedBox(width: S.s8),
+                          GestureDetector(
+                            onTap: () => _showSourceInfoSheet(
+                              context: context,
+                              title: 'Daily Adkar',
+                              sourceName: 'Daily Adkar',
+                              description:
+                                  'Morning & evening remembrance (أذكار) to be '
+                                  'recited daily as part of a Muslim\'s spiritual routine.',
+                              endpoint: '/dailyAdkar',
+                              accentColor: C.primary,
+                            ),
+                            child: Icon(
+                              CupertinoIcons.info_circle,
+                              size: 18,
+                              color: dark ? C.onDark2 : C.onLight2,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                     const SizedBox(height: S.s4),
                     FadeIn(
@@ -168,7 +192,29 @@ class _HadithPageState extends State<HadithPage> {
                     const SizedBox(height: S.s32),
                     FadeIn(
                       delay: const Duration(milliseconds: 360),
-                      child: Text('Post-Salaah', style: tt.titleLarge),
+                      child: Row(
+                        children: [
+                          Text('Post-Salaah', style: tt.titleLarge),
+                          const SizedBox(width: S.s8),
+                          GestureDetector(
+                            onTap: () => _showSourceInfoSheet(
+                              context: context,
+                              title: 'Post-Salaah',
+                              sourceName: 'Post-Salaah Zikr',
+                              description:
+                                  'Remembrance and supplications to be recited '
+                                  'after the five daily prayers.',
+                              endpoint: '/postSalaah',
+                              accentColor: C.primary,
+                            ),
+                            child: Icon(
+                              CupertinoIcons.info_circle,
+                              size: 18,
+                              color: dark ? C.onDark2 : C.onLight2,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                     const SizedBox(height: S.s4),
                     FadeIn(
@@ -205,7 +251,29 @@ class _HadithPageState extends State<HadithPage> {
                     const SizedBox(height: S.s32),
                     FadeIn(
                       delay: const Duration(milliseconds: 480),
-                      child: Text('Doa Collection', style: tt.titleLarge),
+                      child: Row(
+                        children: [
+                          Text('Doa Collection', style: tt.titleLarge),
+                          const SizedBox(width: S.s8),
+                          GestureDetector(
+                            onTap: () => _showSourceInfoSheet(
+                              context: context,
+                              title: 'Doa Collection',
+                              sourceName: 'Useful Duas Collection',
+                              description:
+                                  '102 supplications sourced from the Quran & Sunnah, '
+                                  'categorized by topic for easy reference.',
+                              endpoint: '/usefulDuas',
+                              accentColor: C.primary,
+                            ),
+                            child: Icon(
+                              CupertinoIcons.info_circle,
+                              size: 18,
+                              color: dark ? C.onDark2 : C.onLight2,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                     const SizedBox(height: S.s4),
                     FadeIn(
@@ -287,17 +355,25 @@ class _HadithPageState extends State<HadithPage> {
                         ],
                       ),
                     ),
-                    Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: dark ? C.dark3 : C.light3,
-                        shape: BoxShape.circle,
+                    BounceTap(
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute<void>(
+                          builder: (_) => const SourcesPage(),
+                        ),
                       ),
-                      child: Icon(
-                        CupertinoIcons.share,
-                        size: 16,
-                        color: dark ? C.onDark2 : C.onLight2,
+                      child: Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: dark ? C.dark3 : C.light3,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          CupertinoIcons.info_circle,
+                          size: 16,
+                          color: dark ? C.onDark2 : C.onLight2,
+                        ),
                       ),
                     ),
                   ],
@@ -735,113 +811,35 @@ class _HorizontalAdkarList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 220,
+      height: 160,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: S.page),
         clipBehavior: Clip.none,
         itemCount: items.length,
         separatorBuilder: (_, i) => const SizedBox(width: S.s12),
-        itemBuilder: (_, i) {
-          final item = items[i];
-          return BounceTap(
-            onTap: () => _showZikrDetailSheet(
-              context: context,
-              title: item.title,
-              arabic: item.arabic,
-              translation: item.translation,
-              transliteration: item.transliteration,
-              times: item.times,
-              benefit: item.benefit,
-              accentColor: C.primary,
-              accentSoft: C.primarySoft,
-              accentGlow: C.primaryGlow,
-            ),
-            child: Container(
-            width: 260,
-            padding: const EdgeInsets.all(S.s16),
-            decoration: BoxDecoration(
-              color: dark ? C.dark3 : C.light2,
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: dark ? C.dark4 : C.lightDivider,
-              ),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Title + times badge
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        item.title,
-                        style: tt.titleSmall?.copyWith(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 13,
-                        ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    if (item.times.isNotEmpty) ...[
-                      const SizedBox(width: S.s8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 3),
-                        decoration: BoxDecoration(
-                          color: C.primaryGlow,
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: Text(
-                          '${item.times}x',
-                          style: TextStyle(
-                            fontSize: 10,
-                            fontWeight: FontWeight.w700,
-                            color: dark ? C.primarySoft : C.primary,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
-                const SizedBox(height: S.s8),
-
-                // Arabic
-                if (item.arabic.isNotEmpty)
-                  Expanded(
-                    child: Text(
-                      item.arabic,
-                      textAlign: TextAlign.right,
-                      textDirection: TextDirection.rtl,
-                      style: TextStyle(
-                        fontSize: 16,
-                        height: 1.8,
-                        color: dark ? C.onDark1 : C.onLight1,
-                      ),
-                      maxLines: 3,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-
-                const SizedBox(height: S.s8),
-
-                // Translation
-                if (item.translation.isNotEmpty)
-                  Text(
-                    item.translation,
-                    style: tt.bodySmall?.copyWith(
-                      color: dark ? C.onDark2 : C.onLight2,
-                      height: 1.4,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-              ],
-            ),
-            ),
-          );
-        },
+        itemBuilder: (_, i) => _ZikrPreviewCard(
+          title: items[i].title,
+          arabic: items[i].arabic,
+          times: items[i].times,
+          dark: dark,
+          tt: tt,
+          accentColor: C.primary,
+          accentSoft: C.primarySoft,
+          accentGlow: C.primaryGlow,
+          onTap: () => _showZikrDetailSheet(
+            context: context,
+            title: items[i].title,
+            arabic: items[i].arabic,
+            translation: items[i].translation,
+            transliteration: items[i].transliteration,
+            times: items[i].times,
+            benefit: items[i].benefit,
+            accentColor: C.primary,
+            accentSoft: C.primarySoft,
+            accentGlow: C.primaryGlow,
+          ),
+        ),
       ),
     );
   }
@@ -865,113 +863,144 @@ class _HorizontalPostSalaahList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 220,
+      height: 160,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: S.page),
         clipBehavior: Clip.none,
         itemCount: items.length,
         separatorBuilder: (_, i) => const SizedBox(width: S.s12),
-        itemBuilder: (_, i) {
-          final item = items[i];
-          return BounceTap(
-            onTap: () => _showZikrDetailSheet(
-              context: context,
-              title: item.title,
-              arabic: item.arabic,
-              translation: item.translation,
-              transliteration: item.transliteration,
-              times: item.times,
-              benefit: item.benefit,
-              accentColor: C.gold,
-              accentSoft: C.goldSoft,
-              accentGlow: C.goldGlow,
-            ),
-            child: Container(
-            width: 260,
-            padding: const EdgeInsets.all(S.s16),
-            decoration: BoxDecoration(
-              color: dark ? C.dark3 : C.light2,
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(
-                color: dark ? C.dark4 : C.lightDivider,
+        itemBuilder: (_, i) => _ZikrPreviewCard(
+          title: items[i].title,
+          arabic: items[i].arabic,
+          times: items[i].times,
+          dark: dark,
+          tt: tt,
+          accentColor: C.gold,
+          accentSoft: C.goldSoft,
+          accentGlow: C.goldGlow,
+          onTap: () => _showZikrDetailSheet(
+            context: context,
+            title: items[i].title,
+            arabic: items[i].arabic,
+            translation: items[i].translation,
+            transliteration: items[i].transliteration,
+            times: items[i].times,
+            benefit: items[i].benefit,
+            accentColor: C.gold,
+            accentSoft: C.goldSoft,
+            accentGlow: C.goldGlow,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────
+//  Shared Preview Card (compact, used for both adkar & post-salaah)
+// ─────────────────────────────────────────────────────────
+
+class _ZikrPreviewCard extends StatelessWidget {
+  const _ZikrPreviewCard({
+    required this.title,
+    required this.arabic,
+    required this.times,
+    required this.dark,
+    required this.tt,
+    required this.accentColor,
+    required this.accentSoft,
+    required this.accentGlow,
+    required this.onTap,
+  });
+
+  final String title;
+  final String arabic;
+  final String times;
+  final bool dark;
+  final TextTheme tt;
+  final Color accentColor;
+  final Color accentSoft;
+  final Color accentGlow;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return BounceTap(
+      onTap: onTap,
+      child: Container(
+        width: 240,
+        padding: const EdgeInsets.all(S.s16),
+        decoration: BoxDecoration(
+          color: dark ? C.dark3 : C.light2,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: dark ? C.dark4 : C.lightDivider),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Title
+            Text(
+              title,
+              style: tt.titleSmall?.copyWith(
+                fontWeight: FontWeight.w600,
+                fontSize: 13,
               ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Title + times badge
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        item.title,
-                        style: tt.titleSmall?.copyWith(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 13,
-                        ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    if (item.times.isNotEmpty) ...[
-                      const SizedBox(width: S.s8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 3),
-                        decoration: BoxDecoration(
-                          color: C.goldGlow,
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: Text(
-                          '${item.times}x',
-                          style: TextStyle(
-                            fontSize: 10,
-                            fontWeight: FontWeight.w700,
-                            color: dark ? C.goldSoft : C.gold,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ],
+
+            const SizedBox(height: S.s12),
+
+            // Arabic preview
+            if (arabic.isNotEmpty)
+              Expanded(
+                child: Text(
+                  arabic,
+                  textAlign: TextAlign.right,
+                  textDirection: TextDirection.rtl,
+                  style: TextStyle(
+                    fontSize: 15,
+                    height: 1.8,
+                    color: dark ? C.onDark1 : C.onLight1,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: S.s8),
+              ),
 
-                // Arabic
-                if (item.arabic.isNotEmpty)
-                  Expanded(
+            const SizedBox(height: S.s12),
+
+            // Bottom row: times badge + tap hint
+            Row(
+              children: [
+                if (times.isNotEmpty)
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 8, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: accentGlow,
+                      borderRadius: BorderRadius.circular(6),
+                    ),
                     child: Text(
-                      item.arabic,
-                      textAlign: TextAlign.right,
-                      textDirection: TextDirection.rtl,
+                      '${times}x',
                       style: TextStyle(
-                        fontSize: 16,
-                        height: 1.8,
-                        color: dark ? C.onDark1 : C.onLight1,
+                        fontSize: 10,
+                        fontWeight: FontWeight.w700,
+                        color: dark ? accentSoft : accentColor,
                       ),
-                      maxLines: 3,
-                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
-
-                const SizedBox(height: S.s8),
-
-                // Translation
-                if (item.translation.isNotEmpty)
-                  Text(
-                    item.translation,
-                    style: tt.bodySmall?.copyWith(
-                      color: dark ? C.onDark2 : C.onLight2,
-                      height: 1.4,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
+                const Spacer(),
+                Icon(
+                  CupertinoIcons.chevron_right,
+                  size: 12,
+                  color: dark ? C.onDark3 : C.onLight3,
+                ),
               ],
             ),
-            ),
-          );
-        },
+          ],
+        ),
       ),
     );
   }
@@ -980,6 +1009,142 @@ class _HorizontalPostSalaahList extends StatelessWidget {
 // ─────────────────────────────────────────────────────────
 //  Zikr / Adkar Detail Bottom Sheet
 // ─────────────────────────────────────────────────────────
+
+// ─────────────────────────────────────────────────────────
+//  Source info bottom sheet
+// ─────────────────────────────────────────────────────────
+
+void _showSourceInfoSheet({
+  required BuildContext context,
+  required String title,
+  required String sourceName,
+  required String description,
+  required String endpoint,
+  required Color accentColor,
+}) {
+  final dark = Theme.of(context).brightness == Brightness.dark;
+  final tt = Theme.of(context).textTheme;
+
+  showAppBottomSheet(
+    context: context,
+    initialSize: 0.45,
+    minSize: 0.3,
+    maxSize: 0.7,
+    headerChildren: [
+      Expanded(
+        child: Text(
+          title,
+          style: tt.titleLarge?.copyWith(
+            fontWeight: FontWeight.w700,
+            color: accentColor,
+          ),
+        ),
+      ),
+    ],
+    bodyChildren: [
+      // Source name
+      Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(S.s16),
+        decoration: BoxDecoration(
+          color: dark
+              ? accentColor.withValues(alpha: 0.08)
+              : accentColor.withValues(alpha: 0.04),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: dark
+                ? accentColor.withValues(alpha: 0.12)
+                : accentColor.withValues(alpha: 0.08),
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Source',
+              style: tt.labelSmall?.copyWith(
+                fontWeight: FontWeight.w700,
+                color: dark ? C.onDark3 : C.onLight3,
+              ),
+            ),
+            const SizedBox(height: S.s4),
+            Text(
+              sourceName,
+              style: tt.titleSmall?.copyWith(
+                fontWeight: FontWeight.w600,
+                color: dark ? C.onDark1 : C.onLight1,
+              ),
+            ),
+          ],
+        ),
+      ),
+
+      const SizedBox(height: S.s12),
+
+      // Description
+      Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(S.s16),
+        decoration: BoxDecoration(
+          color: dark ? C.dark3 : C.light3,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Description',
+              style: tt.labelSmall?.copyWith(
+                fontWeight: FontWeight.w700,
+                color: dark ? C.onDark3 : C.onLight3,
+              ),
+            ),
+            const SizedBox(height: S.s4),
+            Text(
+              description,
+              style: tt.bodyMedium?.copyWith(
+                height: 1.5,
+                color: dark ? C.onDark2 : C.onLight2,
+              ),
+            ),
+          ],
+        ),
+      ),
+
+      const SizedBox(height: S.s12),
+
+      // Endpoint
+      Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(S.s16),
+        decoration: BoxDecoration(
+          color: dark
+              ? C.dark4.withValues(alpha: 0.5)
+              : C.light3.withValues(alpha: 0.7),
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              CupertinoIcons.link,
+              size: 14,
+              color: dark ? C.onDark2 : C.onLight2,
+            ),
+            const SizedBox(width: S.s8),
+            Text(
+              endpoint,
+              style: tt.bodyMedium?.copyWith(
+                fontFamily: 'monospace',
+                fontWeight: FontWeight.w500,
+                color: dark ? C.onDark2 : C.onLight2,
+              ),
+            ),
+          ],
+        ),
+      ),
+    ],
+  );
+}
 
 void _showZikrDetailSheet({
   required BuildContext context,
@@ -995,107 +1160,101 @@ void _showZikrDetailSheet({
 }) {
   final dark = Theme.of(context).brightness == Brightness.dark;
   final tt = Theme.of(context).textTheme;
-  final bottomInset = MediaQuery.of(context).padding.bottom;
 
-  showModalBottomSheet(
+  showAppBottomSheet(
     context: context,
-    isScrollControlled: true,
-    backgroundColor: Colors.transparent,
-    builder: (_) => DraggableScrollableSheet(
-      initialChildSize: 0.7,
-      minChildSize: 0.4,
-      maxChildSize: 0.92,
-      builder: (context, scrollCtrl) => Container(
-        decoration: BoxDecoration(
-          color: dark ? C.dark2 : C.light2,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+    initialSize: 0.7,
+    minSize: 0.4,
+    maxSize: 0.92,
+    headerChildren: [
+      // Times badge
+      if (times.isNotEmpty)
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+          decoration: BoxDecoration(
+            color: accentGlow,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                CupertinoIcons.repeat,
+                size: 12,
+                color: dark ? accentSoft : accentColor,
+              ),
+              const SizedBox(width: 4),
+              Text(
+                '${times}x',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                  color: dark ? accentSoft : accentColor,
+                ),
+              ),
+            ],
+          ),
         ),
-        child: ListView(
-          controller: scrollCtrl,
-          padding: const EdgeInsets.symmetric(horizontal: S.page),
-          children: [
-            const SizedBox(height: S.s12),
+    ],
+    bodyChildren: [
+      // Title
+      Text(
+        title,
+        style: tt.titleLarge?.copyWith(fontWeight: FontWeight.w700),
+      ),
 
-            // Drag handle
-            Center(
-              child: Container(
-                width: 36,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: dark ? C.dark4 : C.lightDivider,
-                  borderRadius: BorderRadius.circular(2),
+      const SizedBox(height: S.s20),
+
+      // Arabic text
+      if (arabic.isNotEmpty)
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(S.s24),
+          decoration: BoxDecoration(
+            color: dark
+                ? accentColor.withValues(alpha: 0.08)
+                : accentColor.withValues(alpha: 0.04),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: dark
+                  ? accentSoft.withValues(alpha: 0.1)
+                  : accentColor.withValues(alpha: 0.08),
+            ),
+          ),
+          child: Text(
+            arabic,
+            textAlign: TextAlign.right,
+            textDirection: TextDirection.rtl,
+            style: TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.w600,
+              height: 2.0,
+              color: dark ? C.onDark1 : C.onLight1,
+            ),
+          ),
+        ),
+
+      // Transliteration
+      if (transliteration.isNotEmpty) ...[
+        const SizedBox(height: S.s20),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(S.s16),
+          decoration: BoxDecoration(
+            color: dark ? C.dark3 : C.light3,
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Transliteration',
+                style: tt.labelSmall?.copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: dark ? C.onDark3 : C.onLight3,
                 ),
               ),
-            ),
-
-            const SizedBox(height: S.s20),
-
-            // Title + times badge
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: Text(
-                    title,
-                    style: tt.titleLarge?.copyWith(fontWeight: FontWeight.w700),
-                  ),
-                ),
-                if (times.isNotEmpty) ...[
-                  const SizedBox(width: S.s12),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 10, vertical: 5),
-                    decoration: BoxDecoration(
-                      color: accentGlow,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      'Repeat ${times}x',
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w700,
-                        color: dark ? accentSoft : accentColor,
-                      ),
-                    ),
-                  ),
-                ],
-              ],
-            ),
-
-            const SizedBox(height: S.s24),
-
-            // Arabic text
-            if (arabic.isNotEmpty)
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(S.s24),
-                decoration: BoxDecoration(
-                  color: dark
-                      ? accentColor.withValues(alpha: 0.08)
-                      : accentColor.withValues(alpha: 0.04),
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: dark
-                        ? accentSoft.withValues(alpha: 0.1)
-                        : accentColor.withValues(alpha: 0.08),
-                  ),
-                ),
-                child: Text(
-                  arabic,
-                  textAlign: TextAlign.right,
-                  textDirection: TextDirection.rtl,
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w600,
-                    height: 2.0,
-                    color: dark ? C.onDark1 : C.onLight1,
-                  ),
-                ),
-              ),
-
-            // Transliteration
-            if (transliteration.isNotEmpty) ...[
-              const SizedBox(height: S.s16),
+              const SizedBox(height: S.s8),
               Text(
                 transliteration,
                 style: tt.bodyMedium?.copyWith(
@@ -1105,13 +1264,33 @@ void _showZikrDetailSheet({
                 ),
               ),
             ],
+          ),
+        ),
+      ],
 
-            // Translation
-            if (translation.isNotEmpty) ...[
-              const SizedBox(height: S.s20),
+      // Translation
+      if (translation.isNotEmpty) ...[
+        const SizedBox(height: S.s16),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(S.s16),
+          decoration: BoxDecoration(
+            color: dark
+                ? accentColor.withValues(alpha: 0.06)
+                : accentColor.withValues(alpha: 0.03),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: dark
+                  ? accentSoft.withValues(alpha: 0.08)
+                  : accentColor.withValues(alpha: 0.06),
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
               Text(
                 'Translation',
-                style: tt.labelMedium?.copyWith(
+                style: tt.labelSmall?.copyWith(
                   fontWeight: FontWeight.w700,
                   color: dark ? accentSoft : accentColor,
                 ),
@@ -1125,40 +1304,53 @@ void _showZikrDetailSheet({
                 ),
               ),
             ],
+          ),
+        ),
+      ],
 
-            // Benefits
-            if (benefit.isNotEmpty) ...[
-              const SizedBox(height: S.s20),
-              Text(
-                'Benefits',
-                style: tt.labelMedium?.copyWith(
-                  fontWeight: FontWeight.w700,
-                  color: dark ? accentSoft : accentColor,
-                ),
+      // Benefits
+      if (benefit.isNotEmpty) ...[
+        const SizedBox(height: S.s16),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(S.s16),
+          decoration: BoxDecoration(
+            color: dark ? C.dark3 : C.light3,
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Icon(
+                    CupertinoIcons.sparkles,
+                    size: 14,
+                    color: dark ? accentSoft : accentColor,
+                  ),
+                  const SizedBox(width: S.s6),
+                  Text(
+                    'Benefits',
+                    style: tt.labelSmall?.copyWith(
+                      fontWeight: FontWeight.w700,
+                      color: dark ? accentSoft : accentColor,
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: S.s8),
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(S.s16),
-                decoration: BoxDecoration(
-                  color: dark ? C.dark3 : C.light3,
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Text(
-                  benefit,
-                  style: tt.bodyMedium?.copyWith(
-                    height: 1.6,
-                    color: dark ? C.onDark2 : C.onLight2,
-                  ),
+              Text(
+                benefit,
+                style: tt.bodyMedium?.copyWith(
+                  height: 1.6,
+                  color: dark ? C.onDark2 : C.onLight2,
                 ),
               ),
             ],
-
-            SizedBox(height: bottomInset + 56 + S.s24),
-          ],
+          ),
         ),
-      ),
-    ),
+      ],
+    ],
   );
 }
 

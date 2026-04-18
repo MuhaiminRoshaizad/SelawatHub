@@ -151,7 +151,7 @@ class _StatsPageState extends State<StatsPage> {
         ListView(
         padding: EdgeInsets.zero,
         children: [
-          SizedBox(height: MediaQuery.of(context).padding.top + 100),
+          SizedBox(height: MediaQuery.of(context).padding.top + 76),
 
           // ── Streak + Daily Progress hero card ──
           FadeIn(
