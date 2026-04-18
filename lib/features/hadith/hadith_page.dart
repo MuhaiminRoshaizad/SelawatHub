@@ -3,12 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:selawathub/core/animations/bounce_tap.dart';
 import 'package:selawathub/core/animations/fade_in.dart';
 import 'package:selawathub/core/constants.dart';
+import 'package:selawathub/core/services/doa_api_service.dart';
 import 'package:selawathub/core/theme/colors.dart';
+import 'package:selawathub/core/widgets/frosted_bar.dart';
+import 'package:selawathub/features/hadith/doa_category_page.dart';
 import 'package:selawathub/features/hadith/models/doa.dart';
-import 'package:selawathub/features/hadith/models/doa_data.dart';
 
 // ─────────────────────────────────────────────────────────
-//  Hadith & Doa Page — Daily featured cards + doa browser
+//  Daily Page — Hadith, Doa, Adkar, Post-Salaah from API
 // ─────────────────────────────────────────────────────────
 
 class HadithPage extends StatefulWidget {
@@ -18,21 +20,83 @@ class HadithPage extends StatefulWidget {
 }
 
 class _HadithPageState extends State<HadithPage> {
-  /// Which category index is currently expanded (-1 = none).
-  int _expandedIdx = -1;
+  final _api = DoaApiService.instance;
+
+  List<NawawiHadith> _hadiths = [];
+  List<Doa> _duas = [];
+  List<DailyAdkar> _adkar = [];
+  List<PostSalaahZikr> _postSalaah = [];
+
+  bool _loading = true;
+  bool _error = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchAll();
+  }
+
+  Future<void> _fetchAll() async {
+    setState(() {
+      _loading = true;
+      _error = false;
+    });
+
+    final results = await Future.wait([
+      _api.fetchHadiths(),
+      _api.fetchDuas(),
+      _api.fetchDailyAdkar(),
+      _api.fetchPostSalaah(),
+    ]);
+
+    final hadiths = results[0] as List<NawawiHadith>;
+    final duas = results[1] as List<Doa>;
+    final adkar = results[2] as List<DailyAdkar>;
+    final postSalaah = results[3] as List<PostSalaahZikr>;
+
+    if (!mounted) return;
+
+    if (hadiths.isEmpty && duas.isEmpty && adkar.isEmpty && postSalaah.isEmpty) {
+      setState(() {
+        _loading = false;
+        _error = true;
+      });
+      return;
+    }
+
+    setState(() {
+      _hadiths = hadiths;
+      _duas = duas;
+      _adkar = adkar;
+      _postSalaah = postSalaah;
+      _loading = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     final dark = Theme.of(context).brightness == Brightness.dark;
     final tt = Theme.of(context).textTheme;
-    final today = dailyHadith();
-    final todayDoa = dailyDoa();
-    final grouped = doasByCategory();
-    final categories = grouped.keys.toList();
 
-    return SafeArea(
-      bottom: false,
-      child: CustomScrollView(
+    if (_loading) return _LoadingView(dark: dark);
+    if (_error) return _ErrorView(dark: dark, tt: tt, onRetry: _fetchAll);
+
+    final dayIndex = DateTime.now().day;
+    final todayHadith =
+        _hadiths.isNotEmpty ? _hadiths[dayIndex % _hadiths.length] : null;
+    final todayDoa = _duas.isNotEmpty ? _duas[dayIndex % _duas.length] : null;
+
+    // Group duas by category
+    final grouped = <String, List<Doa>>{};
+    for (final d in _duas) {
+      final cat = d.category.isNotEmpty ? d.category : 'other';
+      grouped.putIfAbsent(cat, () => []).add(d);
+    }
+    final categories = grouped.keys.toList()..sort();
+
+    return Stack(
+      children: [
+        CustomScrollView(
         slivers: [
           SliverToBoxAdapter(
             child: Padding(
@@ -40,105 +104,366 @@ class _HadithPageState extends State<HadithPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(height: S.s16),
+                  SizedBox(height: MediaQuery.of(context).padding.top + 100),
 
-                  // ── Header ──
-                  FadeIn(
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('Hadith & Doa', style: tt.headlineLarge),
-                              const SizedBox(height: S.s4),
-                              Text(
-                                'Your daily spiritual companion',
-                                style: tt.bodyMedium,
-                              ),
-                            ],
-                          ),
-                        ),
-                        Container(
-                          width: 40,
-                          height: 40,
-                          decoration: BoxDecoration(
-                            color: dark ? C.dark3 : C.light3,
-                            shape: BoxShape.circle,
-                          ),
-                          child: Icon(
-                            CupertinoIcons.share,
-                            size: 16,
-                            color: dark ? C.onDark2 : C.onLight2,
-                          ),
-                        ),
-                      ],
+                  // ── Daily Hadith Card ──
+                  if (todayHadith != null)
+                    FadeIn(
+                      delay: const Duration(milliseconds: 80),
+                      child: _DailyHadithCard(
+                          hadith: todayHadith, dark: dark, tt: tt),
                     ),
-                  ),
 
-                  const SizedBox(height: S.s24),
-
-                  // ── Daily featured cards ──
-                  FadeIn(
-                    delay: const Duration(milliseconds: 80),
-                    child: _DailyHadithCard(hadith: today, dark: dark, tt: tt),
-                  ),
                   const SizedBox(height: S.s12),
-                  FadeIn(
-                    delay: const Duration(milliseconds: 160),
-                    child: _DailyDoaCard(doa: todayDoa, dark: dark, tt: tt),
-                  ),
+
+                  // ── Daily Doa Card ──
+                  if (todayDoa != null)
+                    FadeIn(
+                      delay: const Duration(milliseconds: 160),
+                      child:
+                          _DailyDoaCard(doa: todayDoa, dark: dark, tt: tt),
+                    ),
 
                   const SizedBox(height: S.s32),
 
-                  // ── Doa Collection header ──
-                  FadeIn(
-                    delay: const Duration(milliseconds: 240),
-                    child: Text('Doa Collection', style: tt.titleLarge),
-                  ),
-                  const SizedBox(height: S.s4),
-                  FadeIn(
-                    delay: const Duration(milliseconds: 240),
-                    child: Text(
-                      'Browse supplications by category',
-                      style: tt.bodyMedium,
+                  // ── Daily Adkar Title ──
+                  if (_adkar.isNotEmpty) ...[
+                    FadeIn(
+                      delay: const Duration(milliseconds: 240),
+                      child: Text('Daily Adkar', style: tt.titleLarge),
                     ),
-                  ),
-                  const SizedBox(height: S.s16),
+                    const SizedBox(height: S.s4),
+                    FadeIn(
+                      delay: const Duration(milliseconds: 240),
+                      child: Text(
+                        'Morning & evening remembrance',
+                        style: tt.bodyMedium,
+                      ),
+                    ),
+                    const SizedBox(height: S.s12),
+                  ],
                 ],
               ),
             ),
           ),
 
-          // ── Category accordion list ──
-          SliverList.builder(
-            itemCount: categories.length,
-            itemBuilder: (ctx, i) {
-              final cat = categories[i];
-              final items = grouped[cat]!;
-              final expanded = _expandedIdx == i;
+          // ── Daily Adkar horizontal list (full-width) ──
+          if (_adkar.isNotEmpty)
+            SliverToBoxAdapter(
+              child: FadeIn(
+                delay: const Duration(milliseconds: 300),
+                child: _HorizontalAdkarList(
+                    items: _adkar, dark: dark, tt: tt),
+              ),
+            ),
 
-              return FadeIn(
-                delay: Duration(milliseconds: 300 + i * 60),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: S.page),
-                  child: _CategoryAccordion(
-                    category: cat,
-                    doas: items,
-                    expanded: expanded,
-                    dark: dark,
-                    tt: tt,
-                    onToggle: () =>
-                        setState(() => _expandedIdx = expanded ? -1 : i),
+          // ── Post-Salaah section ──
+          if (_postSalaah.isNotEmpty)
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: S.page),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: S.s32),
+                    FadeIn(
+                      delay: const Duration(milliseconds: 360),
+                      child: Text('Post-Salaah', style: tt.titleLarge),
+                    ),
+                    const SizedBox(height: S.s4),
+                    FadeIn(
+                      delay: const Duration(milliseconds: 360),
+                      child: Text(
+                        'Remembrance after prayer',
+                        style: tt.bodyMedium,
+                      ),
+                    ),
+                    const SizedBox(height: S.s12),
+                  ],
+                ),
+              ),
+            ),
+
+          // ── Post-Salaah horizontal list (full-width) ──
+          if (_postSalaah.isNotEmpty)
+            SliverToBoxAdapter(
+              child: FadeIn(
+                delay: const Duration(milliseconds: 420),
+                child: _HorizontalPostSalaahList(
+                    items: _postSalaah, dark: dark, tt: tt),
+              ),
+            ),
+
+          // ── Doa Collection header ──
+          if (categories.isNotEmpty)
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: S.page),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: S.s32),
+                    FadeIn(
+                      delay: const Duration(milliseconds: 480),
+                      child: Text('Doa Collection', style: tt.titleLarge),
+                    ),
+                    const SizedBox(height: S.s4),
+                    FadeIn(
+                      delay: const Duration(milliseconds: 480),
+                      child: Text(
+                        'Browse supplications by category',
+                        style: tt.bodyMedium,
+                      ),
+                    ),
+                    const SizedBox(height: S.s16),
+                  ],
+                ),
+              ),
+            ),
+
+          // ── Category grid ──
+          if (categories.isNotEmpty)
+            SliverPadding(
+              padding: const EdgeInsets.symmetric(horizontal: S.page),
+              sliver: SliverGrid.builder(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  mainAxisSpacing: S.s12,
+                  crossAxisSpacing: S.s12,
+                  childAspectRatio: 1.55,
+                ),
+                itemCount: categories.length,
+                itemBuilder: (ctx, i) {
+                  final cat = categories[i];
+                  final items = grouped[cat]!;
+
+                  return FadeIn(
+                    delay: Duration(milliseconds: 540 + i * 50),
+                    child: _CategoryCard(
+                      category: cat,
+                      count: items.length,
+                      dark: dark,
+                      tt: tt,
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute<void>(
+                          builder: (_) => DoaCategoryPage(
+                            category: cat,
+                            doas: items,
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+
+          SliverToBoxAdapter(
+            child: SizedBox(height: MediaQuery.of(context).padding.bottom + 56 + S.s24),
+          ),
+        ],
+      ),
+        Positioned(
+          top: 0,
+          left: 0,
+          right: 0,
+          child: FrostedBar(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: S.page, vertical: S.s16),
+              child: FadeIn(
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Daily', style: tt.headlineLarge),
+                          const SizedBox(height: S.s4),
+                          Text(
+                            'Your spiritual companion',
+                            style: tt.bodyMedium,
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: dark ? C.dark3 : C.light3,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        CupertinoIcons.share,
+                        size: 16,
+                        color: dark ? C.onDark2 : C.onLight2,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────
+//  Loading skeleton
+// ─────────────────────────────────────────────────────────
+
+class _LoadingView extends StatelessWidget {
+  const _LoadingView({required this.dark});
+  final bool dark;
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      bottom: false,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: S.page),
+        child: ListView(
+          children: [
+            const SizedBox(height: S.s16),
+            _SkeletonBox(width: 120, height: 28, dark: dark),
+            const SizedBox(height: S.s4),
+            _SkeletonBox(width: 180, height: 16, dark: dark),
+            const SizedBox(height: S.s24),
+            _SkeletonBox(width: double.infinity, height: 200, dark: dark),
+            const SizedBox(height: S.s12),
+            _SkeletonBox(width: double.infinity, height: 180, dark: dark),
+            const SizedBox(height: S.s32),
+            _SkeletonBox(width: 140, height: 22, dark: dark),
+            const SizedBox(height: S.s12),
+            _SkeletonBox(width: double.infinity, height: 120, dark: dark),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _SkeletonBox extends StatefulWidget {
+  const _SkeletonBox({
+    required this.width,
+    required this.height,
+    required this.dark,
+  });
+  final double width;
+  final double height;
+  final bool dark;
+
+  @override
+  State<_SkeletonBox> createState() => _SkeletonBoxState();
+}
+
+class _SkeletonBoxState extends State<_SkeletonBox>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _ctrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1200),
+    )..repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _ctrl,
+      builder: (_, _) {
+        final opacity = 0.08 + _ctrl.value * 0.08;
+        return Container(
+          width: widget.width,
+          height: widget.height,
+          decoration: BoxDecoration(
+            color: (widget.dark ? C.onDark1 : C.onLight1)
+                .withValues(alpha: opacity),
+            borderRadius: BorderRadius.circular(12),
+          ),
+        );
+      },
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────
+//  Error view with retry
+// ─────────────────────────────────────────────────────────
+
+class _ErrorView extends StatelessWidget {
+  const _ErrorView({
+    required this.dark,
+    required this.tt,
+    required this.onRetry,
+  });
+  final bool dark;
+  final TextTheme tt;
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      bottom: false,
+      child: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(S.page),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                CupertinoIcons.wifi_slash,
+                size: 48,
+                color: dark ? C.onDark3 : C.onLight3,
+              ),
+              const SizedBox(height: S.s16),
+              Text(
+                'Unable to load',
+                style: tt.titleMedium?.copyWith(
+                  color: dark ? C.onDark1 : C.onLight1,
+                ),
+              ),
+              const SizedBox(height: S.s8),
+              Text(
+                'Check your connection and try again',
+                style: tt.bodyMedium?.copyWith(
+                  color: dark ? C.onDark2 : C.onLight2,
+                ),
+              ),
+              const SizedBox(height: S.s24),
+              BounceTap(
+                onTap: onRetry,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: S.s24, vertical: S.s12),
+                  decoration: BoxDecoration(
+                    color: C.primary,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Text(
+                    'Retry',
+                    style: TextStyle(
+                      color: C.white,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
-              );
-            },
+              ),
+            ],
           ),
-
-          // Bottom padding
-          const SliverToBoxAdapter(child: SizedBox(height: S.s80)),
-        ],
+        ),
       ),
     );
   }
@@ -155,7 +480,7 @@ class _DailyHadithCard extends StatelessWidget {
     required this.tt,
   });
 
-  final Hadith hadith;
+  final NawawiHadith hadith;
   final bool dark;
   final TextTheme tt;
 
@@ -219,7 +544,23 @@ class _DailyHadithCard extends StatelessWidget {
           ),
           const SizedBox(height: S.s16),
 
-          // Quote
+          // Arabic text
+          if (hadith.arabic.isNotEmpty) ...[
+            Text(
+              hadith.arabic,
+              textAlign: TextAlign.right,
+              textDirection: TextDirection.rtl,
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+                height: 1.9,
+                color: dark ? C.onDark1 : C.onLight1,
+              ),
+            ),
+            const SizedBox(height: S.s12),
+          ],
+
+          // Translation
           Text(
             '"',
             style: TextStyle(
@@ -233,7 +574,7 @@ class _DailyHadithCard extends StatelessWidget {
           ),
           const SizedBox(height: S.s4),
           Text(
-            hadith.text,
+            hadith.translation,
             style: tt.bodyLarge?.copyWith(
               fontStyle: FontStyle.italic,
               height: 1.6,
@@ -242,8 +583,10 @@ class _DailyHadithCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: S.s12),
+
+          // Narrator + source
           Text(
-            '— ${hadith.source}',
+            '— ${hadith.narrator}${hadith.source.isNotEmpty ? ' (${hadith.source})' : ''}',
             style: tt.bodySmall?.copyWith(
               color: dark ? C.onDark2 : C.onLight2,
               fontWeight: FontWeight.w500,
@@ -318,7 +661,7 @@ class _DailyDoaCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
-                  _categoryLabel(doa.category),
+                  _capitalize(doa.category),
                   style: TextStyle(
                     fontSize: 10,
                     fontWeight: FontWeight.w600,
@@ -328,39 +671,46 @@ class _DailyDoaCard extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: S.s16),
-
-          // Arabic
-          Text(
-            doa.arabic,
-            textAlign: TextAlign.right,
-            textDirection: TextDirection.rtl,
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w600,
-              height: 1.9,
-              color: dark ? C.onDark1 : C.onLight1,
-            ),
-          ),
           const SizedBox(height: S.s12),
 
-          // Translation
-          Text(
-            doa.translation,
-            style: tt.bodyMedium?.copyWith(
-              fontStyle: FontStyle.italic,
-              height: 1.5,
-              color: dark ? C.onDark2 : C.onLight2,
+          // Title
+          if (doa.title.isNotEmpty) ...[
+            Text(
+              doa.title,
+              style: tt.titleSmall?.copyWith(
+                fontWeight: FontWeight.w600,
+                color: dark ? C.onDark1 : C.onLight1,
+              ),
             ),
-          ),
-          const SizedBox(height: S.s8),
-          Text(
-            '— ${doa.source}',
-            style: tt.bodySmall?.copyWith(
-              color: dark ? C.onDark3 : C.onLight3,
-              fontWeight: FontWeight.w500,
+            const SizedBox(height: S.s12),
+          ],
+
+          // Arabic
+          if (doa.arabic.isNotEmpty) ...[
+            Text(
+              doa.arabic,
+              textAlign: TextAlign.right,
+              textDirection: TextDirection.rtl,
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+                height: 1.9,
+                color: dark ? C.onDark1 : C.onLight1,
+              ),
             ),
-          ),
+            const SizedBox(height: S.s12),
+          ],
+
+          // Description (as usage context)
+          if (doa.description.isNotEmpty)
+            Text(
+              doa.description,
+              style: tt.bodyMedium?.copyWith(
+                fontStyle: FontStyle.italic,
+                height: 1.5,
+                color: dark ? C.onDark2 : C.onLight2,
+              ),
+            ),
         ],
       ),
     );
@@ -368,204 +718,512 @@ class _DailyDoaCard extends StatelessWidget {
 }
 
 // ─────────────────────────────────────────────────────────
-//  Category Accordion
+//  Horizontal Adkar List
 // ─────────────────────────────────────────────────────────
 
-class _CategoryAccordion extends StatelessWidget {
-  const _CategoryAccordion({
-    required this.category,
-    required this.doas,
-    required this.expanded,
+class _HorizontalAdkarList extends StatelessWidget {
+  const _HorizontalAdkarList({
+    required this.items,
     required this.dark,
     required this.tt,
-    required this.onToggle,
   });
 
-  final DoaCategory category;
-  final List<Doa> doas;
-  final bool expanded;
+  final List<DailyAdkar> items;
   final bool dark;
   final TextTheme tt;
-  final VoidCallback onToggle;
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: S.s8),
-      child: Column(
-        children: [
-          // ── Header row ──
-          BounceTap(
-            onTap: onToggle,
+    return SizedBox(
+      height: 220,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: S.page),
+        clipBehavior: Clip.none,
+        itemCount: items.length,
+        separatorBuilder: (_, i) => const SizedBox(width: S.s12),
+        itemBuilder: (_, i) {
+          final item = items[i];
+          return BounceTap(
+            onTap: () => _showZikrDetailSheet(
+              context: context,
+              title: item.title,
+              arabic: item.arabic,
+              translation: item.translation,
+              transliteration: item.transliteration,
+              times: item.times,
+              benefit: item.benefit,
+              accentColor: C.primary,
+              accentSoft: C.primarySoft,
+              accentGlow: C.primaryGlow,
+            ),
             child: Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: S.s16,
-                vertical: S.s16,
+            width: 260,
+            padding: const EdgeInsets.all(S.s16),
+            decoration: BoxDecoration(
+              color: dark ? C.dark3 : C.light2,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: dark ? C.dark4 : C.lightDivider,
               ),
-              decoration: BoxDecoration(
-                color: dark ? C.dark3 : C.light2,
-                borderRadius: expanded
-                    ? const BorderRadius.vertical(top: Radius.circular(16))
-                    : BorderRadius.circular(16),
-                border: Border.all(
-                  color: expanded
-                      ? (dark
-                          ? C.primarySoft.withValues(alpha: 0.15)
-                          : C.primary.withValues(alpha: 0.1))
-                      : (dark ? C.dark4 : C.lightDivider),
-                ),
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    width: 36,
-                    height: 36,
-                    decoration: BoxDecoration(
-                      color: dark ? C.primaryGlow : C.primaryGlow,
-                      borderRadius: BorderRadius.circular(10),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Title + times badge
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        item.title,
+                        style: tt.titleSmall?.copyWith(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 13,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
-                    child: Icon(
-                      _categoryIcon(category),
-                      size: 18,
-                      color: dark ? C.primarySoft : C.primary,
-                    ),
-                  ),
-                  const SizedBox(width: S.s12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          _categoryLabel(category),
-                          style: tt.titleSmall?.copyWith(
-                            fontWeight: FontWeight.w600,
+                    if (item.times.isNotEmpty) ...[
+                      const SizedBox(width: S.s8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: C.primaryGlow,
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text(
+                          '${item.times}x',
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w700,
+                            color: dark ? C.primarySoft : C.primary,
                           ),
                         ),
-                        const SizedBox(height: 2),
-                        Text(
-                          '${doas.length} doa',
-                          style: tt.bodySmall,
-                        ),
-                      ],
+                      ),
+                    ],
+                  ],
+                ),
+                const SizedBox(height: S.s8),
+
+                // Arabic
+                if (item.arabic.isNotEmpty)
+                  Expanded(
+                    child: Text(
+                      item.arabic,
+                      textAlign: TextAlign.right,
+                      textDirection: TextDirection.rtl,
+                      style: TextStyle(
+                        fontSize: 16,
+                        height: 1.8,
+                        color: dark ? C.onDark1 : C.onLight1,
+                      ),
+                      maxLines: 3,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
-                  AnimatedRotation(
-                    duration: const Duration(milliseconds: 200),
-                    turns: expanded ? 0.25 : 0,
-                    child: Icon(
-                      CupertinoIcons.chevron_right,
-                      size: 14,
-                      color: dark ? C.onDark3 : C.onLight3,
+
+                const SizedBox(height: S.s8),
+
+                // Translation
+                if (item.translation.isNotEmpty)
+                  Text(
+                    item.translation,
+                    style: tt.bodySmall?.copyWith(
+                      color: dark ? C.onDark2 : C.onLight2,
+                      height: 1.4,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+              ],
+            ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────
+//  Horizontal Post-Salaah List
+// ─────────────────────────────────────────────────────────
+
+class _HorizontalPostSalaahList extends StatelessWidget {
+  const _HorizontalPostSalaahList({
+    required this.items,
+    required this.dark,
+    required this.tt,
+  });
+
+  final List<PostSalaahZikr> items;
+  final bool dark;
+  final TextTheme tt;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 220,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: S.page),
+        clipBehavior: Clip.none,
+        itemCount: items.length,
+        separatorBuilder: (_, i) => const SizedBox(width: S.s12),
+        itemBuilder: (_, i) {
+          final item = items[i];
+          return BounceTap(
+            onTap: () => _showZikrDetailSheet(
+              context: context,
+              title: item.title,
+              arabic: item.arabic,
+              translation: item.translation,
+              transliteration: item.transliteration,
+              times: item.times,
+              benefit: item.benefit,
+              accentColor: C.gold,
+              accentSoft: C.goldSoft,
+              accentGlow: C.goldGlow,
+            ),
+            child: Container(
+            width: 260,
+            padding: const EdgeInsets.all(S.s16),
+            decoration: BoxDecoration(
+              color: dark ? C.dark3 : C.light2,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: dark ? C.dark4 : C.lightDivider,
+              ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Title + times badge
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        item.title,
+                        style: tt.titleSmall?.copyWith(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 13,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    if (item.times.isNotEmpty) ...[
+                      const SizedBox(width: S.s8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: C.goldGlow,
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text(
+                          '${item.times}x',
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w700,
+                            color: dark ? C.goldSoft : C.gold,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+                const SizedBox(height: S.s8),
+
+                // Arabic
+                if (item.arabic.isNotEmpty)
+                  Expanded(
+                    child: Text(
+                      item.arabic,
+                      textAlign: TextAlign.right,
+                      textDirection: TextDirection.rtl,
+                      style: TextStyle(
+                        fontSize: 16,
+                        height: 1.8,
+                        color: dark ? C.onDark1 : C.onLight1,
+                      ),
+                      maxLines: 3,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+
+                const SizedBox(height: S.s8),
+
+                // Translation
+                if (item.translation.isNotEmpty)
+                  Text(
+                    item.translation,
+                    style: tt.bodySmall?.copyWith(
+                      color: dark ? C.onDark2 : C.onLight2,
+                      height: 1.4,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+              ],
+            ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────
+//  Zikr / Adkar Detail Bottom Sheet
+// ─────────────────────────────────────────────────────────
+
+void _showZikrDetailSheet({
+  required BuildContext context,
+  required String title,
+  required String arabic,
+  required String translation,
+  required String transliteration,
+  required String times,
+  required String benefit,
+  required Color accentColor,
+  required Color accentSoft,
+  required Color accentGlow,
+}) {
+  final dark = Theme.of(context).brightness == Brightness.dark;
+  final tt = Theme.of(context).textTheme;
+  final bottomInset = MediaQuery.of(context).padding.bottom;
+
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.transparent,
+    builder: (_) => DraggableScrollableSheet(
+      initialChildSize: 0.7,
+      minChildSize: 0.4,
+      maxChildSize: 0.92,
+      builder: (context, scrollCtrl) => Container(
+        decoration: BoxDecoration(
+          color: dark ? C.dark2 : C.light2,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        child: ListView(
+          controller: scrollCtrl,
+          padding: const EdgeInsets.symmetric(horizontal: S.page),
+          children: [
+            const SizedBox(height: S.s12),
+
+            // Drag handle
+            Center(
+              child: Container(
+                width: 36,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: dark ? C.dark4 : C.lightDivider,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+
+            const SizedBox(height: S.s20),
+
+            // Title + times badge
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Text(
+                    title,
+                    style: tt.titleLarge?.copyWith(fontWeight: FontWeight.w700),
+                  ),
+                ),
+                if (times.isNotEmpty) ...[
+                  const SizedBox(width: S.s12),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 10, vertical: 5),
+                    decoration: BoxDecoration(
+                      color: accentGlow,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      'Repeat ${times}x',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                        color: dark ? accentSoft : accentColor,
+                      ),
                     ),
                   ),
                 ],
-              ),
+              ],
             ),
-          ),
 
-          // ── Expanded doa list ──
-          AnimatedSize(
-            duration: const Duration(milliseconds: 250),
-            curve: Curves.easeOutCubic,
-            alignment: Alignment.topCenter,
-            child: expanded
-                ? Container(
-                    decoration: BoxDecoration(
-                      color: dark
-                          ? C.dark2.withValues(alpha: 0.6)
-                          : C.light3.withValues(alpha: 0.5),
-                      borderRadius: const BorderRadius.vertical(
-                        bottom: Radius.circular(16),
-                      ),
-                      border: Border.all(
-                        color: dark
-                            ? C.primarySoft.withValues(alpha: 0.1)
-                            : C.primary.withValues(alpha: 0.06),
-                      ),
-                    ),
-                    child: Column(
-                      children: [
-                        for (var j = 0; j < doas.length; j++) ...[
-                          if (j > 0)
-                            Divider(
-                              height: 1,
-                              color: dark ? C.dark4 : C.lightDivider,
-                              indent: S.s16,
-                              endIndent: S.s16,
-                            ),
-                          _DoaEntry(doa: doas[j], dark: dark, tt: tt),
-                        ],
-                      ],
-                    ),
-                  )
-                : const SizedBox.shrink(),
-          ),
-        ],
+            const SizedBox(height: S.s24),
+
+            // Arabic text
+            if (arabic.isNotEmpty)
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(S.s24),
+                decoration: BoxDecoration(
+                  color: dark
+                      ? accentColor.withValues(alpha: 0.08)
+                      : accentColor.withValues(alpha: 0.04),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: dark
+                        ? accentSoft.withValues(alpha: 0.1)
+                        : accentColor.withValues(alpha: 0.08),
+                  ),
+                ),
+                child: Text(
+                  arabic,
+                  textAlign: TextAlign.right,
+                  textDirection: TextDirection.rtl,
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w600,
+                    height: 2.0,
+                    color: dark ? C.onDark1 : C.onLight1,
+                  ),
+                ),
+              ),
+
+            // Transliteration
+            if (transliteration.isNotEmpty) ...[
+              const SizedBox(height: S.s16),
+              Text(
+                transliteration,
+                style: tt.bodyMedium?.copyWith(
+                  fontStyle: FontStyle.italic,
+                  height: 1.6,
+                  color: dark ? C.onDark2 : C.onLight2,
+                ),
+              ),
+            ],
+
+            // Translation
+            if (translation.isNotEmpty) ...[
+              const SizedBox(height: S.s20),
+              Text(
+                'Translation',
+                style: tt.labelMedium?.copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: dark ? accentSoft : accentColor,
+                ),
+              ),
+              const SizedBox(height: S.s8),
+              Text(
+                translation,
+                style: tt.bodyMedium?.copyWith(
+                  height: 1.6,
+                  color: dark ? C.onDark1 : C.onLight1,
+                ),
+              ),
+            ],
+
+            // Benefits
+            if (benefit.isNotEmpty) ...[
+              const SizedBox(height: S.s20),
+              Text(
+                'Benefits',
+                style: tt.labelMedium?.copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: dark ? accentSoft : accentColor,
+                ),
+              ),
+              const SizedBox(height: S.s8),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(S.s16),
+                decoration: BoxDecoration(
+                  color: dark ? C.dark3 : C.light3,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Text(
+                  benefit,
+                  style: tt.bodyMedium?.copyWith(
+                    height: 1.6,
+                    color: dark ? C.onDark2 : C.onLight2,
+                  ),
+                ),
+              ),
+            ],
+
+            SizedBox(height: bottomInset + 56 + S.s24),
+          ],
+        ),
       ),
-    );
-  }
+    ),
+  );
 }
 
 // ─────────────────────────────────────────────────────────
-//  Individual Doa Entry (inside accordion)
+//  Category Card (grid item → taps to detail page)
 // ─────────────────────────────────────────────────────────
 
-class _DoaEntry extends StatelessWidget {
-  const _DoaEntry({
-    required this.doa,
+class _CategoryCard extends StatelessWidget {
+  const _CategoryCard({
+    required this.category,
+    required this.count,
     required this.dark,
     required this.tt,
+    required this.onTap,
   });
 
-  final Doa doa;
+  final String category;
+  final int count;
   final bool dark;
   final TextTheme tt;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(S.s16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          // Arabic text
-          Text(
-            doa.arabic,
-            textAlign: TextAlign.right,
-            textDirection: TextDirection.rtl,
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              height: 1.9,
-              color: dark ? C.onDark1 : C.onLight1,
-            ),
-          ),
-          const SizedBox(height: S.s12),
-
-          // Translation
-          Text(
-            doa.translation,
-            style: tt.bodyMedium?.copyWith(
-              fontStyle: FontStyle.italic,
-              height: 1.5,
-              color: dark ? C.onDark2 : C.onLight2,
-            ),
-          ),
-          const SizedBox(height: S.s8),
-
-          // Source
-          Align(
-            alignment: Alignment.centerLeft,
-            child: Text(
-              doa.source,
-              style: tt.bodySmall?.copyWith(
-                color: dark ? C.onDark3 : C.onLight3,
-                fontWeight: FontWeight.w500,
-                fontSize: 11,
+    return BounceTap(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(S.s16),
+        decoration: BoxDecoration(
+          color: dark ? C.dark3 : C.light2,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: dark ? C.dark4 : C.lightDivider),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(
+                color: C.primaryGlow,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(
+                _categoryIcon(category),
+                size: 18,
+                color: dark ? C.primarySoft : C.primary,
               ),
             ),
-          ),
-        ],
+            const Spacer(),
+            Text(
+              _capitalize(category),
+              style: tt.titleSmall?.copyWith(fontWeight: FontWeight.w600),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+            const SizedBox(height: 2),
+            Text(
+              '$count doa',
+              style: tt.bodySmall?.copyWith(
+                color: dark ? C.onDark3 : C.onLight3,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -575,17 +1233,19 @@ class _DoaEntry extends StatelessWidget {
 //  Helpers
 // ─────────────────────────────────────────────────────────
 
-String _categoryLabel(DoaCategory cat) => switch (cat) {
-      DoaCategory.morningEvening => 'Morning & Evening',
-      DoaCategory.afterSolat => 'After Solat',
-      DoaCategory.protection => 'Protection',
-      DoaCategory.dailyEssentials => 'Daily Essentials',
-    };
+String _capitalize(String s) =>
+    s.isEmpty ? s : '${s[0].toUpperCase()}${s.substring(1)}';
 
-IconData _categoryIcon(DoaCategory cat) => switch (cat) {
-      DoaCategory.morningEvening => CupertinoIcons.sun_max,
-      DoaCategory.afterSolat => CupertinoIcons.heart,
-      DoaCategory.protection => CupertinoIcons.shield,
-      DoaCategory.dailyEssentials => CupertinoIcons.star,
+IconData _categoryIcon(String cat) => switch (cat) {
+      'daily' => CupertinoIcons.sun_max,
+      'prayer' => CupertinoIcons.heart,
+      'protection' => CupertinoIcons.shield,
+      'hardship' => CupertinoIcons.flame,
+      'social' => CupertinoIcons.person_2,
+      'family' => CupertinoIcons.house,
+      'death' => CupertinoIcons.moon_stars,
+      'ramadan' => CupertinoIcons.moon,
+      'travel' => CupertinoIcons.airplane,
+      _ => CupertinoIcons.star,
     };
 

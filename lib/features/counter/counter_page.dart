@@ -273,7 +273,7 @@ class _CounterPageState extends State<CounterPage>
             child: Padding(
               padding: EdgeInsets.fromLTRB(
                 S.page, 0, S.page,
-                MediaQuery.of(context).padding.bottom + S.s16,
+                MediaQuery.of(context).padding.bottom + 56 + S.s16,
               ),
               child: Container(
                 padding: const EdgeInsets.symmetric(vertical: S.s16, horizontal: S.s24),

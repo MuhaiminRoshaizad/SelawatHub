@@ -5,6 +5,7 @@ import 'package:selawathub/core/animations/fade_in.dart';
 import 'package:selawathub/core/constants.dart';
 import 'package:selawathub/core/theme/colors.dart';
 import 'package:selawathub/core/theme/theme.dart';
+import 'package:selawathub/core/widgets/frosted_bar.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
@@ -15,20 +16,12 @@ class ProfilePage extends StatelessWidget {
     final tt = Theme.of(context).textTheme;
     final themeCtrl = ThemeController.of(context);
 
-    return SafeArea(
-      bottom: false,
-      child: ListView(
+    return Stack(
+      children: [
+        ListView(
         padding: EdgeInsets.zero,
         children: [
-          const SizedBox(height: S.s16),
-
-          // Header
-          FadeIn(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: S.page),
-              child: Text('Profile', style: tt.headlineLarge),
-            ),
-          ),
+          SizedBox(height: MediaQuery.of(context).padding.top + 80),
 
           const SizedBox(height: S.s32),
 
@@ -253,9 +246,23 @@ class ProfilePage extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(height: S.s80),
+          SizedBox(height: MediaQuery.of(context).padding.bottom + 56 + S.s24),
         ],
       ),
+        Positioned(
+          top: 0,
+          left: 0,
+          right: 0,
+          child: FrostedBar(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: S.page, vertical: S.s12),
+              child: FadeIn(
+                child: Text('Profile', style: tt.headlineLarge),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 

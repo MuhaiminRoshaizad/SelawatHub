@@ -5,6 +5,7 @@ import 'package:selawathub/core/animations/bounce_tap.dart';
 import 'package:selawathub/core/animations/fade_in.dart';
 import 'package:selawathub/core/constants.dart';
 import 'package:selawathub/core/theme/colors.dart';
+import 'package:selawathub/core/widgets/frosted_bar.dart';
 
 class GroupPage extends StatefulWidget {
   const GroupPage({super.key});
@@ -18,10 +19,7 @@ class _GroupPageState extends State<GroupPage> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      bottom: false,
-      child: _hasGroup ? _GroupView(onLeave: () => setState(() => _hasGroup = false)) : _NoGroupView(onJoined: () => setState(() => _hasGroup = true)),
-    );
+    return _hasGroup ? _GroupView(onLeave: () => setState(() => _hasGroup = false)) : SafeArea(bottom: false, child: _NoGroupView(onJoined: () => setState(() => _hasGroup = true)));
   }
 }
 
@@ -44,47 +42,12 @@ class _GroupView extends StatelessWidget {
     final dark = Theme.of(context).brightness == Brightness.dark;
     final tt = Theme.of(context).textTheme;
 
-    return ListView(
+    return Stack(
+      children: [
+        ListView(
       padding: EdgeInsets.zero,
       children: [
-        const SizedBox(height: S.s16),
-
-        // Header
-        FadeIn(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: S.page),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('SelawatHub Family', style: tt.headlineLarge),
-                      const SizedBox(height: S.s4),
-                      Text(
-                        '${_members.length} members',
-                        style: tt.bodyMedium,
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: dark ? C.dark3 : C.light3,
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    CupertinoIcons.ellipsis,
-                    size: 18,
-                    color: dark ? C.onDark2 : C.onLight2,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
+        SizedBox(height: MediaQuery.of(context).padding.top + 100),
 
         const SizedBox(height: S.s32),
 
@@ -292,7 +255,51 @@ class _GroupView extends StatelessWidget {
           );
         }),
 
-        const SizedBox(height: S.s80),
+        SizedBox(height: MediaQuery.of(context).padding.bottom + 56 + S.s24),
+      ],
+    ),
+        Positioned(
+          top: 0,
+          left: 0,
+          right: 0,
+          child: FrostedBar(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: S.page, vertical: S.s16),
+              child: FadeIn(
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('SelawatHub Family', style: tt.headlineLarge),
+                          const SizedBox(height: S.s4),
+                          Text(
+                            '${_members.length} members',
+                            style: tt.bodyMedium,
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: dark ? C.dark3 : C.light3,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        CupertinoIcons.ellipsis,
+                        size: 18,
+                        color: dark ? C.onDark2 : C.onLight2,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
       ],
     );
   }

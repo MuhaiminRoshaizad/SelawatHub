@@ -5,6 +5,7 @@ import 'package:selawathub/core/animations/fade_in.dart';
 import 'package:selawathub/core/animations/fire_emoji.dart';
 import 'package:selawathub/core/constants.dart';
 import 'package:selawathub/core/theme/colors.dart';
+import 'package:selawathub/core/widgets/frosted_bar.dart';
 
 // ── Mock per-day data model ──
 class _DayData {
@@ -145,29 +146,12 @@ class _StatsPageState extends State<StatsPage> {
       selectedDateLabel = '${d.day} ${months[d.month - 1]} ${d.year}';
     }
 
-    return SafeArea(
-      bottom: false,
-      child: ListView(
+    return Stack(
+      children: [
+        ListView(
         padding: EdgeInsets.zero,
         children: [
-          const SizedBox(height: S.s16),
-
-          // Header
-          FadeIn(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: S.page),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Statistics', style: tt.headlineLarge),
-                  const SizedBox(height: S.s4),
-                  Text('Your selawat & zikir journey', style: tt.bodyMedium),
-                ],
-              ),
-            ),
-          ),
-
-          const SizedBox(height: S.s24),
+          SizedBox(height: MediaQuery.of(context).padding.top + 100),
 
           // ── Streak + Daily Progress hero card ──
           FadeIn(
@@ -303,9 +287,30 @@ class _StatsPageState extends State<StatsPage> {
             ),
           ),
 
-          const SizedBox(height: S.s80),
+          SizedBox(height: MediaQuery.of(context).padding.bottom + 56 + S.s24),
         ],
       ),
+        Positioned(
+          top: 0,
+          left: 0,
+          right: 0,
+          child: FrostedBar(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: S.page, vertical: S.s16),
+              child: FadeIn(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Statistics', style: tt.headlineLarge),
+                    const SizedBox(height: S.s4),
+                    Text('Your selawat & zikir journey', style: tt.bodyMedium),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
