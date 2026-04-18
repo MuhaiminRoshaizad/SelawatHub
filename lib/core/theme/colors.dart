@@ -1,37 +1,47 @@
 import 'package:flutter/material.dart';
 
-class AppColors {
-  static const Color mint = Color(0xFFD4AF37);
-  static const Color sky = Color(0xFFF2E5B8);
-  static const Color ocean = Color(0xFFB9891E);
-  static const Color ink = Color(0xFF111111);
-  static const Color slate = Color(0xFF595042);
-  static const Color card = Color(0xFFFCF7EA);
-  static const Color white = Color(0xFFFFFFFF);
-  static const Color transparent = Color(0x00000000);
-  static const Color darkInk = Color(0xFFF6E8C3);
-  static const Color darkSlate = Color(0xFFC9B78A);
-  static const Color darkSurface = Color(0xFF080808);
-  static const Color darkCard = Color(0xFF14110A);
-  static const Color danger = Color(0xFFFF3B30);
-  static const Color navGlassLight = Color(0xCCFFF9EB);
-  static const Color navGlassDark = Color(0xCC171209);
-  static const Color navBorderLight = Color(0xD9FFFFFF);
-  static const Color navBorderDark = Color(0x66E0C98C);
+/// Warm, spiritual color palette — earthy greens, cream, muted gold.
+class C {
+  C._();
 
-  static const LinearGradient lightGradient = LinearGradient(
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-    colors: [Color(0xFFFFFCF4), Color(0xFFF8F1DE), Color(0xFFF1E4C1)],
-  );
+  // ── Brand ──
+  static const primary = Color(0xFF4A7C5C);
+  static const primarySoft = Color(0xFF6B9E7E);
+  static const primaryMuted = Color(0xFF3A6148);
+  static const primaryGlow = Color(0x334A7C5C);
 
-  static const LinearGradient darkGradient = LinearGradient(
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-    colors: [Color(0xFF060606), Color(0xFF0F0C07), Color(0xFF181208)],
-  );
+  // ── Gold accent ──
+  static const gold = Color(0xFFC4A44E);
+  static const goldSoft = Color(0xFFD4BA6F);
+  static const goldGlow = Color(0x33C4A44E);
 
-  static LinearGradient backgroundGradientFor(Brightness brightness) {
-    return brightness == Brightness.dark ? darkGradient : lightGradient;
-  }
+  // ── Dark surfaces ──
+  static const dark1 = Color(0xFF0E0D0B);
+  static const dark2 = Color(0xFF161513);
+  static const dark3 = Color(0xFF1F1E1A);
+  static const dark4 = Color(0xFF28261F);
+  static const darkDivider = Color(0xFF332F27);
+
+  // ── Light surfaces ──
+  static const light1 = Color(0xFFF7F3EB);
+  static const light2 = Color(0xFFFFFFFF);
+  static const light3 = Color(0xFFF0EBE1);
+  static const lightDivider = Color(0xFFE5DFD3);
+
+  // ── Text on dark ──
+  static const onDark1 = Color(0xFFEDE8DD);
+  static const onDark2 = Color(0xFFA09882);
+  static const onDark3 = Color(0xFF635D50);
+
+  // ── Text on light ──
+  static const onLight1 = Color(0xFF1C1B17);
+  static const onLight2 = Color(0xFF6B6558);
+  static const onLight3 = Color(0xFFA8A196);
+
+  // ── Utility ──
+  static const error = Color(0xFFC75050);
+  static const success = Color(0xFF5CA06B);
+  static const white = Color(0xFFFFFFFF);
+  static const black = Color(0xFF000000);
+  static const transparent = Color(0x00000000);
 }

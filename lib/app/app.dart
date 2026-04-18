@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:selawathub/app/app_shell.dart';
-import 'package:selawathub/core/theme/app_theme.dart';
-import 'package:selawathub/core/theme/theme_controller.dart';
+import 'package:selawathub/core/theme/theme.dart';
+import 'package:selawathub/features/auth/welcome_page.dart';
 
 class SelawatHubApp extends StatefulWidget {
   const SelawatHubApp({super.key});
@@ -11,8 +10,7 @@ class SelawatHubApp extends StatefulWidget {
 }
 
 class _SelawatHubAppState extends State<SelawatHubApp> {
-  final ValueNotifier<ThemeMode> _themeMode =
-      ValueNotifier<ThemeMode>(ThemeMode.light);
+  final _themeMode = ValueNotifier<ThemeMode>(ThemeMode.system);
 
   @override
   void dispose() {
@@ -26,16 +24,14 @@ class _SelawatHubAppState extends State<SelawatHubApp> {
       notifier: _themeMode,
       child: ValueListenableBuilder<ThemeMode>(
         valueListenable: _themeMode,
-        builder: (context, themeMode, child) {
-          return MaterialApp(
-            title: 'SelawatHub',
-            debugShowCheckedModeBanner: false,
-            theme: AppTheme.light(),
-            darkTheme: AppTheme.dark(),
-            themeMode: themeMode,
-            home: const AppShell(),
-          );
-        },
+        builder: (context, mode, child) => MaterialApp(
+          title: 'SelawatHub',
+          debugShowCheckedModeBanner: false,
+          theme: AppTheme.light(),
+          darkTheme: AppTheme.dark(),
+          themeMode: mode,
+          home: const WelcomePage(),
+        ),
       ),
     );
   }

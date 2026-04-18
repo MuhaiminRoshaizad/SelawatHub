@@ -1,13 +1,11 @@
-import 'dart:ui';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:selawathub/core/theme/colors.dart';
-import 'package:selawathub/core/widgets/app_background.dart';
-import 'package:selawathub/features/analytics/presentation/pages/analytics_page.dart';
-import 'package:selawathub/features/counter/presentation/pages/counter_page.dart';
-import 'package:selawathub/features/group/presentation/pages/group_page.dart';
-import 'package:selawathub/features/profile/presentation/pages/profile_page.dart';
+import 'package:selawathub/features/counter/counter_page.dart';
+import 'package:selawathub/features/group/group_page.dart';
+import 'package:selawathub/features/stats/stats_page.dart';
+import 'package:selawathub/features/hadith/hadith_page.dart';
+import 'package:selawathub/features/profile/profile_page.dart';
 
 class AppShell extends StatefulWidget {
   const AppShell({super.key});
@@ -17,219 +15,85 @@ class AppShell extends StatefulWidget {
 }
 
 class _AppShellState extends State<AppShell> {
-  int _index = 0;
-  late final PageController _pageController;
+  int _tab = 0;
 
-  static const List<Widget> _pages = <Widget>[
+  static const _pages = [
     CounterPage(),
     GroupPage(),
-    AnalyticsPage(),
+    StatsPage(),
+    HadithPage(),
     ProfilePage(),
   ];
 
-  static const List<({IconData icon, IconData activeIcon, String label})>
-      _tabs = [
-    (
-      icon: CupertinoIcons.plus_circle,
-      activeIcon: CupertinoIcons.plus_circle_fill,
-      label: 'Counter',
-    ),
-    (
-      icon: CupertinoIcons.person_3,
-      activeIcon: CupertinoIcons.person_3_fill,
-      label: 'Group',
-    ),
-    (
-      icon: CupertinoIcons.chart_bar,
-      activeIcon: CupertinoIcons.chart_bar_fill,
-      label: 'Analytics',
-    ),
-    (
-      icon: CupertinoIcons.person_crop_circle,
-      activeIcon: CupertinoIcons.person_crop_circle_fill,
-      label: 'Profile',
-    ),
+  static const _items = [
+    (CupertinoIcons.circle_grid_3x3, CupertinoIcons.circle_grid_3x3_fill, 'Tasbih'),
+    (CupertinoIcons.person_3, CupertinoIcons.person_3_fill, 'Group'),
+    (CupertinoIcons.chart_bar, CupertinoIcons.chart_bar_fill, 'Stats'),
+    (CupertinoIcons.book, CupertinoIcons.book_fill, 'Hadith'),
+    (CupertinoIcons.person, CupertinoIcons.person_fill, 'Profile'),
   ];
 
   @override
-  void initState() {
-    super.initState();
-    _pageController = PageController(initialPage: _index);
-  }
-
-  @override
-  void dispose() {
-    _pageController.dispose();
-    super.dispose();
-  }
-
-  void _onTabTapped(int value) {
-    if (value == _index) {
-      return;
-    }
-    _pageController.animateToPage(
-      value,
-      duration: const Duration(milliseconds: 260),
-      curve: Curves.easeOutCubic,
-    );
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    final bottomPadding = MediaQuery.of(context).padding.bottom;
 
     return Scaffold(
-      extendBody: true,
-      body: AppBackground(
-        child: PageView(
-          controller: _pageController,
-          physics: const BouncingScrollPhysics(),
-          onPageChanged: (value) => setState(() => _index = value),
-          children: _pages,
-        ),
-      ),
-      bottomNavigationBar: SafeArea(
-        top: false,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
-          child: _LiquidTabBar(
-            currentIndex: _index,
-            tabs: _tabs,
-            isDark: isDark,
-            onTap: _onTabTapped,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _LiquidTabBar extends StatelessWidget {
-  const _LiquidTabBar({
-    required this.currentIndex,
-    required this.tabs,
-    required this.isDark,
-    required this.onTap,
-  });
-
-  final int currentIndex;
-  final List<({IconData icon, IconData activeIcon, String label})> tabs;
-  final bool isDark;
-  final ValueChanged<int> onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(30),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 28, sigmaY: 28),
-        child: Container(
-          height: 76,
-          decoration: BoxDecoration(
-            color: isDark
-                ? AppColors.navGlassDark.withValues(alpha: 0.86)
-                : AppColors.navGlassLight.withValues(alpha: 0.86),
-            borderRadius: BorderRadius.circular(30),
-            border: Border.all(
-              color: isDark ? AppColors.navBorderDark : AppColors.navBorderLight,
-              width: 1.2,
+      body: IndexedStack(index: _tab, children: _pages),
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          color: dark ? C.dark2 : C.light2,
+          border: Border(
+            top: BorderSide(
+              color: dark ? C.darkDivider : C.lightDivider,
+              width: 0.5,
             ),
-            boxShadow: [
-              BoxShadow(
-                blurRadius: 24,
-                offset: const Offset(0, 10),
-                color: (isDark ? AppColors.ink : AppColors.ocean)
-                    .withValues(alpha: 0.14),
-              ),
-            ],
           ),
-          child: Stack(
-            children: [
-              Positioned(
-                left: 0,
-                right: 0,
-                top: 0,
-                child: IgnorePointer(
-                  child: Container(
-                    height: 26,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.vertical(
-                        top: Radius.circular(30),
-                      ),
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          AppColors.white
-                              .withValues(alpha: isDark ? 0.14 : 0.36),
-                          AppColors.transparent,
-                        ],
-                      ),
+        ),
+        padding: EdgeInsets.only(bottom: bottomPadding),
+        child: SizedBox(
+          height: 56,
+          child: Row(
+            children: List.generate(5, (i) {
+              final active = i == _tab;
+              final (icon, activeIcon, label) = _items[i];
+              return Expanded(
+                child: GestureDetector(
+                  onTap: () => setState(() => _tab = i),
+                  behavior: HitTestBehavior.opaque,
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 200),
+                          child: Icon(
+                            active ? activeIcon : icon,
+                            key: ValueKey('$i-$active'),
+                            size: 22,
+                            color: active
+                                ? (dark ? C.primarySoft : C.primary)
+                                : (dark ? C.onDark3 : C.onLight3),
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          label,
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: active ? FontWeight.w600 : FontWeight.w400,
+                            color: active
+                                ? (dark ? C.primarySoft : C.primary)
+                                : (dark ? C.onDark3 : C.onLight3),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
-              ),
-              Row(
-                children: [
-                  for (int i = 0; i < tabs.length; i++)
-                    Expanded(
-                      child: InkWell(
-                        borderRadius: BorderRadius.circular(24),
-                        onTap: () => onTap(i),
-                        child: AnimatedContainer(
-                          duration: const Duration(milliseconds: 220),
-                          curve: Curves.easeOutCubic,
-                          margin: const EdgeInsets.symmetric(
-                            horizontal: 6,
-                            vertical: 9,
-                          ),
-                          decoration: BoxDecoration(
-                            color: i == currentIndex
-                                ? AppColors.ocean.withValues(alpha: 0.2)
-                                : AppColors.transparent,
-                            borderRadius: BorderRadius.circular(22),
-                          ),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                i == currentIndex
-                                    ? tabs[i].activeIcon
-                                    : tabs[i].icon,
-                                size: 20,
-                                color: i == currentIndex
-                                    ? (isDark
-                                        ? AppColors.darkInk
-                                        : AppColors.ink)
-                                    : (isDark
-                                        ? AppColors.darkSlate
-                                        : AppColors.slate),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                tabs[i].label,
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: i == currentIndex
-                                      ? FontWeight.w700
-                                      : FontWeight.w500,
-                                  color: i == currentIndex
-                                      ? (isDark
-                                          ? AppColors.darkInk
-                                          : AppColors.ink)
-                                      : (isDark
-                                          ? AppColors.darkSlate
-                                          : AppColors.slate),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                ],
-              ),
-            ],
+              );
+            }),
           ),
         ),
       ),
