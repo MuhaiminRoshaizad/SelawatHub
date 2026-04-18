@@ -29,7 +29,7 @@ class _AppShellState extends State<AppShell> {
     (CupertinoIcons.circle_grid_3x3, CupertinoIcons.circle_grid_3x3_fill, 'Tasbih'),
     (CupertinoIcons.person_3, CupertinoIcons.person_3_fill, 'Group'),
     (CupertinoIcons.chart_bar, CupertinoIcons.chart_bar_fill, 'Stats'),
-    (CupertinoIcons.book, CupertinoIcons.book_fill, 'Hadith'),
+    (CupertinoIcons.book, CupertinoIcons.book_fill, 'Doa'),
     (CupertinoIcons.person, CupertinoIcons.person_fill, 'Profile'),
   ];
 
