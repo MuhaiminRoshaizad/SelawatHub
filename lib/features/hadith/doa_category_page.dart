@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -6,6 +5,7 @@ import 'package:selawathub/core/animations/fade_in.dart';
 import 'package:selawathub/core/constants.dart';
 import 'package:selawathub/core/theme/colors.dart';
 import 'package:selawathub/core/widgets/app_bottom_sheet.dart';
+import 'package:selawathub/core/widgets/frosted_bar.dart';
 import 'package:selawathub/features/hadith/models/doa.dart';
 
 // ─────────────────────────────────────────────────────────
@@ -29,89 +29,40 @@ class DoaCategoryPage extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: dark ? C.dark1 : C.light1,
-      body: CustomScrollView(
-        slivers: [
-          // ── App bar ──
-          SliverAppBar(
-            pinned: true,
-            backgroundColor: Colors.transparent,
-            surfaceTintColor: Colors.transparent,
-            flexibleSpace: ClipRect(
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
-                child: Container(
-                  color: dark ? C.dark1.withValues(alpha: 0.75) : C.light1.withValues(alpha: 0.8),
-                ),
-              ),
-            ),
-            shape: Border(
-              bottom: BorderSide(
-                color: dark ? C.dark4.withValues(alpha: 0.5) : C.lightDivider.withValues(alpha: 0.5),
-                width: 0.5,
-              ),
-            ),
-            leading: GestureDetector(
-              onTap: () => Navigator.pop(context),
-              child: Container(
-                alignment: Alignment.center,
-                child: Icon(
-                  CupertinoIcons.chevron_left,
-                  size: 20,
-                  color: dark ? C.onDark1 : C.onLight1,
-                ),
-              ),
-            ),
-            title: Text(
-              _capitalize(category),
-              style: tt.titleLarge?.copyWith(fontWeight: FontWeight.w600),
-            ),
-            actions: [
-              IconButton(
-                icon: Icon(
-                  CupertinoIcons.info_circle,
-                  size: 20,
-                  color: dark ? C.onDark2 : C.onLight2,
-                ),
-                onPressed: () => _showDoaSourceSheet(context, dark),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(right: S.s16),
-                child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: C.primaryGlow,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    '${doas.length} doa',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: dark ? C.primarySoft : C.primary,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-
-          // ── Doa list ──
-          SliverList.separated(
-            itemCount: doas.length,
-            separatorBuilder: (_, i) => Divider(
-              height: 1,
-              color: dark ? C.dark4 : C.lightDivider,
-              indent: S.page,
-              endIndent: S.page,
-            ),
+      body: Stack(
+        children: [
+          ListView.separated(
+            padding: EdgeInsets.zero,
+            itemCount: doas.length + 2, // spacer + items + bottom
+            separatorBuilder: (_, i) {
+              if (i == 0) return const SizedBox.shrink();
+              return Divider(
+                height: 1,
+                color: dark ? C.dark4 : C.lightDivider,
+                indent: S.page,
+                endIndent: S.page,
+              );
+            },
             itemBuilder: (_, i) {
-              final doa = doas[i];
+              // Top spacer for frosted bar
+              if (i == 0) {
+                return SizedBox(
+                    height: MediaQuery.of(context).padding.top + 56);
+              }
+              // Bottom spacer
+              if (i == doas.length + 1) {
+                return SizedBox(
+                    height: MediaQuery.of(context).padding.bottom +
+                        56 +
+                        S.s24);
+              }
+              final idx = i - 1;
+              final doa = doas[idx];
               return FadeIn(
-                delay: Duration(milliseconds: i.clamp(0, 8) * 50),
+                delay: Duration(milliseconds: idx.clamp(0, 8) * 50),
                 child: _DoaCard(
                   doa: doa,
-                  index: i + 1,
+                  index: idx + 1,
                   dark: dark,
                   tt: tt,
                 ),
@@ -119,9 +70,72 @@ class DoaCategoryPage extends StatelessWidget {
             },
           ),
 
-          SliverToBoxAdapter(
-            child: SizedBox(height: MediaQuery.of(context).padding.bottom + 56 + S.s24),
-          ),
+          // ── Frosted app bar ──
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: FrostedBar(
+              child: SizedBox(
+                  height: 56,
+                  child: Row(
+                    children: [
+                      // Back button
+                      GestureDetector(
+                        onTap: () => Navigator.pop(context),
+                        child: Padding(
+                          padding:
+                              const EdgeInsets.symmetric(horizontal: S.s16),
+                          child: Icon(
+                            CupertinoIcons.chevron_left,
+                            size: 20,
+                            color: dark ? C.onDark1 : C.onLight1,
+                          ),
+                        ),
+                      ),
+                      // Title
+                      Expanded(
+                        child: Text(
+                          _capitalize(category),
+                          style: tt.titleLarge
+                              ?.copyWith(fontWeight: FontWeight.w600),
+                        ),
+                      ),
+                      // Info button
+                      IconButton(
+                        icon: Icon(
+                          CupertinoIcons.info_circle,
+                          size: 20,
+                          color: dark ? C.onDark2 : C.onLight2,
+                        ),
+                        onPressed: () =>
+                            _showDoaSourceSheet(context, dark),
+                      ),
+                      // Count badge
+                      Padding(
+                        padding: const EdgeInsets.only(right: S.s16),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 10, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: C.primaryGlow,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            '${doas.length} doa',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: dark ? C.primarySoft : C.primary,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
         ],
       ),
     );

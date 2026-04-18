@@ -151,7 +151,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
     final tt = Theme.of(context).textTheme;
     final accent = dark ? C.primarySoft : C.primary;
     final muted = dark ? C.onDark3 : C.onLight3;
-    final dividerColor = dark ? C.darkDivider : C.lightDivider;
 
     return PopScope(
       canPop: !_hasChanges,
@@ -268,88 +267,97 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   const SizedBox(height: S.s32),
 
                   // ── Fields ──
-                  FadeIn(
-                    delay: const Duration(milliseconds: 80),
+                  Padding(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: S.page),
                     child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Divider(height: 1, color: dividerColor),
-
-                        // Name row
-                        _FieldRow(
-                          label: 'Name',
-                          controller: _nameCtrl,
-                          focusNode: _nameFocus,
-                          dark: dark,
-                          accent: accent,
-                          textInputAction: TextInputAction.next,
-                          onSubmitted: (_) => FocusScope.of(context)
-                              .requestFocus(_bioFocus),
+                        // Name
+                        FadeIn(
+                          delay: const Duration(milliseconds: 80),
+                          child: _Field(
+                            label: 'Full Name',
+                            hint: 'Enter your name',
+                            icon: CupertinoIcons.person,
+                            controller: _nameCtrl,
+                            focusNode: _nameFocus,
+                            dark: dark,
+                            textInputAction: TextInputAction.next,
+                            onSubmitted: (_) => FocusScope.of(context)
+                                .requestFocus(_bioFocus),
+                          ),
                         ),
-                        Divider(
-                            height: 1,
-                            indent: S.page,
-                            color: dividerColor),
+                        const SizedBox(height: S.s16),
 
-                        // Bio row
-                        _FieldRow(
-                          label: 'Bio',
-                          controller: _bioCtrl,
-                          focusNode: _bioFocus,
-                          dark: dark,
-                          accent: accent,
-                          textInputAction: TextInputAction.next,
-                          onSubmitted: (_) => FocusScope.of(context)
-                              .requestFocus(_emailFocus),
-                          maxLength: _bioMax,
-                          hint: 'Write something about yourself...',
-                        ),
-                        Divider(
-                            height: 1,
-                            indent: S.page,
-                            color: dividerColor),
-
-                        // Email row
-                        _FieldRow(
-                          label: 'Email',
-                          controller: _emailCtrl,
-                          focusNode: _emailFocus,
-                          dark: dark,
-                          accent: accent,
-                          keyboardType: TextInputType.emailAddress,
-                          textInputAction: TextInputAction.done,
-                          onSubmitted: (_) => _save(),
-                        ),
-                        Divider(height: 1, color: dividerColor),
-                      ],
-                    ),
-                  ),
-
-                  // Bio counter
-                  FadeIn(
-                    delay: const Duration(milliseconds: 100),
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(
-                          S.page, S.s6, S.page, 0),
-                      child: ListenableBuilder(
-                        listenable: _bioCtrl,
-                        builder: (context, _) {
-                          final remaining =
-                              _bioMax - _bioCtrl.text.length;
-                          final warn = remaining <= 10;
-                          return Align(
-                            alignment: Alignment.centerRight,
-                            child: Text(
-                              '${_bioCtrl.text.length}/$_bioMax',
-                              style: tt.bodySmall?.copyWith(
-                                fontSize: 11,
-                                color: warn
-                                    ? C.error.withValues(alpha: 0.8)
-                                    : muted,
+                        // Bio
+                        FadeIn(
+                          delay: const Duration(milliseconds: 140),
+                          child: Column(
+                            crossAxisAlignment:
+                                CrossAxisAlignment.start,
+                            children: [
+                              _Field(
+                                label: 'Bio',
+                                hint: 'Write something about yourself...',
+                                icon: CupertinoIcons.pencil,
+                                controller: _bioCtrl,
+                                focusNode: _bioFocus,
+                                dark: dark,
+                                maxLength: _bioMax,
+                                textInputAction: TextInputAction.next,
+                                onSubmitted: (_) =>
+                                    FocusScope.of(context)
+                                        .requestFocus(_emailFocus),
                               ),
-                            ),
-                          );
-                        },
-                      ),
+                              Padding(
+                                padding: const EdgeInsets.only(
+                                    right: 4, top: S.s6),
+                                child: ListenableBuilder(
+                                  listenable: _bioCtrl,
+                                  builder: (context, _) {
+                                    final warn = _bioMax -
+                                            _bioCtrl.text.length <=
+                                        10;
+                                    return Align(
+                                      alignment:
+                                          Alignment.centerRight,
+                                      child: Text(
+                                        '${_bioCtrl.text.length}/$_bioMax',
+                                        style:
+                                            tt.bodySmall?.copyWith(
+                                          fontSize: 11,
+                                          color: warn
+                                              ? C.error.withValues(
+                                                  alpha: 0.8)
+                                              : muted,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: S.s16),
+
+                        // Email
+                        FadeIn(
+                          delay: const Duration(milliseconds: 200),
+                          child: _Field(
+                            label: 'Email',
+                            hint: 'Enter your email',
+                            icon: CupertinoIcons.mail,
+                            controller: _emailCtrl,
+                            focusNode: _emailFocus,
+                            dark: dark,
+                            keyboardType: TextInputType.emailAddress,
+                            textInputAction: TextInputAction.done,
+                            onSubmitted: (_) => _save(),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
 
@@ -430,88 +438,68 @@ class _EditProfilePageState extends State<EditProfilePage> {
 }
 
 // ─────────────────────────────────────────────────────────
-//  Field row — Instagram-style: label left, input right
+//  Field — same style as login page (label above, filled, icon)
 // ─────────────────────────────────────────────────────────
 
-class _FieldRow extends StatelessWidget {
-  const _FieldRow({
+class _Field extends StatelessWidget {
+  const _Field({
     required this.label,
+    required this.hint,
+    required this.icon,
     required this.controller,
     required this.focusNode,
     required this.dark,
-    required this.accent,
     this.keyboardType,
     this.textInputAction,
     this.onSubmitted,
     this.maxLength,
-    this.hint,
   });
 
   final String label;
+  final String hint;
+  final IconData icon;
   final TextEditingController controller;
   final FocusNode focusNode;
   final bool dark;
-  final Color accent;
   final TextInputType? keyboardType;
   final TextInputAction? textInputAction;
   final ValueChanged<String>? onSubmitted;
   final int? maxLength;
-  final String? hint;
 
   @override
   Widget build(BuildContext context) {
     final tt = Theme.of(context).textTheme;
-    return Padding(
-      padding: const EdgeInsets.symmetric(
-          horizontal: S.page, vertical: S.s2),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          // Fixed-width label
-          SizedBox(
-            width: 72,
-            child: Text(
-              label,
-              style: tt.bodyMedium?.copyWith(
-                fontWeight: FontWeight.w500,
-                color: dark ? C.onDark1 : C.onLight1,
-              ),
-            ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 4, bottom: S.s8),
+          child: Text(label, style: tt.titleSmall),
+        ),
+        TextField(
+          controller: controller,
+          focusNode: focusNode,
+          keyboardType: keyboardType,
+          textInputAction: textInputAction,
+          onSubmitted: onSubmitted,
+          maxLength: maxLength,
+          style: tt.bodyMedium?.copyWith(
+            color: dark ? C.onDark1 : C.onLight1,
           ),
-          const SizedBox(width: S.s12),
-          // Expanding input
-          Expanded(
-            child: TextField(
-              controller: controller,
-              focusNode: focusNode,
-              keyboardType: keyboardType,
-              textInputAction: textInputAction,
-              onSubmitted: onSubmitted,
-              maxLength: maxLength,
-              style: tt.bodyMedium?.copyWith(
-                color: dark ? C.onDark1 : C.onLight1,
-              ),
-              cursorColor: accent,
-              decoration: InputDecoration(
-                isDense: true,
-                contentPadding:
-                    const EdgeInsets.symmetric(vertical: S.s12),
-                border: InputBorder.none,
-                counterText: '',
-                hintText: hint,
-                hintStyle: tt.bodyMedium?.copyWith(
-                  color: dark
-                      ? C.onDark3.withValues(alpha: 0.4)
-                      : C.onLight3.withValues(alpha: 0.4),
-                ),
-              ),
+          cursorColor: dark ? C.primarySoft : C.primary,
+          decoration: InputDecoration(
+            hintText: hint,
+            counterText: '',
+            prefixIcon: Padding(
+              padding: const EdgeInsets.only(left: 16, right: 12),
+              child: Icon(icon,
+                  size: 18, color: dark ? C.onDark3 : C.onLight3),
             ),
+            prefixIconConstraints:
+                const BoxConstraints(minWidth: 0, minHeight: 0),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
-
-// AnimatedBuilder is just ListenableBuilder
-typedef AnimatedBuilder = ListenableBuilder;

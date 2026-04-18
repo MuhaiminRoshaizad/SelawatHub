@@ -6,6 +6,7 @@ import 'package:selawathub/core/animations/fade_in.dart';
 import 'package:selawathub/core/constants.dart';
 import 'package:selawathub/core/theme/colors.dart';
 import 'package:selawathub/core/widgets/frosted_bar.dart';
+import 'package:selawathub/features/group/group_settings_page.dart';
 
 class GroupPage extends StatefulWidget {
   const GroupPage({super.key});
@@ -29,12 +30,12 @@ class _GroupView extends StatelessWidget {
   final VoidCallback onLeave;
 
   static const _members = [
-    ('Amin', 4120, true),
-    ('Sarah', 3891, false),
-    ('Ahmad', 3450, false),
-    ('Fatimah', 2987, false),
-    ('Yusuf', 2654, false),
-    ('Khadijah', 2210, false),
+    ('Amin', 4120, true, GroupRole.leader),
+    ('Sarah', 3891, false, GroupRole.coLeader),
+    ('Ahmad', 3450, false, GroupRole.member),
+    ('Fatimah', 2987, false, GroupRole.member),
+    ('Yusuf', 2654, false, GroupRole.member),
+    ('Khadijah', 2210, false, GroupRole.member),
   ];
 
   @override
@@ -166,7 +167,7 @@ class _GroupView extends StatelessWidget {
 
         // Members list
         ...List.generate(_members.length, (i) {
-          final (name, count, isYou) = _members[i];
+          final (name, count, isYou, role) = _members[i];
           return FadeIn(
             delay: Duration(milliseconds: 240 + i * 40),
             offset: const Offset(0, 8),
@@ -217,6 +218,16 @@ class _GroupView extends StatelessWidget {
                     Expanded(
                       child: Row(
                         children: [
+                          if (role == GroupRole.leader)
+                            const Padding(
+                              padding: EdgeInsets.only(right: 4),
+                              child: Text('👑', style: TextStyle(fontSize: 12)),
+                            ),
+                          if (role == GroupRole.coLeader)
+                            const Padding(
+                              padding: EdgeInsets.only(right: 4),
+                              child: Text('⭐', style: TextStyle(fontSize: 12)),
+                            ),
                           Flexible(
                             child: Text(
                               name,
@@ -279,17 +290,39 @@ class _GroupView extends StatelessWidget {
                         ],
                       ),
                     ),
-                    Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: dark ? C.dark3 : C.light3,
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        CupertinoIcons.ellipsis,
-                        size: 18,
-                        color: dark ? C.onDark2 : C.onLight2,
+                    BounceTap(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) {
+                              final userRole = _members
+                                  .firstWhere((m) => m.$3)
+                                  .$4;
+                              return GroupSettingsPage(
+                                groupName: 'SelawatHub Family',
+                                inviteCode: 'SLWT-7861',
+                                memberCount: _members.length,
+                                userRole: userRole,
+                                members: _members,
+                                onLeave: onLeave,
+                              );
+                            },
+                          ),
+                        );
+                      },
+                      child: Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: dark ? C.dark3 : C.light3,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          CupertinoIcons.gear,
+                          size: 18,
+                          color: dark ? C.onDark2 : C.onLight2,
+                        ),
                       ),
                     ),
                   ],

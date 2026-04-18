@@ -1,10 +1,10 @@
-import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:selawathub/core/animations/fade_in.dart';
 import 'package:selawathub/core/constants.dart';
 import 'package:selawathub/core/theme/colors.dart';
+import 'package:selawathub/core/widgets/frosted_bar.dart';
 
 // ─────────────────────────────────────────────────────────
 //  Sources & Credits Page
@@ -13,7 +13,7 @@ import 'package:selawathub/core/theme/colors.dart';
 class SourcesPage extends StatelessWidget {
   const SourcesPage({super.key});
 
-  static const _apiBase = 'https://dua-data-api.vercel.app/api';
+  static const _apiBase = 'https://dua-data-api.vercel.app/';
 
   static const _sources = [
     _SourceData(
@@ -57,169 +57,192 @@ class SourcesPage extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: dark ? C.dark1 : C.light1,
-      body: CustomScrollView(
-        slivers: [
-          // ── Frosted app bar ──
-          SliverAppBar(
-            pinned: true,
-            backgroundColor: Colors.transparent,
-            surfaceTintColor: Colors.transparent,
-            flexibleSpace: ClipRect(
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
-                child: Container(
-                  color: dark
-                      ? C.dark1.withValues(alpha: 0.75)
-                      : C.light1.withValues(alpha: 0.8),
-                ),
-              ),
-            ),
-            shape: Border(
-              bottom: BorderSide(
-                color: dark
-                    ? C.dark4.withValues(alpha: 0.5)
-                    : C.lightDivider.withValues(alpha: 0.5),
-                width: 0.5,
-              ),
-            ),
-            leading: GestureDetector(
-              onTap: () => Navigator.pop(context),
-              child: Container(
-                alignment: Alignment.center,
-                child: Icon(
-                  CupertinoIcons.chevron_left,
-                  size: 20,
-                  color: dark ? C.onDark1 : C.onLight1,
-                ),
-              ),
-            ),
-            title: Text(
-              'Sources & Credits',
-              style: tt.titleLarge?.copyWith(fontWeight: FontWeight.w600),
-            ),
-          ),
+      body: Stack(
+        children: [
+          ListView(
+            padding: EdgeInsets.zero,
+            children: [
+              // Top spacer for frosted bar
+              SizedBox(height: MediaQuery.of(context).padding.top + 56),
 
-          // ── API badge ──
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(S.page, S.s24, S.page, S.s8),
-              child: FadeIn(
-                child: GestureDetector(
-                onTap: () => launchUrl(
-                  Uri.parse(_apiBase),
-                  mode: LaunchMode.externalApplication,
-                ),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: S.s16,
-                    vertical: S.s12,
-                  ),
-                  decoration: BoxDecoration(
-                    color: C.primaryGlow,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: dark
-                          ? C.primarySoft.withValues(alpha: 0.15)
-                          : C.primary.withValues(alpha: 0.12),
+              // ── API badge ──
+              Padding(
+                padding:
+                    const EdgeInsets.fromLTRB(S.page, S.s24, S.page, S.s8),
+                child: FadeIn(
+                  child: GestureDetector(
+                    onTap: () => launchUrl(
+                      Uri.parse(_apiBase),
+                      mode: LaunchMode.externalApplication,
+                    ),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: S.s16,
+                        vertical: S.s12,
+                      ),
+                      decoration: BoxDecoration(
+                        color: C.primaryGlow,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: dark
+                              ? C.primarySoft.withValues(alpha: 0.15)
+                              : C.primary.withValues(alpha: 0.12),
+                        ),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Icon(
+                                CupertinoIcons.globe,
+                                size: 16,
+                                color: dark ? C.primarySoft : C.primary,
+                              ),
+                              const SizedBox(width: S.s8),
+                              Text(
+                                'Naikiyah Dua Data API',
+                                style: tt.bodyMedium?.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                  color: dark ? C.primarySoft : C.primary,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: S.s8),
+                          Row(
+                            children: [
+                              Icon(
+                                CupertinoIcons.link,
+                                size: 12,
+                                color: (dark ? C.primarySoft : C.primary)
+                                    .withValues(alpha: 0.6),
+                              ),
+                              const SizedBox(width: S.s6),
+                              Flexible(
+                                child: Text(
+                                  _apiBase,
+                                  style: tt.bodySmall?.copyWith(
+                                    color: dark ? C.primarySoft : C.primary,
+                                    fontSize: 12,
+                                    decoration: TextDecoration.underline,
+                                    decorationColor:
+                                        (dark ? C.primarySoft : C.primary)
+                                            .withValues(alpha: 0.4),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: S.s4),
+                              Icon(
+                                CupertinoIcons.arrow_up_right_square,
+                                size: 12,
+                                color: (dark ? C.primarySoft : C.primary)
+                                    .withValues(alpha: 0.6),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        CupertinoIcons.globe,
-                        size: 16,
-                        color: dark ? C.primarySoft : C.primary,
-                      ),
-                      const SizedBox(width: S.s8),
-                      Expanded(
-                        child: Text(
-                          'Naikiyah Dua Data API',
-                          style: tt.bodyMedium?.copyWith(
-                            fontWeight: FontWeight.w600,
-                            color: dark ? C.primarySoft : C.primary,
-                          ),
-                        ),
-                      ),
-                      Text(
-                        _apiBase,
-                        style: tt.bodySmall?.copyWith(
-                          color: dark ? C.primarySoft : C.primary,
-                          fontSize: 11,
-                          decoration: TextDecoration.underline,
-                          decorationColor: (dark ? C.primarySoft : C.primary)
-                              .withValues(alpha: 0.4),
-                        ),
-                      ),
-                      const SizedBox(width: S.s4),
-                      Icon(
-                        CupertinoIcons.arrow_up_right_square,
-                        size: 12,
-                        color: (dark ? C.primarySoft : C.primary)
-                            .withValues(alpha: 0.6),
-                      ),
-                    ],
-                  ),
                 ),
               ),
-              ),
-            ),
-          ),
 
-          // ── Source cards ──
-          SliverPadding(
-            padding: const EdgeInsets.symmetric(horizontal: S.page),
-            sliver: SliverList.builder(
-              itemCount: _sources.length,
-              itemBuilder: (context, i) {
+              // ── Source cards ──
+              ...List.generate(_sources.length, (i) {
                 final src = _sources[i];
                 return FadeIn(
                   delay: Duration(milliseconds: 100 + i * 80),
                   child: Padding(
-                    padding: const EdgeInsets.only(top: S.s12),
+                    padding: EdgeInsets.fromLTRB(
+                        S.page, S.s12, S.page, 0),
                     child: _SourceCard(source: src, dark: dark, tt: tt),
                   ),
                 );
-              },
-            ),
-          ),
+              }),
 
-          // ── Disclaimer ──
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(S.page, S.s32, S.page, 0),
-              child: FadeIn(
-                delay: const Duration(milliseconds: 500),
-                child: Container(
-                  padding: const EdgeInsets.all(S.s16),
-                  decoration: BoxDecoration(
-                    color: dark
-                        ? C.dark3.withValues(alpha: 0.5)
-                        : C.light3.withValues(alpha: 0.6),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
+              // ── Disclaimer ──
+              Padding(
+                padding:
+                    const EdgeInsets.fromLTRB(S.page, S.s32, S.page, 0),
+                child: FadeIn(
+                  delay: const Duration(milliseconds: 500),
+                  child: Container(
+                    padding: const EdgeInsets.all(S.s16),
+                    decoration: BoxDecoration(
                       color: dark
-                          ? C.dark4.withValues(alpha: 0.5)
-                          : C.lightDivider.withValues(alpha: 0.5),
+                          ? C.dark3.withValues(alpha: 0.5)
+                          : C.light3.withValues(alpha: 0.6),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: dark
+                            ? C.dark4.withValues(alpha: 0.5)
+                            : C.lightDivider.withValues(alpha: 0.5),
+                      ),
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Icon(
+                          CupertinoIcons.book,
+                          size: 16,
+                          color: dark ? C.onDark2 : C.onLight2,
+                        ),
+                        const SizedBox(width: S.s12),
+                        Expanded(
+                          child: Text(
+                            'All content is sourced from open Islamic API '
+                            'databases. We do not claim ownership of any '
+                            'religious content.',
+                            style: tt.bodySmall?.copyWith(
+                              color: dark ? C.onDark2 : C.onLight2,
+                              height: 1.5,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
+                ),
+              ),
+
+              // ── Bottom spacer ──
+              SizedBox(
+                height:
+                    MediaQuery.of(context).padding.bottom + 56 + S.s24,
+              ),
+            ],
+          ),
+
+          // ── Frosted app bar ──
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: FrostedBar(
+              child: SizedBox(
+                  height: 56,
                   child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Icon(
-                        CupertinoIcons.book,
-                        size: 16,
-                        color: dark ? C.onDark2 : C.onLight2,
+                      // Back button
+                      GestureDetector(
+                        onTap: () => Navigator.pop(context),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: S.s16),
+                          child: Icon(
+                            CupertinoIcons.chevron_left,
+                            size: 20,
+                            color: dark ? C.onDark1 : C.onLight1,
+                          ),
+                        ),
                       ),
-                      const SizedBox(width: S.s12),
+                      // Title
                       Expanded(
                         child: Text(
-                          'All content is sourced from open Islamic API '
-                          'databases. We do not claim ownership of any '
-                          'religious content.',
-                          style: tt.bodySmall?.copyWith(
-                            color: dark ? C.onDark2 : C.onLight2,
-                            height: 1.5,
-                          ),
+                          'Sources & Credits',
+                          style: tt.titleLarge
+                              ?.copyWith(fontWeight: FontWeight.w600),
                         ),
                       ),
                     ],
@@ -227,17 +250,6 @@ class SourcesPage extends StatelessWidget {
                 ),
               ),
             ),
-          ),
-
-          // ── Bottom spacer ──
-          SliverToBoxAdapter(
-            child: Builder(
-              builder: (context) => SizedBox(
-                height:
-                    MediaQuery.of(context).padding.bottom + 56 + S.s24,
-              ),
-            ),
-          ),
         ],
       ),
     );

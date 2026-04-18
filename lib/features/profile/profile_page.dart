@@ -383,7 +383,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     builder: (context, mode, child) => _ToggleRow(
                       icon: CupertinoIcons.moon_fill,
                       label: 'Dark Mode',
-                      value: mode == ThemeMode.dark,
+                      value: dark,
                       dark: dark,
                       onChanged: (v) => themeCtrl.value =
                           v ? ThemeMode.dark : ThemeMode.light,
