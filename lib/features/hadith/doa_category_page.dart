@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:selawathub/core/animations/fade_in.dart';
 import 'package:selawathub/core/constants.dart';
 import 'package:selawathub/core/theme/colors.dart';
@@ -353,33 +354,55 @@ void _showDoaSourceSheet(BuildContext context, bool dark) {
 
       const SizedBox(height: S.s12),
 
-      // Endpoint
-      Container(
-        width: double.infinity,
-        padding: const EdgeInsets.all(S.s16),
-        decoration: BoxDecoration(
-          color: dark
-              ? C.dark4.withValues(alpha: 0.5)
-              : C.light3.withValues(alpha: 0.7),
-          borderRadius: BorderRadius.circular(16),
+      // Endpoint — tappable link
+      GestureDetector(
+        onTap: () => launchUrl(
+          Uri.parse('https://dua-data-api.vercel.app/api/usefulDuas'),
+          mode: LaunchMode.externalApplication,
         ),
-        child: Row(
-          children: [
-            Icon(
-              CupertinoIcons.link,
-              size: 14,
-              color: dark ? C.onDark2 : C.onLight2,
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(S.s16),
+          decoration: BoxDecoration(
+            color: dark
+                ? C.primarySoft.withValues(alpha: 0.06)
+                : C.primary.withValues(alpha: 0.03),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: dark
+                  ? C.primarySoft.withValues(alpha: 0.12)
+                  : C.primary.withValues(alpha: 0.08),
             ),
-            const SizedBox(width: S.s8),
-            Text(
-              '/usefulDuas',
-              style: tt.bodyMedium?.copyWith(
-                fontFamily: 'monospace',
-                fontWeight: FontWeight.w500,
-                color: dark ? C.onDark2 : C.onLight2,
+          ),
+          child: Row(
+            children: [
+              Icon(
+                CupertinoIcons.link,
+                size: 14,
+                color: dark ? C.primarySoft : C.primary,
               ),
-            ),
-          ],
+              const SizedBox(width: S.s8),
+              Expanded(
+                child: Text(
+                  'https://dua-data-api.vercel.app/api/usefulDuas',
+                  style: tt.bodySmall?.copyWith(
+                    fontWeight: FontWeight.w500,
+                    color: dark ? C.primarySoft : C.primary,
+                    decoration: TextDecoration.underline,
+                    decorationColor: (dark ? C.primarySoft : C.primary)
+                        .withValues(alpha: 0.4),
+                  ),
+                ),
+              ),
+              const SizedBox(width: S.s8),
+              Icon(
+                CupertinoIcons.arrow_up_right_square,
+                size: 14,
+                color: (dark ? C.primarySoft : C.primary)
+                    .withValues(alpha: 0.6),
+              ),
+            ],
+          ),
         ),
       ),
     ],

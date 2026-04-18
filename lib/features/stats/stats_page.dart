@@ -151,7 +151,7 @@ class _StatsPageState extends State<StatsPage> {
         ListView(
         padding: EdgeInsets.zero,
         children: [
-          SizedBox(height: MediaQuery.of(context).padding.top + 76),
+          SizedBox(height: MediaQuery.of(context).padding.top + 100),
 
           // ── Streak + Daily Progress hero card ──
           FadeIn(
@@ -519,20 +519,6 @@ class _WeeklyChartState extends State<_WeeklyChart> {
           ),
           const SizedBox(height: S.s20),
 
-          // Tooltip for selected bar
-          AnimatedSize(
-            duration: const Duration(milliseconds: 200),
-            curve: Curves.easeOut,
-            child: _selectedIdx != null
-                ? _BarTooltip(
-                    day: _days[_selectedIdx!],
-                    selawat: _selawat[_selectedIdx!],
-                    zikir: _zikir[_selectedIdx!],
-                    dark: dark,
-                  )
-                : const SizedBox.shrink(),
-          ),
-
           SizedBox(
             height: 140,
             child: Row(
@@ -641,13 +627,27 @@ class _WeeklyChartState extends State<_WeeklyChart> {
               }),
             ),
           ),
+
+          // Tooltip for selected bar (below chart)
+          AnimatedSize(
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.easeOut,
+            child: _selectedIdx != null
+                ? _BarTooltip(
+                    day: _days[_selectedIdx!],
+                    selawat: _selawat[_selectedIdx!],
+                    zikir: _zikir[_selectedIdx!],
+                    dark: dark,
+                  )
+                : const SizedBox.shrink(),
+          ),
         ],
       ),
     );
   }
 }
 
-// Tooltip card shown above weekly chart bars
+// Tooltip card shown below weekly chart bars
 class _BarTooltip extends StatelessWidget {
   const _BarTooltip({
     required this.day,
@@ -663,7 +663,7 @@ class _BarTooltip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(bottom: S.s12),
+      margin: const EdgeInsets.only(top: S.s16),
       padding: const EdgeInsets.symmetric(horizontal: S.s16, vertical: S.s12),
       decoration: BoxDecoration(
         color: dark ? C.dark2 : C.light1,
@@ -680,6 +680,15 @@ class _BarTooltip extends StatelessWidget {
               fontSize: 13,
               fontWeight: FontWeight.w700,
               color: dark ? C.onDark1 : C.onLight1,
+            ),
+          ),
+          const SizedBox(width: S.s8),
+          Text(
+            _fmtNum(selawat + zikir),
+            style: TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w500,
+              color: dark ? C.onDark3 : C.onLight3,
             ),
           ),
           const Spacer(),

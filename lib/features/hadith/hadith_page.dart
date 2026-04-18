@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:selawathub/core/animations/bounce_tap.dart';
 import 'package:selawathub/core/animations/fade_in.dart';
 import 'package:selawathub/core/constants.dart';
@@ -1113,33 +1114,53 @@ void _showSourceInfoSheet({
 
       const SizedBox(height: S.s12),
 
-      // Endpoint
-      Container(
-        width: double.infinity,
-        padding: const EdgeInsets.all(S.s16),
-        decoration: BoxDecoration(
-          color: dark
-              ? C.dark4.withValues(alpha: 0.5)
-              : C.light3.withValues(alpha: 0.7),
-          borderRadius: BorderRadius.circular(16),
+      // Endpoint — tappable link
+      GestureDetector(
+        onTap: () => launchUrl(
+          Uri.parse('https://dua-data-api.vercel.app/api$endpoint'),
+          mode: LaunchMode.externalApplication,
         ),
-        child: Row(
-          children: [
-            Icon(
-              CupertinoIcons.link,
-              size: 14,
-              color: dark ? C.onDark2 : C.onLight2,
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(S.s16),
+          decoration: BoxDecoration(
+            color: dark
+                ? accentColor.withValues(alpha: 0.06)
+                : accentColor.withValues(alpha: 0.03),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: dark
+                  ? accentColor.withValues(alpha: 0.12)
+                  : accentColor.withValues(alpha: 0.08),
             ),
-            const SizedBox(width: S.s8),
-            Text(
-              endpoint,
-              style: tt.bodyMedium?.copyWith(
-                fontFamily: 'monospace',
-                fontWeight: FontWeight.w500,
-                color: dark ? C.onDark2 : C.onLight2,
+          ),
+          child: Row(
+            children: [
+              Icon(
+                CupertinoIcons.link,
+                size: 14,
+                color: accentColor,
               ),
-            ),
-          ],
+              const SizedBox(width: S.s8),
+              Expanded(
+                child: Text(
+                  'https://dua-data-api.vercel.app/api$endpoint',
+                  style: tt.bodySmall?.copyWith(
+                    fontWeight: FontWeight.w500,
+                    color: accentColor,
+                    decoration: TextDecoration.underline,
+                    decorationColor: accentColor.withValues(alpha: 0.4),
+                  ),
+                ),
+              ),
+              const SizedBox(width: S.s8),
+              Icon(
+                CupertinoIcons.arrow_up_right_square,
+                size: 14,
+                color: accentColor.withValues(alpha: 0.6),
+              ),
+            ],
+          ),
         ),
       ),
     ],

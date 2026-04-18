@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:selawathub/core/animations/fade_in.dart';
 import 'package:selawathub/core/constants.dart';
 import 'package:selawathub/core/theme/colors.dart';
@@ -103,6 +104,11 @@ class SourcesPage extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.fromLTRB(S.page, S.s24, S.page, S.s8),
               child: FadeIn(
+                child: GestureDetector(
+                onTap: () => launchUrl(
+                  Uri.parse(_apiBase),
+                  mode: LaunchMode.externalApplication,
+                ),
                 child: Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: S.s16,
@@ -137,13 +143,24 @@ class SourcesPage extends StatelessWidget {
                       Text(
                         _apiBase,
                         style: tt.bodySmall?.copyWith(
-                          color: dark ? C.onDark2 : C.onLight2,
+                          color: dark ? C.primarySoft : C.primary,
                           fontSize: 11,
+                          decoration: TextDecoration.underline,
+                          decorationColor: (dark ? C.primarySoft : C.primary)
+                              .withValues(alpha: 0.4),
                         ),
+                      ),
+                      const SizedBox(width: S.s4),
+                      Icon(
+                        CupertinoIcons.arrow_up_right_square,
+                        size: 12,
+                        color: (dark ? C.primarySoft : C.primary)
+                            .withValues(alpha: 0.6),
                       ),
                     ],
                   ),
                 ),
+              ),
               ),
             ),
           ),
@@ -317,37 +334,58 @@ class _SourceCard extends StatelessWidget {
           ),
           const SizedBox(height: S.s8),
 
-          // Endpoint
-          Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: S.s8,
-              vertical: S.s4,
+          // Endpoint — tappable link
+          GestureDetector(
+            onTap: () => launchUrl(
+              Uri.parse('https://dua-data-api.vercel.app/api${source.endpoint}'),
+              mode: LaunchMode.externalApplication,
             ),
-            decoration: BoxDecoration(
-              color: dark
-                  ? C.dark4.withValues(alpha: 0.5)
-                  : C.light3.withValues(alpha: 0.7),
-              borderRadius: BorderRadius.circular(6),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  CupertinoIcons.link,
-                  size: 11,
-                  color: dark ? C.onDark2 : C.onLight2,
+            child: Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: S.s8,
+                vertical: S.s4,
+              ),
+              decoration: BoxDecoration(
+                color: dark
+                    ? C.primarySoft.withValues(alpha: 0.06)
+                    : C.primary.withValues(alpha: 0.03),
+                borderRadius: BorderRadius.circular(6),
+                border: Border.all(
+                  color: dark
+                      ? C.primarySoft.withValues(alpha: 0.12)
+                      : C.primary.withValues(alpha: 0.08),
                 ),
-                const SizedBox(width: S.s4),
-                Text(
-                  source.endpoint,
-                  style: TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w500,
-                    fontFamily: 'monospace',
-                    color: dark ? C.onDark2 : C.onLight2,
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    CupertinoIcons.link,
+                    size: 11,
+                    color: dark ? C.primarySoft : C.primary,
                   ),
-                ),
-              ],
+                  const SizedBox(width: S.s4),
+                  Text(
+                    source.endpoint,
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w500,
+                      fontFamily: 'monospace',
+                      color: dark ? C.primarySoft : C.primary,
+                      decoration: TextDecoration.underline,
+                      decorationColor: (dark ? C.primarySoft : C.primary)
+                          .withValues(alpha: 0.4),
+                    ),
+                  ),
+                  const SizedBox(width: S.s4),
+                  Icon(
+                    CupertinoIcons.arrow_up_right_square,
+                    size: 10,
+                    color: (dark ? C.primarySoft : C.primary)
+                        .withValues(alpha: 0.6),
+                  ),
+                ],
+              ),
             ),
           ),
         ],
