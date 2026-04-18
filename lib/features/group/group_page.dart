@@ -49,8 +49,6 @@ class _GroupView extends StatelessWidget {
       children: [
         SizedBox(height: MediaQuery.of(context).padding.top + 100),
 
-        const SizedBox(height: S.s32),
-
         // Group total
         FadeIn(
           delay: const Duration(milliseconds: 80),
