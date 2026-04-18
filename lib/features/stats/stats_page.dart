@@ -2,6 +2,7 @@ import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:selawathub/core/animations/fade_in.dart';
+import 'package:selawathub/core/animations/fire_emoji.dart';
 import 'package:selawathub/core/constants.dart';
 import 'package:selawathub/core/theme/colors.dart';
 
@@ -85,10 +86,9 @@ final _allTimeBreakdown = (() {
       dhikrTotals[name] = (cat, (prev?.$2 ?? 0) + count);
     }
   }
-  final topList = dhikrTotals.entries
-      .map((e) => (e.key, e.value.$1, e.value.$2))
-      .toList()
-    ..sort((a, b) => b.$3.compareTo(a.$3));
+  final topList =
+      dhikrTotals.entries.map((e) => (e.key, e.value.$1, e.value.$2)).toList()
+        ..sort((a, b) => b.$3.compareTo(a.$3));
   return (sel: totalSel, zik: totalZik, top: topList.take(7).toList());
 })();
 
@@ -129,8 +129,18 @@ class _StatsPageState extends State<StatsPage> {
     if (_selectedHeatmapIdx != null) {
       final d = heatmapStart.add(Duration(days: _selectedHeatmapIdx!));
       const months = [
-        'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+        'Jan',
+        'Feb',
+        'Mar',
+        'Apr',
+        'May',
+        'Jun',
+        'Jul',
+        'Aug',
+        'Sep',
+        'Oct',
+        'Nov',
+        'Dec',
       ];
       selectedDateLabel = '${d.day} ${months[d.month - 1]} ${d.year}';
     }
@@ -306,17 +316,32 @@ class _StreakCard extends StatelessWidget {
   final bool dark;
   final TextTheme tt;
 
+  // Mock streak days — change to test different tiers
+  static const _streakDays = 1;
+
   @override
   Widget build(BuildContext context) {
+    final tier = streakTierFromDays(_streakDays);
+    final tierLabel = switch (tier) {
+      StreakTier.dead => 'No Streak',
+      StreakTier.burning => '$_streakDays Day Streak',
+      StreakTier.blazing => '$_streakDays Day Streak 🔥',
+      StreakTier.legendary => '$_streakDays Day Streak ⚡',
+    };
+    final subtitle = switch (tier) {
+      StreakTier.dead => 'Start reciting today!',
+      StreakTier.burning => 'Keep it going!',
+      StreakTier.blazing => 'You\'re on fire!',
+      StreakTier.legendary => 'Legendary status!',
+    };
+
     return Container(
       padding: const EdgeInsets.all(S.s20),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: dark
-              ? [C.primaryMuted, C.dark3]
-              : [C.primary, C.primarySoft],
+          colors: dark ? [C.primaryMuted, C.dark3] : [C.primary, C.primarySoft],
         ),
         borderRadius: BorderRadius.circular(20),
       ),
@@ -324,13 +349,13 @@ class _StreakCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Text('🔥', style: TextStyle(fontSize: 32)),
+              FireEmoji(size: 36, tier: tier),
               const SizedBox(width: S.s12),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    '19 Day Streak',
+                    tierLabel,
                     style: TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.w800,
@@ -338,7 +363,7 @@ class _StreakCard extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    'Keep it going!',
+                    subtitle,
                     style: TextStyle(
                       fontSize: 13,
                       color: C.white.withValues(alpha: 0.7),
@@ -349,7 +374,6 @@ class _StreakCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: S.s20),
-          // Daily progress
           Row(
             children: [
               Text(
@@ -378,7 +402,9 @@ class _StreakCard extends StatelessWidget {
               value: 0.62,
               minHeight: 6,
               backgroundColor: C.white.withValues(alpha: 0.15),
-              valueColor: AlwaysStoppedAnimation(C.white.withValues(alpha: 0.9)),
+              valueColor: AlwaysStoppedAnimation(
+                C.white.withValues(alpha: 0.9),
+              ),
             ),
           ),
         ],
@@ -448,8 +474,10 @@ class _WeeklyChartState extends State<_WeeklyChart> {
   Widget build(BuildContext context) {
     final dark = widget.dark;
     final tt = widget.tt;
-    final totalWeek = List.generate(7, (i) => _selawat[i] + _zikir[i])
-        .reduce((a, b) => a + b);
+    final totalWeek = List.generate(
+      7,
+      (i) => _selawat[i] + _zikir[i],
+    ).reduce((a, b) => a + b);
 
     return Container(
       padding: const EdgeInsets.all(S.s20),
@@ -476,7 +504,10 @@ class _WeeklyChartState extends State<_WeeklyChart> {
           const SizedBox(height: S.s8),
           Row(
             children: [
-              _LegendDot(color: dark ? C.primarySoft : C.primary, label: 'Selawat'),
+              _LegendDot(
+                color: dark ? C.primarySoft : C.primary,
+                label: 'Selawat',
+              ),
               const SizedBox(width: S.s16),
               _LegendDot(color: C.gold, label: 'Zikir'),
             ],
@@ -506,7 +537,8 @@ class _WeeklyChartState extends State<_WeeklyChart> {
                 final zRatio = _zikir[i] / _maxVal;
                 final isToday = i == DateTime.now().weekday - 1;
                 final isSelected = _selectedIdx == i;
-                final isActive = isSelected || (_selectedIdx == null && isToday);
+                final isActive =
+                    isSelected || (_selectedIdx == null && isToday);
                 return Expanded(
                   child: GestureDetector(
                     onTap: () {
@@ -540,33 +572,42 @@ class _WeeklyChartState extends State<_WeeklyChart> {
                                   Expanded(
                                     flex: (_zikir[i]).clamp(1, 9999),
                                     child: AnimatedContainer(
-                                      duration: const Duration(milliseconds: 200),
+                                      duration: const Duration(
+                                        milliseconds: 200,
+                                      ),
                                       decoration: BoxDecoration(
                                         color: isActive
                                             ? C.gold
                                             : C.gold.withValues(
-                                                alpha: dark ? 0.3 : 0.25),
-                                        borderRadius: const BorderRadius.vertical(
-                                          top: Radius.circular(4),
-                                        ),
+                                                alpha: dark ? 0.3 : 0.25,
+                                              ),
+                                        borderRadius:
+                                            const BorderRadius.vertical(
+                                              top: Radius.circular(4),
+                                            ),
                                       ),
                                     ),
                                   ),
                                   Expanded(
                                     flex: (_selawat[i]).clamp(1, 9999),
                                     child: AnimatedContainer(
-                                      duration: const Duration(milliseconds: 200),
+                                      duration: const Duration(
+                                        milliseconds: 200,
+                                      ),
                                       decoration: BoxDecoration(
                                         color: isActive
                                             ? (dark ? C.primarySoft : C.primary)
                                             : (dark
-                                                ? C.primarySoft
-                                                    .withValues(alpha: 0.3)
-                                                : C.primary
-                                                    .withValues(alpha: 0.2)),
-                                        borderRadius: const BorderRadius.vertical(
-                                          bottom: Radius.circular(4),
-                                        ),
+                                                  ? C.primarySoft.withValues(
+                                                      alpha: 0.3,
+                                                    )
+                                                  : C.primary.withValues(
+                                                      alpha: 0.2,
+                                                    )),
+                                        borderRadius:
+                                            const BorderRadius.vertical(
+                                              bottom: Radius.circular(4),
+                                            ),
                                       ),
                                     ),
                                   ),
@@ -579,8 +620,9 @@ class _WeeklyChartState extends State<_WeeklyChart> {
                             _days[i],
                             style: TextStyle(
                               fontSize: 10,
-                              fontWeight:
-                                  isActive ? FontWeight.w700 : FontWeight.w400,
+                              fontWeight: isActive
+                                  ? FontWeight.w700
+                                  : FontWeight.w400,
                               color: isActive
                                   ? (dark ? C.onDark1 : C.onLight1)
                                   : (dark ? C.onDark3 : C.onLight3),
@@ -696,10 +738,7 @@ class _LegendDot extends StatelessWidget {
         const SizedBox(width: S.s4),
         Text(
           label,
-          style: TextStyle(
-            fontSize: 11,
-            color: dark ? C.onDark3 : C.onLight3,
-          ),
+          style: TextStyle(fontSize: 11, color: dark ? C.onDark3 : C.onLight3),
         ),
       ],
     );
@@ -726,12 +765,24 @@ class _Heatmap extends StatelessWidget {
   Widget build(BuildContext context) {
     // Compute month labels from actual dates
     final now = DateTime.now();
-    final startDate = now.subtract(const Duration(days: _weeks * _daysPerWeek - 1));
+    final startDate = now.subtract(
+      const Duration(days: _weeks * _daysPerWeek - 1),
+    );
     final monthLabels = <(int weekIdx, String label)>[];
     int lastMonth = -1;
     const monthNames = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
     ];
     for (int w = 0; w < _weeks; w++) {
       final d = startDate.add(Duration(days: w * _daysPerWeek));
@@ -787,8 +838,9 @@ class _Heatmap extends StatelessWidget {
                       vertical: S.s6,
                     ),
                     decoration: BoxDecoration(
-                      color: (dark ? C.primarySoft : C.primary)
-                          .withValues(alpha: 0.15),
+                      color: (dark ? C.primarySoft : C.primary).withValues(
+                        alpha: 0.15,
+                      ),
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Row(
@@ -849,8 +901,9 @@ class _Heatmap extends StatelessWidget {
                     child: Column(
                       children: List.generate(_daysPerWeek, (day) {
                         final idx = week * _daysPerWeek + day;
-                        final data =
-                            idx < _heatmapData.length ? _heatmapData[idx] : null;
+                        final data = idx < _heatmapData.length
+                            ? _heatmapData[idx]
+                            : null;
                         final level = data?.level ?? 0;
                         final isSelected = selectedIdx == idx;
                         return Expanded(
@@ -865,19 +918,18 @@ class _Heatmap extends StatelessWidget {
                                   borderRadius: BorderRadius.circular(3),
                                   border: isSelected
                                       ? Border.all(
-                                          color: dark
-                                              ? C.onDark1
-                                              : C.onLight1,
+                                          color: dark ? C.onDark1 : C.onLight1,
                                           width: 1.5,
                                         )
                                       : null,
                                   boxShadow: isSelected
                                       ? [
                                           BoxShadow(
-                                            color: (dark
-                                                    ? C.primarySoft
-                                                    : C.primary)
-                                                .withValues(alpha: 0.4),
+                                            color:
+                                                (dark
+                                                        ? C.primarySoft
+                                                        : C.primary)
+                                                    .withValues(alpha: 0.4),
                                             blurRadius: 4,
                                           ),
                                         ]
@@ -936,10 +988,22 @@ class _Heatmap extends StatelessWidget {
 
   static Color _levelColor(int level, bool dark) {
     return switch (level) {
-      0 => dark ? C.white.withValues(alpha: 0.04) : C.black.withValues(alpha: 0.04),
-      1 => dark ? C.primarySoft.withValues(alpha: 0.2) : C.primary.withValues(alpha: 0.12),
-      2 => dark ? C.primarySoft.withValues(alpha: 0.4) : C.primary.withValues(alpha: 0.25),
-      3 => dark ? C.primarySoft.withValues(alpha: 0.65) : C.primary.withValues(alpha: 0.45),
+      0 =>
+        dark
+            ? C.white.withValues(alpha: 0.04)
+            : C.black.withValues(alpha: 0.04),
+      1 =>
+        dark
+            ? C.primarySoft.withValues(alpha: 0.2)
+            : C.primary.withValues(alpha: 0.12),
+      2 =>
+        dark
+            ? C.primarySoft.withValues(alpha: 0.4)
+            : C.primary.withValues(alpha: 0.25),
+      3 =>
+        dark
+            ? C.primarySoft.withValues(alpha: 0.65)
+            : C.primary.withValues(alpha: 0.45),
       _ => dark ? C.primarySoft : C.primary,
     };
   }
@@ -1027,7 +1091,9 @@ class _CategoryBreakdown extends StatelessWidget {
                     children: [
                       Expanded(
                         flex: (selawatRatio * 100).round().clamp(1, 99),
-                        child: Container(color: dark ? C.primarySoft : C.primary),
+                        child: Container(
+                          color: dark ? C.primarySoft : C.primary,
+                        ),
                       ),
                       Expanded(
                         flex: (zikirRatio * 100).round().clamp(1, 99),
@@ -1236,8 +1302,7 @@ class _TopDhikrList extends StatelessWidget {
                                 vertical: 1,
                               ),
                               decoration: BoxDecoration(
-                                color:
-                                    isSelawat ? C.goldGlow : C.primaryGlow,
+                                color: isSelawat ? C.goldGlow : C.primaryGlow,
                                 borderRadius: BorderRadius.circular(6),
                               ),
                               child: Text(
