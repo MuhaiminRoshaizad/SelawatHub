@@ -41,8 +41,10 @@ class _GroupPageState extends State<GroupPage> {
     setState(() => _loading = true);
     try {
       final group = await GroupService.getMyGroup();
+      debugPrint('[GroupPage] _loadGroup result: ${group != null ? 'found group' : 'no group'}');
       if (mounted) setState(() { _group = group; _loading = false; });
-    } catch (_) {
+    } catch (e) {
+      debugPrint('[GroupPage] _loadGroup error: $e');
       if (mounted) setState(() { _group = null; _loading = false; });
     }
   }
@@ -59,9 +61,52 @@ class _GroupPageState extends State<GroupPage> {
         onReload: _loadGroup,
       );
     }
+    if (widget.isGuest) {
+      return _GuestGroupView();
+    }
     return SafeArea(
       bottom: false,
       child: NoGroupView(onJoined: _loadGroup),
+    );
+  }
+}
+
+// ── Guest view (sign in required) ──
+class _GuestGroupView extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    final tt = Theme.of(context).textTheme;
+    return SafeArea(
+      bottom: false,
+      child: Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: S.page),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                CupertinoIcons.person_3_fill,
+                size: 64,
+                color: dark ? C.onDark3 : C.onLight3,
+              ),
+              const SizedBox(height: S.s16),
+              Text(
+                'Groups',
+                style: tt.headlineSmall?.copyWith(fontWeight: FontWeight.w600),
+              ),
+              const SizedBox(height: S.s8),
+              Text(
+                'Sign in to create or join a group\nand track dhikr together.',
+                style: tt.bodyMedium?.copyWith(
+                  color: dark ? C.onDark2 : C.onLight2,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
@@ -80,6 +125,10 @@ class _GroupView extends StatefulWidget {
 class _GroupViewState extends State<_GroupView> {
   List<Map<String, dynamic>> _members = [];
   bool _loading = true;
+  int _weekTotal = 0;
+  int _monthTotal = 0;
+  static const _periods = ['Today', 'This Week', 'This Month'];
+  int _periodIdx = 0;
 
   @override
   void initState() {
@@ -90,7 +139,16 @@ class _GroupViewState extends State<_GroupView> {
   Future<void> _loadMembers() async {
     try {
       final members = await GroupService.getGroupMembers(widget.group['id']);
-      if (mounted) setState(() { _members = members; _loading = false; });
+      // Also load week/month totals
+      final periodTotals = await GroupService.getGroupPeriodTotals(widget.group['id'] as String);
+      if (mounted) {
+        setState(() {
+          _members = members;
+          _weekTotal = periodTotals['week'] ?? 0;
+          _monthTotal = periodTotals['month'] ?? 0;
+          _loading = false;
+        });
+      }
     } catch (_) {
       if (mounted) setState(() => _loading = false);
     }
@@ -110,7 +168,7 @@ class _GroupViewState extends State<_GroupView> {
     final tt = Theme.of(context).textTheme;
     final groupName = widget.group['name'] as String? ?? 'Group';
     final inviteCode = widget.group['invite_code'] as String? ?? '';
-    final dailyGoal = widget.group['daily_goal'] as int? ?? 10000;
+    final dailyGoal = widget.group['daily_goal'] as int? ?? 0;
     final groupTotal = _groupTotal;
 
     if (_loading) {
@@ -166,26 +224,55 @@ class _GroupViewState extends State<_GroupView> {
                   Text('selawat', style: tt.bodySmall),
 
                   // Daily goal progress
-                  const SizedBox(height: S.s16),
-                  _GoalProgressBar(
-                    current: groupTotal,
-                    goal: dailyGoal,
-                    dark: dark,
-                  ),
+                  if (dailyGoal > 0) ...[
+                    const SizedBox(height: S.s16),
+                    _GoalProgressBar(
+                      current: groupTotal,
+                      goal: dailyGoal,
+                      dark: dark,
+                    ),
+                  ],
                 ],
               ),
             ),
           ),
         ),
 
-        const SizedBox(height: S.s16),
+        const SizedBox(height: S.s12),
 
-        // Yearly summary chart
+        // Period stat cards (week & month)
+        FadeIn(
+          delay: const Duration(milliseconds: 120),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: S.page),
+            child: Row(
+              children: [
+                Expanded(
+                  child: _PeriodStatCard(
+                    label: 'This Week',
+                    value: _weekTotal,
+                    dark: dark,
+                  ),
+                ),
+                const SizedBox(width: S.s12),
+                Expanded(
+                  child: _PeriodStatCard(
+                    label: 'This Month',
+                    value: _monthTotal,
+                    dark: dark,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+
+        const SizedBox(height: S.s16),
         FadeIn(
           delay: const Duration(milliseconds: 160),
-          child: const Padding(
-            padding: EdgeInsets.symmetric(horizontal: S.page),
-            child: YearlyChart(),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: S.page),
+            child: YearlyChart(groupId: widget.group['id'] as String),
           ),
         ),
 
@@ -246,7 +333,7 @@ class _GroupViewState extends State<_GroupView> {
 
         const SizedBox(height: S.s32),
 
-        // Members header
+        // Members header with period toggle
         FadeIn(
           delay: const Duration(milliseconds: 200),
           child: Padding(
@@ -255,12 +342,42 @@ class _GroupViewState extends State<_GroupView> {
               children: [
                 Text('Members', style: tt.titleMedium),
                 const Spacer(),
-                Text(
-                  'Today',
-                  style: TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w600,
-                    color: dark ? C.onDark3 : C.onLight3,
+                Container(
+                  padding: const EdgeInsets.all(2),
+                  decoration: BoxDecoration(
+                    color: dark ? C.dark4 : C.light3,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    children: List.generate(_periods.length, (i) {
+                      final active = i == _periodIdx;
+                      return GestureDetector(
+                        onTap: () => setState(() => _periodIdx = i),
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 200),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: S.s8,
+                            vertical: S.s4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: active
+                                ? (dark ? C.primarySoft : C.primary)
+                                : Colors.transparent,
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Text(
+                            _periods[i],
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: active ? FontWeight.w700 : FontWeight.w500,
+                              color: active
+                                  ? C.white
+                                  : (dark ? C.onDark3 : C.onLight3),
+                            ),
+                          ),
+                        ),
+                      );
+                    }),
                   ),
                 ),
               ],
@@ -377,6 +494,52 @@ String _fmtNum(int n) {
     b.write(s[i]);
   }
   return b.toString();
+}
+
+// ── Period stat card (week/month) ──
+class _PeriodStatCard extends StatelessWidget {
+  const _PeriodStatCard({
+    required this.label,
+    required this.value,
+    required this.dark,
+  });
+
+  final String label;
+  final int value;
+  final bool dark;
+
+  @override
+  Widget build(BuildContext context) {
+    final tt = Theme.of(context).textTheme;
+    return Container(
+      padding: const EdgeInsets.all(S.s16),
+      decoration: BoxDecoration(
+        color: dark ? C.dark3 : C.light2,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: tt.labelSmall?.copyWith(
+              color: dark ? C.onDark3 : C.onLight3,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          const SizedBox(height: S.s6),
+          Text(
+            _fmtNum(value),
+            style: TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.w800,
+              color: dark ? C.onDark1 : C.onLight1,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 // ── Goal progress bar ──

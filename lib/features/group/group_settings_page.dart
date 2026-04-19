@@ -6,7 +6,6 @@ import 'package:selawathub/core/animations/fade_in.dart';
 import 'package:selawathub/core/constants.dart';
 import 'package:selawathub/core/services/group_service.dart';
 import 'package:selawathub/core/theme/colors.dart';
-import 'package:selawathub/core/widgets/action_buttons.dart';
 import 'package:selawathub/core/widgets/app_bottom_sheet.dart';
 import 'package:selawathub/core/widgets/app_snackbar.dart';
 import 'package:selawathub/core/widgets/frosted_bar.dart';
@@ -74,68 +73,80 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
     final dark = Theme.of(context).brightness == Brightness.dark;
     final tt = Theme.of(context).textTheme;
     final controller = TextEditingController(text: _groupName);
+    bool saving = false;
     showAppFormSheet(
       context: context,
-      builder: (ctx) => SafeArea(
-        child: Padding(
-          padding: EdgeInsets.fromLTRB(
-            S.page, S.s8, S.page,
-            MediaQuery.of(ctx).viewInsets.bottom + S.page,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-            Text(
-              'Edit Group Name',
-              style: tt.titleLarge?.copyWith(fontWeight: FontWeight.w600),
-            ),
-            const SizedBox(height: S.s4),
-            Text(
-              'Choose a name that represents your group.',
-              style: tt.bodySmall?.copyWith(
-                color: dark ? C.onDark3 : C.onLight3,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setSheetState) {
+          return SafeArea(
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(
+                S.page, S.s8, S.page,
+                MediaQuery.of(ctx).viewInsets.bottom + S.page,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Edit Group Name',
+                    style: tt.titleLarge?.copyWith(fontWeight: FontWeight.w600),
+                  ),
+                  const SizedBox(height: S.s4),
+                  Text(
+                    'Choose a name that represents your group.',
+                    style: tt.bodySmall?.copyWith(
+                      color: dark ? C.onDark3 : C.onLight3,
+                    ),
+                  ),
+                  const SizedBox(height: S.s20),
+                  TextField(
+                    controller: controller,
+                    autofocus: true,
+                    maxLength: 30,
+                    style: TextStyle(color: dark ? C.onDark1 : C.onLight1),
+                    decoration: InputDecoration(
+                      hintText: 'Enter group name',
+                      hintStyle: TextStyle(color: dark ? C.onDark3 : C.onLight3),
+                      filled: true,
+                      fillColor: dark ? C.dark4 : C.light3,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(14),
+                        borderSide: BorderSide.none,
+                      ),
+                      contentPadding:
+                          const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                      counterStyle:
+                          TextStyle(color: dark ? C.onDark3 : C.onLight3),
+                    ),
+                  ),
+                  const SizedBox(height: S.s16),
+                  _SaveCancelButtons(
+                    saving: saving,
+                    dark: dark,
+                    onCancel: () => Navigator.of(ctx).pop(),
+                    onConfirm: () async {
+                      final name = controller.text.trim();
+                      if (name.isEmpty) return;
+                      setSheetState(() => saving = true);
+                      try {
+                        await GroupService.updateGroup(widget.groupId, name: name);
+                        setState(() => _groupName = name);
+                        if (ctx.mounted) {
+                          Navigator.of(ctx).pop();
+                          showAppSnackBar(ctx, 'Group name updated');
+                        }
+                      } catch (_) {
+                        setSheetState(() => saving = false);
+                        if (ctx.mounted) showAppSnackBar(ctx, 'Failed to update name', backgroundColor: C.error);
+                      }
+                    },
+                  ),
+                ],
               ),
             ),
-            const SizedBox(height: S.s20),
-            TextField(
-              controller: controller,
-              autofocus: true,
-              maxLength: 30,
-              style: TextStyle(color: dark ? C.onDark1 : C.onLight1),
-              decoration: InputDecoration(
-                hintText: 'Enter group name',
-                hintStyle: TextStyle(color: dark ? C.onDark3 : C.onLight3),
-                filled: true,
-                fillColor: dark ? C.dark4 : C.light3,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14),
-                  borderSide: BorderSide.none,
-                ),
-                contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                counterStyle:
-                    TextStyle(color: dark ? C.onDark3 : C.onLight3),
-              ),
-            ),
-            const SizedBox(height: S.s16),
-            ActionButtons(
-              onCancel: () => Navigator.of(ctx).pop(),
-              onConfirm: () {
-                final name = controller.text.trim();
-                if (name.isNotEmpty) {
-                  GroupService.updateGroup(widget.groupId, name: name).then((_) {
-                    setState(() => _groupName = name);
-                  }).catchError((_) {
-                    if (ctx.mounted) showAppSnackBar(ctx, 'Failed to update name');
-                  });
-                }
-                Navigator.of(ctx).pop();
-              },
-            ),
-          ],
-        ),
-      ),
+          );
+        },
       ),
     );
   }
@@ -144,71 +155,82 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
     final dark = Theme.of(context).brightness == Brightness.dark;
     final tt = Theme.of(context).textTheme;
     final controller = TextEditingController(text: _dailyGoal.toString());
+    bool saving = false;
     showAppFormSheet(
       context: context,
-      builder: (ctx) => SafeArea(
-        child: Padding(
-          padding: EdgeInsets.fromLTRB(
-            S.page, S.s8, S.page,
-            MediaQuery.of(ctx).viewInsets.bottom + S.page,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Set Daily Goal',
-                style: tt.titleLarge?.copyWith(fontWeight: FontWeight.w600),
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setSheetState) {
+          return SafeArea(
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(
+                S.page, S.s8, S.page,
+                MediaQuery.of(ctx).viewInsets.bottom + S.page,
               ),
-              const SizedBox(height: S.s4),
-              Text(
-                'Set a daily selawat target for your group.',
-                style: tt.bodySmall?.copyWith(
-                  color: dark ? C.onDark3 : C.onLight3,
-                ),
-              ),
-              const SizedBox(height: S.s20),
-              TextField(
-                controller: controller,
-                autofocus: true,
-                keyboardType: TextInputType.number,
-                style: TextStyle(color: dark ? C.onDark1 : C.onLight1),
-                decoration: InputDecoration(
-                  hintText: 'e.g. 10000',
-                  hintStyle:
-                      TextStyle(color: dark ? C.onDark3 : C.onLight3),
-                  filled: true,
-                  fillColor: dark ? C.dark4 : C.light3,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(14),
-                    borderSide: BorderSide.none,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Set Daily Goal',
+                    style: tt.titleLarge?.copyWith(fontWeight: FontWeight.w600),
                   ),
-                  contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 20, vertical: 16),
-                  suffixText: 'selawat',
-                  suffixStyle:
-                      TextStyle(color: dark ? C.onDark3 : C.onLight3),
-                ),
+                  const SizedBox(height: S.s4),
+                  Text(
+                    'Set a daily selawat target for your group.',
+                    style: tt.bodySmall?.copyWith(
+                      color: dark ? C.onDark3 : C.onLight3,
+                    ),
+                  ),
+                  const SizedBox(height: S.s20),
+                  TextField(
+                    controller: controller,
+                    autofocus: true,
+                    keyboardType: TextInputType.number,
+                    style: TextStyle(color: dark ? C.onDark1 : C.onLight1),
+                    decoration: InputDecoration(
+                      hintText: 'e.g. 10000',
+                      hintStyle:
+                          TextStyle(color: dark ? C.onDark3 : C.onLight3),
+                      filled: true,
+                      fillColor: dark ? C.dark4 : C.light3,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(14),
+                        borderSide: BorderSide.none,
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 16),
+                      suffixText: 'selawat',
+                      suffixStyle:
+                          TextStyle(color: dark ? C.onDark3 : C.onLight3),
+                    ),
+                  ),
+                  const SizedBox(height: S.s16),
+                  _SaveCancelButtons(
+                    saving: saving,
+                    dark: dark,
+                    onCancel: () => Navigator.of(ctx).pop(),
+                    onConfirm: () async {
+                      final val = int.tryParse(controller.text.trim()) ?? 0;
+                      if (val < 0) return;
+                      setSheetState(() => saving = true);
+                      try {
+                        await GroupService.updateGroup(widget.groupId, dailyGoal: val);
+                        setState(() => _dailyGoal = val);
+                        if (ctx.mounted) {
+                          Navigator.of(ctx).pop();
+                          showAppSnackBar(ctx, 'Daily goal updated');
+                        }
+                      } catch (_) {
+                        setSheetState(() => saving = false);
+                        if (ctx.mounted) showAppSnackBar(ctx, 'Failed to update goal', backgroundColor: C.error);
+                      }
+                    },
+                  ),
+                ],
               ),
-              const SizedBox(height: S.s16),
-              ActionButtons(
-                onCancel: () => Navigator.of(ctx).pop(),
-                onConfirm: () {
-                  final val =
-                      int.tryParse(controller.text.trim()) ?? 0;
-                  if (val > 0) {
-                    GroupService.updateGroup(widget.groupId, dailyGoal: val).then((_) {
-                      setState(() => _dailyGoal = val);
-                    }).catchError((_) {
-                      if (ctx.mounted) showAppSnackBar(ctx, 'Failed to update goal');
-                    });
-                  }
-                  Navigator.of(ctx).pop();
-                },
-              ),
-            ],
-          ),
-        ),
+            ),
+          );
+        },
       ),
     );
   }
@@ -929,6 +951,82 @@ class _MenuRow extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────
+//  Save / Cancel buttons with loading state
+// ─────────────────────────────────────────────────────────
+
+class _SaveCancelButtons extends StatelessWidget {
+  const _SaveCancelButtons({
+    required this.saving,
+    required this.dark,
+    required this.onCancel,
+    required this.onConfirm,
+  });
+
+  final bool saving;
+  final bool dark;
+  final VoidCallback onCancel;
+  final VoidCallback onConfirm;
+
+  @override
+  Widget build(BuildContext context) {
+    final tt = Theme.of(context).textTheme;
+    return Row(
+      children: [
+        Expanded(
+          child: BounceTap(
+            onTap: saving ? null : onCancel,
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: S.s12),
+              decoration: BoxDecoration(
+                color: dark ? C.dark4 : C.light3,
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Center(
+                child: Text(
+                  'Cancel',
+                  style: tt.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: dark ? C.onDark2 : C.onLight2,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(width: S.s12),
+        Expanded(
+          child: BounceTap(
+            onTap: saving ? null : onConfirm,
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: S.s12),
+              decoration: BoxDecoration(
+                color: dark ? C.primarySoft : C.primary,
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Center(
+                child: saving
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(strokeWidth: 2, color: C.white),
+                      )
+                    : Text(
+                        'Save',
+                        style: tt.bodyMedium?.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: C.white,
+                        ),
+                      ),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

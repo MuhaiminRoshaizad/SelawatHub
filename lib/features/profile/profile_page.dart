@@ -152,7 +152,7 @@ class _ProfilePageState extends State<ProfilePage> {
               children: [
                 const SizedBox(height: S.s4),
                 Text(
-                  _isGuest ? 'Guest' : (_name.isEmpty ? 'Placeholder Name' : _name),
+                  _isGuest ? 'Guest' : (_name.isEmpty ? (SupabaseService.currentUser?.userMetadata?['name'] as String? ?? 'Set your name') : _name),
                   style: tt.headlineMedium?.copyWith(
                     fontWeight: FontWeight.w700,
                   ),
@@ -161,7 +161,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 if (!_isGuest) ...[
                   const SizedBox(height: S.s4),
                   Text(
-                    _bio.isEmpty ? 'A short bio goes here' : _bio,
+                    _bio.isEmpty ? 'Tap ✏️ to add a bio' : _bio,
                     style: tt.bodyMedium?.copyWith(
                       color: dark ? C.onDark2 : C.onLight2,
                     ),
@@ -192,7 +192,8 @@ class _ProfilePageState extends State<ProfilePage> {
 
         const SizedBox(height: S.s24),
 
-        // ── Account Info section ──
+        // ── Account Info section (authenticated only) ──
+        if (!_isGuest) ...[
         _sectionHeader('Account Info', 200, dark),
         FadeIn(
           delay: const Duration(milliseconds: 240),
@@ -227,6 +228,7 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
           ),
         ),
+        ],
 
         if (!_isGuest) ...[
           const SizedBox(height: S.s24),
@@ -384,13 +386,17 @@ class _ProfilePageState extends State<ProfilePage> {
                   )
                 : BounceTap(
                     onTap: () async {
-                      await AuthService.signOut();
-                      if (!context.mounted) return;
-                      Navigator.of(context).pushAndRemoveUntil(
-                        MaterialPageRoute(
-                            builder: (_) => const WelcomePage()),
-                        (_) => false,
-                      );
+                      try {
+                        await AuthService.signOut();
+                        if (!context.mounted) return;
+                        Navigator.of(context).pushAndRemoveUntil(
+                          MaterialPageRoute(
+                              builder: (_) => const WelcomePage()),
+                          (_) => false,
+                        );
+                      } catch (_) {
+                        if (context.mounted) showAppSnackBar(context, 'Failed to sign out', backgroundColor: C.error);
+                      }
                     },
                     child: Container(
                       padding: const EdgeInsets.symmetric(vertical: S.s16),
@@ -524,49 +530,14 @@ class _ProfilePageState extends State<ProfilePage> {
     showAppFormSheet(
       context: context,
       builder: (ctx) {
-        final tt = Theme.of(ctx).textTheme;
-        return Padding(
-          padding: EdgeInsets.fromLTRB(S.page, S.s8, S.page, MediaQuery.of(ctx).viewInsets.bottom + S.page),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Change Password', style: tt.titleLarge?.copyWith(fontWeight: FontWeight.w600)),
-              const SizedBox(height: S.s24),
-              TextField(
-                controller: currentCtrl,
-                obscureText: true,
-                decoration: const InputDecoration(
-                  labelText: 'Current Password',
-                ),
-              ),
-              const SizedBox(height: S.s16),
-              TextField(
-                controller: newCtrl,
-                obscureText: true,
-                decoration: const InputDecoration(
-                  labelText: 'New Password',
-                ),
-              ),
-              const SizedBox(height: S.s16),
-              TextField(
-                controller: confirmCtrl,
-                obscureText: true,
-                decoration: const InputDecoration(
-                  labelText: 'Confirm Password',
-                ),
-              ),
-              const SizedBox(height: S.s24),
-              ActionButtons(
-                onCancel: () => Navigator.pop(ctx),
-                onConfirm: () {
-                  Navigator.pop(ctx);
-                  showAppSnackBar(context, 'Password changed successfully');
-                },
-              ),
-              SizedBox(height: MediaQuery.of(ctx).padding.bottom),
-            ],
-          ),
+        return _ChangePasswordSheet(
+          currentCtrl: currentCtrl,
+          newCtrl: newCtrl,
+          confirmCtrl: confirmCtrl,
+          onSaved: () {
+            Navigator.pop(ctx);
+            showAppSnackBar(context, 'Password changed successfully');
+          },
         );
       },
     );
@@ -595,4 +566,97 @@ class _ProfilePageState extends State<ProfilePage> {
         indent: 52,
         color: dark ? C.darkDivider : C.lightDivider,
       );
+}
+
+// ── Change password sheet with visibility toggles ──
+class _ChangePasswordSheet extends StatefulWidget {
+  const _ChangePasswordSheet({
+    required this.currentCtrl,
+    required this.newCtrl,
+    required this.confirmCtrl,
+    required this.onSaved,
+  });
+  final TextEditingController currentCtrl;
+  final TextEditingController newCtrl;
+  final TextEditingController confirmCtrl;
+  final VoidCallback onSaved;
+
+  @override
+  State<_ChangePasswordSheet> createState() => _ChangePasswordSheetState();
+}
+
+class _ChangePasswordSheetState extends State<_ChangePasswordSheet> {
+  bool _showCurrent = false;
+  bool _showNew = false;
+  bool _showConfirm = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final tt = Theme.of(context).textTheme;
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    return Padding(
+      padding: EdgeInsets.fromLTRB(S.page, S.s8, S.page, MediaQuery.of(context).viewInsets.bottom + S.page),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Change Password', style: tt.titleLarge?.copyWith(fontWeight: FontWeight.w600)),
+          const SizedBox(height: S.s24),
+          TextField(
+            controller: widget.currentCtrl,
+            obscureText: !_showCurrent,
+            decoration: InputDecoration(
+              labelText: 'Current Password',
+              suffixIcon: GestureDetector(
+                onTap: () => setState(() => _showCurrent = !_showCurrent),
+                child: Icon(
+                  _showCurrent ? CupertinoIcons.eye : CupertinoIcons.eye_slash,
+                  size: 18,
+                  color: dark ? C.onDark3 : C.onLight3,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: S.s16),
+          TextField(
+            controller: widget.newCtrl,
+            obscureText: !_showNew,
+            decoration: InputDecoration(
+              labelText: 'New Password',
+              suffixIcon: GestureDetector(
+                onTap: () => setState(() => _showNew = !_showNew),
+                child: Icon(
+                  _showNew ? CupertinoIcons.eye : CupertinoIcons.eye_slash,
+                  size: 18,
+                  color: dark ? C.onDark3 : C.onLight3,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: S.s16),
+          TextField(
+            controller: widget.confirmCtrl,
+            obscureText: !_showConfirm,
+            decoration: InputDecoration(
+              labelText: 'Confirm Password',
+              suffixIcon: GestureDetector(
+                onTap: () => setState(() => _showConfirm = !_showConfirm),
+                child: Icon(
+                  _showConfirm ? CupertinoIcons.eye : CupertinoIcons.eye_slash,
+                  size: 18,
+                  color: dark ? C.onDark3 : C.onLight3,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: S.s24),
+          ActionButtons(
+            onCancel: () => Navigator.pop(context),
+            onConfirm: widget.onSaved,
+          ),
+          SizedBox(height: MediaQuery.of(context).padding.bottom),
+        ],
+      ),
+    );
+  }
 }
