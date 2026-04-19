@@ -1,76 +1,107 @@
 # SelawatHub
 
-SelawatHub is a Flutter app for group selawat tracking. Members contribute daily counts through a built-in counter, and leaders can monitor group progress.
+A beautiful Flutter app for counting selawat and zikir — individually or together as a group. Track your daily dhikr, build streaks, and stay connected with your community.
 
-## Design Direction
+Built with **Flutter** + **Supabase** (Auth, Database, Storage).
+
+## Screenshots
+
+*Coming soon — dark & light mode previews*
+
+## Features
+
+| Feature | Description |
+|---------|-------------|
+| 🧿 **Tasbih Counter** | 17 dhikr items (10 selawat, 7 zikir) with 3 visualisation styles & 6 color themes |
+| 📊 **Statistics** | 52-week heatmap, streaks with fire tiers, weekly chart, daily goal tracking |
+| 👥 **Groups** | Create/join groups, leaderboard, role hierarchy (leader/co-leader/member) |
+| 📖 **Daily Content** | Nawawi hadiths, duas, adkar, and post-salaah zikr |
+| 👤 **Profile** | Editable profile with avatar, bio, and account management |
+| 🌙 **Dark/Light Mode** | Full theme support with system toggle |
+| 👻 **Guest Mode** | Use the counter and stats without creating an account |
+
+## Design
+
 - **Minimal + Bold + Premium** — clean whitespace, punchy typography, dark luxe feel
-- **Palette** — Deep emerald + warm gold accents + clean neutrals
-- **Modes** — Dark & Light with system toggle
-- **Typography** — Bold headlines, generous letter-spacing, layered hierarchy
+- **Palette** — Deep emerald (`#4A7C5C`) + warm gold (`#C4A44E`) + cream neutrals
+- **Dark & Light** modes with smooth toggle
 
-## Current Tabs
-1. **Home** — Personal dashboard: today's count, streak, group snapshot, rank
-2. **Counter** — Immersive tasbih counter with tap animation and progress tracking
-3. **Community** — Group leaderboard, member activity, invite code, pending requests
-4. **Profile** — Account info, group details, settings (dark mode, language), sign out
+## Quick Start
 
-## MVP Features
-- Firebase Auth (placeholder ready)
-- Create group or join with code
-- Built-in tasbih counter with pulse animation
-- Personal daily counts with target tracking
-- Group daily totals and leaderboard
-- Streak tracking
-- Dark/light mode toggle
+### Prerequisites
+- Flutter SDK ≥ 3.7.0
+- Dart ≥ 3.7.0
+- Android Studio / VS Code
+- A Supabase project (see [docs/SETUP.md](docs/SETUP.md))
 
-## Planned Features
-- Join request approval workflow (leader)
-- Public/private group settings
-- Full analytics dashboard
-- Notifications
-- Multilingual support (English + Malay)
+### Install & Run
 
-## App Structure
+```bash
+flutter pub get
 
-```text
-lib/
-  app/
-    app.dart                  # Root MaterialApp with theme switching
-    app_shell.dart            # Bottom tab navigation shell
-  core/
-    theme/
-      colors.dart             # Emerald + gold color system
-      app_theme.dart          # Material 3 light/dark themes
-      theme_controller.dart   # InheritedNotifier for theme access
-    widgets/
-      app_background.dart     # Clean background wrapper
-      blur_card.dart          # SurfaceCard — clean bordered card
-  features/
-    auth/presentation/pages/auth_gate_page.dart
-    home/presentation/pages/home_page.dart
-    counter/presentation/pages/counter_page.dart
-    community/presentation/pages/community_page.dart
-    profile/presentation/pages/profile_page.dart
-    settings/presentation/pages/settings_page.dart
-  main.dart
+flutter run \
+  --dart-define=SUPABASE_URL=your_supabase_url \
+  --dart-define=SUPABASE_ANON_KEY=your_anon_key
 ```
 
-## Next Build Steps
-1. Wire Firebase Auth in `auth_gate_page.dart`
-2. Implement Firestore group + member schema
-3. Connect counter writes to daily entries
-4. Aggregate group totals and leaderboard from Firestore
-5. Add leader-only approval actions in Community tab
-6. Implement i18n (English + Malay)
+### Build APK
 
-## Getting Started
-1. Install Flutter: https://flutter.dev/docs/get-started/install
-2. Install dependencies:
-   ```bash
-   flutter pub get
-   ```
-3. Run the app:
-   ```bash
-   flutter run
-   ```
+```bash
+flutter build apk \
+  --dart-define=SUPABASE_URL=your_supabase_url \
+  --dart-define=SUPABASE_ANON_KEY=your_anon_key
+```
+
+## Project Structure
+
+```
+lib/
+├── app/
+│   ├── app.dart              # Root MaterialApp, routing, auth listener
+│   └── app_shell.dart        # Bottom tab navigation (5 tabs)
+├── core/
+│   ├── constants.dart        # Spacing scale (S class)
+│   ├── providers/            # Riverpod providers
+│   ├── services/             # 7 static service classes
+│   ├── theme/                # Colors (C class), themes
+│   └── widgets/              # Shared components (BounceTap, FadeIn, etc.)
+├── features/
+│   ├── auth/                 # Login, sign-up, welcome, password reset
+│   ├── counter/              # Tasbih counter + dhikr models
+│   ├── group/                # Group management + settings
+│   ├── hadith/               # Daily content (hadiths, duas, adkar)
+│   ├── profile/              # Profile, about, legal pages, FAQ
+│   └── stats/                # Statistics dashboard
+└── main.dart
+```
+
+## Documentation
+
+Detailed documentation lives in the [`docs/`](docs/) folder:
+
+| Document | Description |
+|----------|-------------|
+| [Architecture](docs/ARCHITECTURE.md) | System design, data flows, design decisions |
+| [Setup](docs/SETUP.md) | Development environment setup guide |
+| [Database](docs/DATABASE.md) | Supabase schema, RLS policies, RPC functions |
+| [Features](docs/FEATURES.md) | Feature-by-feature documentation |
+| [API Reference](docs/API.md) | Services, providers, and external APIs |
+| [Design System](docs/DESIGN_SYSTEM.md) | Colors, spacing, typography, components |
+| [Contributing](docs/CONTRIBUTING.md) | Code style, commit format, conventions |
+| [Roadmap](docs/ROADMAP.md) | Current status and planned features |
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|------------|
+| Framework | Flutter 3.7+ |
+| State Management | Riverpod |
+| Backend | Supabase (PostgreSQL + Auth + Storage) |
+| External API | [Naikiyah Dua Data API](https://dua-data-api.vercel.app/api) |
+| Local Storage | SharedPreferences |
+| Sharing | share_plus |
+
+## License
+
+*To be determined*
 
