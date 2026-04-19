@@ -4,6 +4,7 @@ import 'package:selawathub/core/animations/bounce_tap.dart';
 import 'package:selawathub/core/animations/fade_in.dart';
 import 'package:selawathub/core/constants.dart';
 import 'package:selawathub/core/theme/colors.dart';
+import 'package:selawathub/core/widgets/app_snackbar.dart';
 import 'package:selawathub/core/widgets/frosted_bar.dart';
 
 // ─────────────────────────────────────────────────────────
@@ -85,15 +86,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     final name = _nameCtrl.text.trim();
     if (name.isEmpty) {
       _nameFocus.requestFocus();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('Name cannot be empty'),
-          backgroundColor: C.error,
-          behavior: SnackBarBehavior.floating,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        ),
-      );
+      showAppSnackBar(context, 'Name cannot be empty', backgroundColor: C.error);
       return;
     }
     Navigator.of(context).pop({

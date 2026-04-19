@@ -74,18 +74,29 @@ class _CounterSettingsPageState extends State<CounterSettingsPage> {
       isScrollControlled: true,
       backgroundColor: dark ? C.dark2 : C.light1,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       builder: (ctx) => SafeArea(
         child: Padding(
           padding: EdgeInsets.fromLTRB(
-            S.page, S.s24, S.page,
-            MediaQuery.of(ctx).viewInsets.bottom + S.s24,
+            S.page, S.s16, S.page,
+            MediaQuery.of(ctx).viewInsets.bottom + S.page,
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Center(
+                child: Container(
+                  width: 36,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: dark ? C.dark4 : C.lightDivider,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              const SizedBox(height: S.s16),
               Text(
                 d.name,
                 style: TextStyle(
@@ -146,6 +157,7 @@ class _CounterSettingsPageState extends State<CounterSettingsPage> {
                   dark: dark,
                   children: [
                     _SwitchRow(
+                      icon: CupertinoIcons.bolt_fill,
                       label: 'Haptic Feedback',
                       value: _hapticEnabled,
                       onChanged: (v) => setState(() => _hapticEnabled = v),
@@ -498,24 +510,38 @@ class _SwitchRow extends StatelessWidget {
     required this.label,
     required this.value,
     required this.onChanged,
+    this.icon = CupertinoIcons.bolt_fill,
   });
   final String label;
   final bool value;
+  final IconData icon;
   final ValueChanged<bool> onChanged;
 
   @override
   Widget build(BuildContext context) {
     final dark = Theme.of(context).brightness == Brightness.dark;
+    final tt = Theme.of(context).textTheme;
+    final accent = dark ? C.primarySoft : C.primary;
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: S.s16, vertical: S.s8),
+      padding: const EdgeInsets.symmetric(horizontal: S.s20, vertical: S.s8),
       child: Row(
         children: [
-          Text(label, style: TextStyle(color: dark ? C.onDark1 : C.onLight1)),
-          const Spacer(),
-          CupertinoSwitch(
+          Container(
+            width: 32,
+            height: 32,
+            decoration: BoxDecoration(
+              color: accent.withValues(alpha: 0.08),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Center(child: Icon(icon, size: 16, color: accent)),
+          ),
+          const SizedBox(width: S.s12),
+          Expanded(child: Text(label, style: tt.titleSmall)),
+          Switch.adaptive(
             value: value,
-            activeTrackColor: C.primary,
             onChanged: onChanged,
+            activeTrackColor: accent.withValues(alpha: 0.4),
+            activeThumbColor: accent,
           ),
         ],
       ),

@@ -32,7 +32,7 @@ class BeadCircle extends StatelessWidget {
           filledColor: accentColor,
           emptyColor: dark ? C.white.withValues(alpha: 0.06) : C.black.withValues(alpha: 0.06),
           threadColor: dark ? C.white.withValues(alpha: 0.03) : C.black.withValues(alpha: 0.04),
-          glowColor: C.primaryGlow,
+          glowColor: accentColor.withValues(alpha: 0.2),
         ),
       ),
     );
@@ -87,5 +87,5 @@ class _Painter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _Painter old) =>
-      old.filled != filled || old.total != total;
+      old.filled != filled || old.total != total || old.filledColor != filledColor || old.glowColor != glowColor;
 }

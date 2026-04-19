@@ -7,6 +7,7 @@ import 'package:selawathub/core/constants.dart';
 import 'package:selawathub/core/theme/colors.dart';
 import 'package:selawathub/core/theme/theme.dart';
 import 'package:selawathub/core/widgets/action_buttons.dart';
+import 'package:selawathub/core/widgets/app_snackbar.dart';
 import 'package:selawathub/features/auth/welcome_page.dart';
 import 'package:selawathub/features/profile/about_page.dart';
 import 'package:selawathub/features/profile/edit_profile_page.dart';
@@ -473,9 +474,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     icon: CupertinoIcons.share,
                     label: 'Share App',
                     dark: dark,
-                    onTap: () => ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Share link copied to clipboard!')),
-                    ),
+                    onTap: () => showAppSnackBar(context, 'Share link copied to clipboard!'),
                   ),
                 ],
               ),
@@ -591,18 +590,29 @@ class _ProfilePageState extends State<ProfilePage> {
       context: context,
       backgroundColor: dark ? C.dark2 : C.light1,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       builder: (ctx) {
         return StatefulBuilder(
           builder: (ctx, setSheetState) {
             final tt = Theme.of(ctx).textTheme;
             return Padding(
-              padding: const EdgeInsets.all(S.page),
+              padding: const EdgeInsets.fromLTRB(S.page, S.s16, S.page, S.page),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  Center(
+                    child: Container(
+                      width: 36,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: dark ? C.dark4 : C.lightDivider,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: S.s16),
                   Text('Language', style: tt.titleLarge?.copyWith(fontWeight: FontWeight.w600)),
                   const SizedBox(height: S.s24),
                   for (final lang in ['English', 'Bahasa Melayu'])
@@ -611,9 +621,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         setState(() => _language = lang);
                         setSheetState(() {});
                         Navigator.pop(ctx);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Language changed to $lang')),
-                        );
+                        showAppSnackBar(context, 'Language changed to $lang');
                       },
                       child: Container(
                         padding: const EdgeInsets.symmetric(vertical: S.s16),
@@ -664,16 +672,27 @@ class _ProfilePageState extends State<ProfilePage> {
       isScrollControlled: true,
       backgroundColor: dark ? C.dark2 : C.light1,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       builder: (ctx) {
         final tt = Theme.of(ctx).textTheme;
         return Padding(
-          padding: EdgeInsets.fromLTRB(S.page, S.page, S.page, MediaQuery.of(ctx).viewInsets.bottom + S.page),
+          padding: EdgeInsets.fromLTRB(S.page, S.s16, S.page, MediaQuery.of(ctx).viewInsets.bottom + S.page),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Center(
+                child: Container(
+                  width: 36,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: dark ? C.dark4 : C.lightDivider,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              const SizedBox(height: S.s16),
               Text('Change Password', style: tt.titleLarge?.copyWith(fontWeight: FontWeight.w600)),
               const SizedBox(height: S.s24),
               TextField(
@@ -704,9 +723,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 onCancel: () => Navigator.pop(ctx),
                 onConfirm: () {
                   Navigator.pop(ctx);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Password changed successfully')),
-                  );
+                  showAppSnackBar(context, 'Password changed successfully');
                 },
               ),
               SizedBox(height: MediaQuery.of(ctx).padding.bottom),

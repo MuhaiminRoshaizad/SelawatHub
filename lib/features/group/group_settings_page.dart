@@ -6,6 +6,7 @@ import 'package:selawathub/core/animations/fade_in.dart';
 import 'package:selawathub/core/constants.dart';
 import 'package:selawathub/core/theme/colors.dart';
 import 'package:selawathub/core/widgets/action_buttons.dart';
+import 'package:selawathub/core/widgets/app_snackbar.dart';
 import 'package:selawathub/core/widgets/frosted_bar.dart';
 
 enum GroupRole { leader, coLeader, member }
@@ -57,13 +58,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
 
   void _copyInviteCode() {
     Clipboard.setData(ClipboardData(text: widget.inviteCode));
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Text('Invite code copied!'),
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      ),
-    );
+    showAppSnackBar(context, 'Invite code copied!');
   }
 
   void _editGroupName() {
@@ -73,17 +68,15 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: dark ? C.dark3 : C.light2,
+      backgroundColor: dark ? C.dark2 : C.light1,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       builder: (ctx) => SafeArea(
         child: Padding(
-          padding: EdgeInsets.only(
-            left: S.s24,
-            right: S.s24,
-            top: S.s24,
-            bottom: MediaQuery.of(ctx).viewInsets.bottom + S.s24,
+          padding: EdgeInsets.fromLTRB(
+            S.page, S.s16, S.page,
+            MediaQuery.of(ctx).viewInsets.bottom + S.page,
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -92,16 +85,15 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
             // Drag handle
             Center(
               child: Container(
-                width: 40,
+                width: 36,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: (dark ? C.onDark3 : C.onLight3)
-                      .withValues(alpha: 0.3),
+                  color: dark ? C.dark4 : C.lightDivider,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
             ),
-            const SizedBox(height: S.s20),
+            const SizedBox(height: S.s16),
             Text(
               'Edit Group Name',
               style: tt.titleLarge?.copyWith(fontWeight: FontWeight.w600),
@@ -159,17 +151,15 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: dark ? C.dark3 : C.light2,
+      backgroundColor: dark ? C.dark2 : C.light1,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       builder: (ctx) => SafeArea(
         child: Padding(
-          padding: EdgeInsets.only(
-            left: S.s24,
-            right: S.s24,
-            top: S.s24,
-            bottom: MediaQuery.of(ctx).viewInsets.bottom + S.s24,
+          padding: EdgeInsets.fromLTRB(
+            S.page, S.s16, S.page,
+            MediaQuery.of(ctx).viewInsets.bottom + S.page,
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -177,16 +167,15 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
             children: [
               Center(
                 child: Container(
-                  width: 40,
+                  width: 36,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: (dark ? C.onDark3 : C.onLight3)
-                        .withValues(alpha: 0.3),
+                    color: dark ? C.dark4 : C.lightDivider,
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
               ),
-              const SizedBox(height: S.s20),
+              const SizedBox(height: S.s16),
               Text(
                 'Set Daily Goal',
                 style: tt.titleLarge?.copyWith(fontWeight: FontWeight.w600),
@@ -407,6 +396,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
   Widget build(BuildContext context) {
     final dark = Theme.of(context).brightness == Brightness.dark;
     final tt = Theme.of(context).textTheme;
+    final accent = dark ? C.primarySoft : C.primary;
 
     return Scaffold(
       backgroundColor: dark ? C.dark1 : C.light1,
@@ -562,44 +552,40 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
               FadeIn(
                 delay: const Duration(milliseconds: 140),
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: S.page),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: dark ? C.dark3 : C.light2,
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: S.s16, vertical: S.s4),
-                      child: Row(
-                        children: [
-                          Icon(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: S.s20, vertical: S.s8),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 32,
+                        height: 32,
+                        decoration: BoxDecoration(
+                          color: accent.withValues(alpha: 0.08),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Center(
+                          child: Icon(
                             _muteNotifications
                                 ? CupertinoIcons.bell_slash
                                 : CupertinoIcons.bell,
-                            size: 18,
-                            color: dark ? C.onDark2 : C.onLight2,
+                            size: 16,
+                            color: accent,
                           ),
-                          const SizedBox(width: S.s12),
-                          Expanded(
-                            child: Text(
-                              'Mute Notifications',
-                              style: tt.bodyMedium?.copyWith(
-                                color: dark ? C.onDark1 : C.onLight1,
-                              ),
-                            ),
-                          ),
-                          Switch.adaptive(
-                            value: _muteNotifications,
-                            onChanged: (v) =>
-                                setState(() => _muteNotifications = v),
-                            activeTrackColor:
-                                dark ? C.primarySoft : C.primary,
-                            activeThumbColor: C.white,
-                          ),
-                        ],
+                        ),
                       ),
-                    ),
+                      const SizedBox(width: S.s12),
+                      Expanded(
+                        child: Text('Mute Notifications',
+                            style: tt.titleSmall),
+                      ),
+                      Switch.adaptive(
+                        value: _muteNotifications,
+                        onChanged: (v) =>
+                            setState(() => _muteNotifications = v),
+                        activeTrackColor: accent.withValues(alpha: 0.4),
+                        activeThumbColor: accent,
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -896,13 +882,7 @@ class _ManageRolesPageState extends State<_ManageRolesPage> {
 
   void _saveChanges() {
     Navigator.pop(context);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Text('Roles updated'),
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      ),
-    );
+    showAppSnackBar(context, 'Roles updated');
   }
 
   @override
@@ -1201,14 +1181,7 @@ class _RemoveMemberPageState extends State<_RemoveMemberPage> {
             onPressed: () {
               Navigator.of(ctx).pop();
               Navigator.of(context).pop();
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('$count member${count > 1 ? 's' : ''} removed'),
-                  behavior: SnackBarBehavior.floating,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12)),
-                ),
-              );
+              showAppSnackBar(context, '$count member${count > 1 ? 's' : ''} removed');
             },
             child: Text('Remove', style: TextStyle(color: C.error)),
           ),
@@ -1412,15 +1385,7 @@ class _TransferLeadershipPageState extends State<_TransferLeadershipPage> {
             onPressed: () {
               Navigator.of(ctx).pop();
               Navigator.of(context).pop();
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content:
-                      Text('Leadership transferred to $_selected'),
-                  behavior: SnackBarBehavior.floating,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12)),
-                ),
-              );
+              showAppSnackBar(context, 'Leadership transferred to $_selected');
             },
             child: Text(
               'Transfer',

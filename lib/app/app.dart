@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:selawathub/core/theme/theme.dart';
-import 'package:selawathub/features/auth/welcome_page.dart';
+import 'package:selawathub/features/auth/onboarding_page.dart';
 
 class SelawatHubApp extends StatefulWidget {
   const SelawatHubApp({super.key});
@@ -30,7 +30,7 @@ class _SelawatHubAppState extends State<SelawatHubApp> {
           theme: AppTheme.light(),
           darkTheme: AppTheme.dark(),
           themeMode: mode,
-          home: const WelcomePage(),
+          home: const OnboardingPage(),
         ),
       ),
     );

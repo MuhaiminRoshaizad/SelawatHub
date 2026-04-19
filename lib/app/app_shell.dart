@@ -22,7 +22,7 @@ class _AppShellState extends State<AppShell> {
 
   late final _pages = [
     const CounterPage(),
-    const GroupPage(),
+    GroupPage(isGuest: widget.isGuest),
     const StatsPage(),
     const HadithPage(),
     ProfilePage(isGuest: widget.isGuest),

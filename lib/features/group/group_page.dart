@@ -5,18 +5,21 @@ import 'package:selawathub/core/animations/bounce_tap.dart';
 import 'package:selawathub/core/animations/fade_in.dart';
 import 'package:selawathub/core/constants.dart';
 import 'package:selawathub/core/theme/colors.dart';
+import 'package:selawathub/core/widgets/action_buttons.dart';
+import 'package:selawathub/core/widgets/app_snackbar.dart';
 import 'package:selawathub/core/widgets/frosted_bar.dart';
 import 'package:selawathub/features/group/group_settings_page.dart';
 
 class GroupPage extends StatefulWidget {
-  const GroupPage({super.key});
+  const GroupPage({super.key, this.isGuest = false});
+  final bool isGuest;
 
   @override
   State<GroupPage> createState() => _GroupPageState();
 }
 
 class _GroupPageState extends State<GroupPage> {
-  bool _hasGroup = true; // mock: user has a group
+  late bool _hasGroup = !widget.isGuest; // guests start with no group
 
   @override
   Widget build(BuildContext context) {
@@ -162,15 +165,7 @@ class _GroupViewState extends State<_GroupView> {
             child: BounceTap(
               onTap: () {
                 Clipboard.setData(const ClipboardData(text: 'SLWT-7861'));
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: const Text('Invite code copied!'),
-                    behavior: SnackBarBehavior.floating,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                );
+                showAppSnackBar(context, 'Invite code copied!');
               },
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: S.s20, vertical: S.s16),
@@ -454,9 +449,182 @@ class _GroupViewState extends State<_GroupView> {
 }
 
 // ── No group view ──
-class _NoGroupView extends StatelessWidget {
+class _NoGroupView extends StatefulWidget {
   const _NoGroupView({required this.onJoined});
   final VoidCallback onJoined;
+
+  @override
+  State<_NoGroupView> createState() => _NoGroupViewState();
+}
+
+class _NoGroupViewState extends State<_NoGroupView> {
+  final _codeCtrl = TextEditingController();
+
+  @override
+  void dispose() {
+    _codeCtrl.dispose();
+    super.dispose();
+  }
+
+  void _joinGroup() {
+    if (_codeCtrl.text.trim().isEmpty) {
+      showAppSnackBar(context, 'Please enter an invite code');
+      return;
+    }
+
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    final tt = Theme.of(context).textTheme;
+    final onJoined = widget.onJoined;
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: dark ? C.dark2 : C.light1,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (ctx) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(S.page),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Center(
+                child: Container(
+                  width: 36,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: dark ? C.dark4 : C.lightDivider,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              const SizedBox(height: S.s16),
+              Icon(
+                CupertinoIcons.checkmark_circle_fill,
+                size: 56,
+                color: C.success,
+              ),
+              const SizedBox(height: S.s16),
+              Text("You've joined the group!", style: tt.titleLarge),
+              const SizedBox(height: S.s8),
+              Text(
+                'Welcome to SelawatHub Family',
+                style: tt.bodyMedium?.copyWith(
+                  color: dark ? C.onDark2 : C.onLight2,
+                ),
+              ),
+              const SizedBox(height: S.s24),
+              SizedBox(
+                width: double.infinity,
+                child: BounceTap(
+                  onTap: () {
+                    Navigator.pop(ctx);
+                    onJoined();
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    decoration: BoxDecoration(
+                      color: dark ? C.primarySoft : C.primary,
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: Center(
+                      child: Text(
+                        'Continue',
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          color: C.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _createGroup() {
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    final tt = Theme.of(context).textTheme;
+    final onJoined = widget.onJoined;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: dark ? C.dark2 : C.light1,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (ctx) {
+        final nameCtrl = TextEditingController();
+        final descCtrl = TextEditingController();
+        return Padding(
+          padding: EdgeInsets.only(
+            left: S.page,
+            right: S.page,
+            top: S.s16,
+            bottom: MediaQuery.of(ctx).viewInsets.bottom +
+                MediaQuery.of(ctx).padding.bottom +
+                S.page,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 36,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: dark ? C.dark4 : C.lightDivider,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              const SizedBox(height: S.s16),
+              Text(
+                'Create New Group',
+                style: tt.titleLarge?.copyWith(fontWeight: FontWeight.w600),
+              ),
+              const SizedBox(height: S.s24),
+              TextField(
+                controller: nameCtrl,
+                decoration: const InputDecoration(
+                  hintText: 'Enter group name',
+                ),
+              ),
+              const SizedBox(height: S.s16),
+              TextField(
+                controller: descCtrl,
+                maxLines: 3,
+                decoration: const InputDecoration(
+                  hintText: 'Add a description (optional)',
+                ),
+              ),
+              const SizedBox(height: S.s24),
+              ActionButtons(
+                cancelLabel: 'Cancel',
+                confirmLabel: 'Create',
+                onCancel: () => Navigator.pop(ctx),
+                onConfirm: () {
+                  if (nameCtrl.text.trim().isEmpty) {
+                    showAppSnackBar(ctx, 'Please enter a group name');
+                    return;
+                  }
+                  Navigator.pop(ctx);
+                  onJoined();
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -499,6 +667,7 @@ class _NoGroupView extends StatelessWidget {
           FadeIn(
             delay: const Duration(milliseconds: 200),
             child: TextField(
+              controller: _codeCtrl,
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 18,
@@ -524,7 +693,7 @@ class _NoGroupView extends StatelessWidget {
             child: SizedBox(
               width: double.infinity,
               child: BounceTap(
-                onTap: onJoined,
+                onTap: _joinGroup,
                 child: Container(
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   decoration: BoxDecoration(
@@ -569,7 +738,7 @@ class _NoGroupView extends StatelessWidget {
             child: SizedBox(
               width: double.infinity,
               child: BounceTap(
-                onTap: onJoined,
+                onTap: _createGroup,
                 child: Container(
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   decoration: BoxDecoration(
@@ -631,11 +800,19 @@ class _YearlyChartState extends State<_YearlyChart> {
 
   late int _selectedYear = _yearData.keys.last;
   int? _tappedMonth;
+  final _pageCtrl = PageController();
+  int _currentPage = 0;
 
   List<int> get _data => _yearData[_selectedYear] ?? List.filled(12, 0);
   int get _maxVal {
     final m = _data.reduce((a, b) => a > b ? a : b);
     return m > 0 ? m : 1;
+  }
+
+  @override
+  void dispose() {
+    _pageCtrl.dispose();
+    super.dispose();
   }
 
   @override
@@ -667,6 +844,8 @@ class _YearlyChartState extends State<_YearlyChart> {
                     ? () => setState(() {
                         _selectedYear--;
                         _tappedMonth = null;
+                        _pageCtrl.jumpToPage(0);
+                        _currentPage = 0;
                       })
                     : null,
                 child: Icon(
@@ -693,6 +872,8 @@ class _YearlyChartState extends State<_YearlyChart> {
                     ? () => setState(() {
                         _selectedYear++;
                         _tappedMonth = null;
+                        _pageCtrl.jumpToPage(0);
+                        _currentPage = 0;
                       })
                     : null,
                 child: Icon(
@@ -711,76 +892,106 @@ class _YearlyChartState extends State<_YearlyChart> {
 
           // Bar chart
           SizedBox(
-            height: 140,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: List.generate(12, (i) {
-                final val = _data[i];
-                final ratio = val / _maxVal;
-                final isActive = _tappedMonth == i;
-                final hasData = val > 0;
+            height: 160,
+            child: Column(
+              children: [
+                Expanded(
+                  child: PageView.builder(
+                    controller: _pageCtrl,
+                    itemCount: 2,
+                    onPageChanged: (p) => setState(() => _currentPage = p),
+                    itemBuilder: (ctx, page) {
+                      final startMonth = page * 6;
+                      return Row(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: List.generate(6, (i) {
+                          final monthIdx = startMonth + i;
+                          final val = _data[monthIdx];
+                          final ratio = val / _maxVal;
+                          final isActive = _tappedMonth == monthIdx;
+                          final hasData = val > 0;
 
-                return Expanded(
-                  child: GestureDetector(
-                    onTap: hasData
-                        ? () => setState(() =>
-                            _tappedMonth = _tappedMonth == i ? null : i)
-                        : null,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 2),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          if (isActive)
-                            Padding(
-                              padding: const EdgeInsets.only(bottom: 4),
-                              child: Text(
-                                _fmtCompact(val),
-                                style: TextStyle(
-                                  fontSize: 8,
-                                  fontWeight: FontWeight.w700,
-                                  color: dark ? C.primarySoft : C.primary,
+                          return Expanded(
+                            child: GestureDetector(
+                              onTap: hasData
+                                  ? () => setState(() => _tappedMonth =
+                                      _tappedMonth == monthIdx ? null : monthIdx)
+                                  : null,
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 2),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    if (isActive)
+                                      Padding(
+                                        padding: const EdgeInsets.only(bottom: 4),
+                                        child: Text(
+                                          _fmtCompact(val),
+                                          style: TextStyle(
+                                            fontSize: 8,
+                                            fontWeight: FontWeight.w700,
+                                            color: dark ? C.primarySoft : C.primary,
+                                          ),
+                                        ),
+                                      ),
+                                    Flexible(
+                                      child: FractionallySizedBox(
+                                        heightFactor: hasData ? ratio.clamp(0.05, 1.0) : 0.05,
+                                        child: AnimatedContainer(
+                                          duration: const Duration(milliseconds: 200),
+                                          decoration: BoxDecoration(
+                                            color: !hasData
+                                                ? (dark ? C.dark4 : C.light3)
+                                                : isActive
+                                                    ? (dark ? C.primarySoft : C.primary)
+                                                    : (dark
+                                                        ? C.primarySoft.withValues(alpha: 0.3)
+                                                        : C.primary.withValues(alpha: 0.2)),
+                                            borderRadius: const BorderRadius.vertical(
+                                              top: Radius.circular(4),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(height: S.s6),
+                                    Text(
+                                      _months[monthIdx],
+                                      style: TextStyle(
+                                        fontSize: 9,
+                                        fontWeight:
+                                            isActive ? FontWeight.w700 : FontWeight.w400,
+                                        color: isActive
+                                            ? (dark ? C.onDark1 : C.onLight1)
+                                            : (dark ? C.onDark3 : C.onLight3),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ),
-                          Flexible(
-                            child: FractionallySizedBox(
-                              heightFactor: hasData ? ratio.clamp(0.05, 1.0) : 0.05,
-                              child: AnimatedContainer(
-                                duration: const Duration(milliseconds: 200),
-                                decoration: BoxDecoration(
-                                  color: !hasData
-                                      ? (dark ? C.dark4 : C.light3)
-                                      : isActive
-                                          ? (dark ? C.primarySoft : C.primary)
-                                          : (dark
-                                              ? C.primarySoft.withValues(alpha: 0.3)
-                                              : C.primary.withValues(alpha: 0.2)),
-                                  borderRadius: const BorderRadius.vertical(
-                                    top: Radius.circular(4),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: S.s6),
-                          Text(
-                            _months[i],
-                            style: TextStyle(
-                              fontSize: 9,
-                              fontWeight:
-                                  isActive ? FontWeight.w700 : FontWeight.w400,
-                              color: isActive
-                                  ? (dark ? C.onDark1 : C.onLight1)
-                                  : (dark ? C.onDark3 : C.onLight3),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                          );
+                        }),
+                      );
+                    },
                   ),
-                );
-              }),
+                ),
+                const SizedBox(height: S.s8),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: List.generate(2, (i) => Container(
+                    width: 6,
+                    height: 6,
+                    margin: const EdgeInsets.symmetric(horizontal: 3),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: _currentPage == i
+                          ? (dark ? C.primarySoft : C.primary)
+                          : (dark ? C.dark4 : C.lightDivider),
+                    ),
+                  )),
+                ),
+              ],
             ),
           ),
 

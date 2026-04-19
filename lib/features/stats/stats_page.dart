@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:selawathub/core/animations/bounce_tap.dart';
 import 'package:selawathub/core/animations/fade_in.dart';
 import 'package:selawathub/core/animations/fire_emoji.dart';
 import 'package:selawathub/core/constants.dart';
@@ -102,6 +103,8 @@ class StatsPage extends StatefulWidget {
 
 class _StatsPageState extends State<StatsPage> {
   int? _selectedHeatmapIdx;
+  // ignore: prefer_final_fields
+  bool _hasData = true;
 
   void _onHeatmapDaySelected(int? idx) {
     setState(() {
@@ -148,6 +151,7 @@ class _StatsPageState extends State<StatsPage> {
 
     return Stack(
       children: [
+        if (_hasData)
         ListView(
         padding: EdgeInsets.zero,
         children: [
@@ -289,7 +293,14 @@ class _StatsPageState extends State<StatsPage> {
 
           SizedBox(height: MediaQuery.of(context).padding.bottom + 56 + S.s24),
         ],
-      ),
+      )
+        else
+          SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: S.page),
+              child: _EmptyStatsView(),
+            ),
+          ),
         Positioned(
           top: 0,
           left: 0,
@@ -310,6 +321,73 @@ class _StatsPageState extends State<StatsPage> {
             ),
           ),
         ),
+      ],
+    );
+  }
+}
+
+// ── Empty state ──
+class _EmptyStatsView extends StatelessWidget {
+  const _EmptyStatsView();
+
+  @override
+  Widget build(BuildContext context) {
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    final tt = Theme.of(context).textTheme;
+
+    return Column(
+      children: [
+        const Spacer(flex: 2),
+        FadeIn(
+          child: Text('📊', style: TextStyle(fontSize: 56)),
+        ),
+        const SizedBox(height: S.s24),
+        FadeIn(
+          delay: const Duration(milliseconds: 80),
+          child: Text(
+            'No Activity Yet',
+            style: tt.headlineLarge,
+          ),
+        ),
+        const SizedBox(height: S.s8),
+        FadeIn(
+          delay: const Duration(milliseconds: 120),
+          child: Text(
+            'Start counting selawat and zikir\nto see your statistics here',
+            style: tt.bodyMedium?.copyWith(
+              color: dark ? C.onDark2 : C.onLight2,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ),
+        const SizedBox(height: S.s40),
+        FadeIn(
+          delay: const Duration(milliseconds: 200),
+          child: SizedBox(
+            width: double.infinity,
+            child: BounceTap(
+              onTap: () {},
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: S.s16),
+                decoration: BoxDecoration(
+                  color: dark ? C.primarySoft : C.primary,
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Center(
+                  child: Text(
+                    'Go to Tasbih',
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      color: C.white,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+        const Spacer(flex: 3),
       ],
     );
   }
