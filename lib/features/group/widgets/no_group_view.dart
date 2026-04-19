@@ -183,6 +183,9 @@ class _NoGroupViewState extends State<NoGroupView> {
                                   if (!ctx.mounted) return;
                                   if (group != null) {
                                     Navigator.pop(ctx);
+                                    if (mounted) {
+                                      showAppSnackBar(context, 'Group created');
+                                    }
                                     widget.onJoined();
                                   } else {
                                     setSheetState(() => sheetCreating = false);

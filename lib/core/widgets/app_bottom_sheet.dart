@@ -29,21 +29,24 @@ Future<T?> showAppFormSheet<T>({
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
     ),
-    builder: (ctx) => Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        const SizedBox(height: S.s12),
-        Container(
-          width: 36,
-          height: 4,
-          decoration: BoxDecoration(
-            color: dark ? C.dark4 : C.lightDivider,
-            borderRadius: BorderRadius.circular(2),
+    builder: (ctx) => SafeArea(
+      top: false,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const SizedBox(height: S.s12),
+          Container(
+            width: 36,
+            height: 4,
+            decoration: BoxDecoration(
+              color: dark ? C.dark4 : C.lightDivider,
+              borderRadius: BorderRadius.circular(2),
+            ),
           ),
-        ),
-        const SizedBox(height: S.s8),
-        builder(ctx),
-      ],
+          const SizedBox(height: S.s8),
+          builder(ctx),
+        ],
+      ),
     ),
   );
 }

@@ -611,6 +611,67 @@ class _ChangePasswordSheetState extends State<_ChangePasswordSheet> {
   bool _showNew = false;
   bool _showConfirm = false;
   bool _saving = false;
+  bool _sendingReset = false;
+
+  Future<void> _changePassword() async {
+    final currentPw = widget.currentCtrl.text;
+    final newPw = widget.newCtrl.text;
+    final confirmPw = widget.confirmCtrl.text;
+    if (currentPw.isEmpty) {
+      showAppSnackBar(context, 'Please enter your current password',
+          backgroundColor: C.error);
+      return;
+    }
+    if (newPw.length < 6) {
+      showAppSnackBar(context, 'Password must be at least 6 characters',
+          backgroundColor: C.error);
+      return;
+    }
+    if (newPw != confirmPw) {
+      showAppSnackBar(context, 'Passwords do not match',
+          backgroundColor: C.error);
+      return;
+    }
+    setState(() => _saving = true);
+    try {
+      await AuthService.verifyPassword(currentPw);
+      await AuthService.updatePassword(newPw);
+      widget.onSaved();
+    } on AuthException catch (e) {
+      if (!mounted) return;
+      setState(() => _saving = false);
+      final msg = e.message.contains('Invalid login')
+          ? 'Current password is incorrect'
+          : e.message;
+      showAppSnackBar(context, msg, backgroundColor: C.error);
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _saving = false);
+      showAppSnackBar(context, 'Failed to change password',
+          backgroundColor: C.error);
+    }
+  }
+
+  Future<void> _sendResetEmail() async {
+    final email = AuthService.currentEmail;
+    if (email == null) {
+      showAppSnackBar(context, 'Could not find your email',
+          backgroundColor: C.error);
+      return;
+    }
+    setState(() => _sendingReset = true);
+    try {
+      await AuthService.sendPasswordReset(email);
+      if (!mounted) return;
+      Navigator.pop(context);
+      showAppSnackBar(context, 'Reset link sent to $email');
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _sendingReset = false);
+      showAppSnackBar(context, 'Failed to send reset email',
+          backgroundColor: C.error);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -635,6 +696,20 @@ class _ChangePasswordSheetState extends State<_ChangePasswordSheet> {
                   _showCurrent ? CupertinoIcons.eye : CupertinoIcons.eye_slash,
                   size: 18,
                   color: dark ? C.onDark3 : C.onLight3,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: S.s8),
+          Align(
+            alignment: Alignment.centerRight,
+            child: GestureDetector(
+              onTap: _sendingReset ? null : _sendResetEmail,
+              child: Text(
+                _sendingReset ? 'Sending...' : 'Forgot your current password?',
+                style: tt.bodySmall?.copyWith(
+                  color: dark ? C.primarySoft : C.primary,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
             ),
@@ -675,31 +750,8 @@ class _ChangePasswordSheetState extends State<_ChangePasswordSheet> {
           ActionButtons(
             saving: _saving,
             onCancel: () => Navigator.pop(context),
-            onConfirm: () async {
-              final newPw = widget.newCtrl.text;
-              final confirmPw = widget.confirmCtrl.text;
-              if (newPw.length < 6) {
-                showAppSnackBar(context, 'Password must be at least 6 characters', backgroundColor: C.error);
-                return;
-              }
-              if (newPw != confirmPw) {
-                showAppSnackBar(context, 'Passwords do not match', backgroundColor: C.error);
-                return;
-              }
-              setState(() => _saving = true);
-              try {
-                await Supabase.instance.client.auth.updateUser(
-                  UserAttributes(password: newPw),
-                );
-                widget.onSaved();
-              } catch (e) {
-                if (!context.mounted) return;
-                setState(() => _saving = false);
-                showAppSnackBar(context, 'Failed to change password', backgroundColor: C.error);
-              }
-            },
+            onConfirm: _changePassword,
           ),
-          SizedBox(height: MediaQuery.of(context).padding.bottom),
         ],
       ),
     );

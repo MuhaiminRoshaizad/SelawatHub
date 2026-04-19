@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:selawathub/core/constants.dart';
 import 'package:selawathub/core/theme/colors.dart';
 import 'package:selawathub/core/widgets/action_buttons.dart';
@@ -97,6 +98,7 @@ class _CounterSettingsPageState extends State<CounterSettingsPage> {
                 controller: controller,
                 autofocus: true,
                 keyboardType: TextInputType.number,
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                 decoration: InputDecoration(
                   labelText: 'Target count',
                   border: OutlineInputBorder(
@@ -114,7 +116,7 @@ class _CounterSettingsPageState extends State<CounterSettingsPage> {
                     Navigator.pop(ctx);
                     showAppSnackBar(context, 'Target updated to $val');
                   } else {
-                    showAppSnackBar(ctx, 'Enter a valid number', backgroundColor: C.error);
+                    showAppSnackBar(ctx, 'Enter a number greater than 0', backgroundColor: C.error);
                   }
                 },
               ),

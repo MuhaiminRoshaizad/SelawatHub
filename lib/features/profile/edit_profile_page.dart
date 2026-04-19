@@ -183,6 +183,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     Navigator.pop(ctx);
                     setState(() => _avatarUrl = null);
                     _onChanged();
+                    showAppSnackBar(context, 'Photo removed');
                   },
                 ),
             ],

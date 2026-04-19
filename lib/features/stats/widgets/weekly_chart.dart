@@ -26,10 +26,12 @@ class WeeklyChart extends StatefulWidget {
     required this.dark,
     required this.tt,
     required this.weeklyData,
+    required this.dailyGoal,
   });
   final bool dark;
   final TextTheme tt;
   final List<WeekData> weeklyData;
+  final int dailyGoal;
 
   @override
   State<WeeklyChart> createState() => _WeeklyChartState();
@@ -37,7 +39,6 @@ class WeeklyChart extends StatefulWidget {
 
 class _WeeklyChartState extends State<WeeklyChart> {
   static const _days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-  static const _maxVal = 2000;
   static const _months = [
     'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
     'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
@@ -188,8 +189,9 @@ class _WeeklyChartState extends State<WeeklyChart> {
                 return Row(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: List.generate(7, (i) {
-                    final sRatio = w.selawat[i] / _maxVal;
-                    final zRatio = w.zikir[i] / _maxVal;
+                    final maxVal = widget.dailyGoal > 0 ? widget.dailyGoal : 100;
+                    final sRatio = w.selawat[i] / maxVal;
+                    final zRatio = w.zikir[i] / maxVal;
                     final isToday = isCurrentWeekPage &&
                         i == DateTime.now().weekday - 1;
                     final isSelected =

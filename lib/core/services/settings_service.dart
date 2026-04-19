@@ -30,9 +30,15 @@ class SettingsService {
   static int get colorThemeIndex => _prefs?.getInt(_kColorThemeIndex) ?? 0;
   static set colorThemeIndex(int v) => _prefs?.setInt(_kColorThemeIndex, v);
 
+  static const _kDailyGoal = 'daily_goal';
+
   /// Theme mode: 0 = system, 1 = light, 2 = dark
   static int get themeMode => _prefs?.getInt(_kThemeMode) ?? 0;
   static set themeMode(int v) => _prefs?.setInt(_kThemeMode, v);
+
+  /// Daily goal for stats progress bar (default 100)
+  static int get dailyGoal => _prefs?.getInt(_kDailyGoal) ?? 100;
+  static set dailyGoal(int v) => _prefs?.setInt(_kDailyGoal, v);
 
   /// Get custom target for a dhikr ID, or null if not set.
   static int? getCustomTarget(String dhikrId) =>

@@ -11,11 +11,15 @@ class StreakCard extends StatelessWidget {
     required this.tt,
     required this.streakDays,
     required this.todayTotal,
+    required this.dailyGoal,
+    this.onGoalTap,
   });
   final bool dark;
   final TextTheme tt;
   final int streakDays;
   final int todayTotal;
+  final int dailyGoal;
+  final VoidCallback? onGoalTap;
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +37,6 @@ class StreakCard extends StatelessWidget {
       StreakTier.legendary => 'Legendary status!',
     };
 
-    const dailyGoal = 2000;
     final progress = dailyGoal > 0
         ? (todayTotal / dailyGoal).clamp(0.0, 1.0)
         : 0.0;
@@ -77,37 +80,53 @@ class StreakCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: S.s20),
-          Row(
-            children: [
-              Text(
-                'Today',
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                  color: C.white.withValues(alpha: 0.7),
+          GestureDetector(
+            onTap: onGoalTap,
+            behavior: HitTestBehavior.opaque,
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    Text(
+                      'Today',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                        color: C.white.withValues(alpha: 0.7),
+                      ),
+                    ),
+                    const Spacer(),
+                    Text(
+                      '${fmtNum(todayTotal)} / ${fmtNum(dailyGoal)}',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: C.white,
+                      ),
+                    ),
+                    if (onGoalTap != null) ...[
+                      const SizedBox(width: 4),
+                      Icon(
+                        Icons.edit_rounded,
+                        size: 12,
+                        color: C.white.withValues(alpha: 0.6),
+                      ),
+                    ],
+                  ],
                 ),
-              ),
-              const Spacer(),
-              Text(
-                '${fmtNum(todayTotal)} / ${fmtNum(dailyGoal)}',
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: C.white,
+                const SizedBox(height: S.s8),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(4),
+                  child: LinearProgressIndicator(
+                    value: progress,
+                    minHeight: 6,
+                    backgroundColor: C.white.withValues(alpha: 0.15),
+                    valueColor: AlwaysStoppedAnimation(
+                      C.white.withValues(alpha: 0.9),
+                    ),
+                  ),
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: S.s8),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(4),
-            child: LinearProgressIndicator(
-              value: progress,
-              minHeight: 6,
-              backgroundColor: C.white.withValues(alpha: 0.15),
-              valueColor: AlwaysStoppedAnimation(
-                C.white.withValues(alpha: 0.9),
-              ),
+              ],
             ),
           ),
         ],

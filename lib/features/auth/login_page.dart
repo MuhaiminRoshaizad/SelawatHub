@@ -7,6 +7,7 @@ import 'package:selawathub/core/constants.dart';
 import 'package:selawathub/core/theme/colors.dart';
 import 'package:selawathub/core/services/auth_service.dart';
 import 'package:selawathub/core/widgets/app_snackbar.dart';
+import 'package:selawathub/core/widgets/app_bottom_sheet.dart';
 import 'package:selawathub/app/app_shell.dart';
 
 class LoginPage extends StatefulWidget {
@@ -91,6 +92,14 @@ class _LoginPageState extends State<LoginPage> {
       showAppSnackBar(context, 'Something went wrong. Please try again.');
       setState(() => _loading = false);
     }
+  }
+
+  void _showForgotPassword() {
+    final resetEmailCtrl = TextEditingController(text: _emailCtrl.text.trim());
+    showAppFormSheet(
+      context: context,
+      builder: (ctx) => _ForgotPasswordSheet(controller: resetEmailCtrl),
+    );
   }
 
   @override
@@ -212,11 +221,14 @@ class _LoginPageState extends State<LoginPage> {
                 delay: const Duration(milliseconds: 200),
                 child: Align(
                   alignment: Alignment.centerRight,
-                  child: Text(
-                    'Forgot password?',
-                    style: tt.bodySmall?.copyWith(
-                      color: dark ? C.primarySoft : C.primary,
-                      fontWeight: FontWeight.w500,
+                  child: GestureDetector(
+                    onTap: _showForgotPassword,
+                    child: Text(
+                      'Forgot password?',
+                      style: tt.bodySmall?.copyWith(
+                        color: dark ? C.primarySoft : C.primary,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                   ),
                 ),
@@ -367,6 +379,132 @@ class _FieldState extends State<_Field> {
           ),
         ),
       ],
+    );
+  }
+}
+
+// ── Forgot Password Bottom Sheet ──
+
+class _ForgotPasswordSheet extends StatefulWidget {
+  const _ForgotPasswordSheet({required this.controller});
+  final TextEditingController controller;
+
+  @override
+  State<_ForgotPasswordSheet> createState() => _ForgotPasswordSheetState();
+}
+
+class _ForgotPasswordSheetState extends State<_ForgotPasswordSheet> {
+  bool _sending = false;
+
+  Future<void> _send() async {
+    final email = widget.controller.text.trim();
+    if (email.isEmpty) {
+      showAppSnackBar(context, 'Please enter your email',
+          backgroundColor: C.error);
+      return;
+    }
+
+    setState(() => _sending = true);
+    try {
+      await AuthService.sendPasswordReset(email);
+      if (!mounted) return;
+      Navigator.pop(context);
+      showAppSnackBar(context, 'Reset link sent! Check your email');
+    } on AuthException catch (e) {
+      if (!mounted) return;
+      setState(() => _sending = false);
+      showAppSnackBar(context, e.message, backgroundColor: C.error);
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _sending = false);
+      showAppSnackBar(context, 'Something went wrong. Try again.',
+          backgroundColor: C.error);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    final tt = Theme.of(context).textTheme;
+
+    return Padding(
+      padding: EdgeInsets.fromLTRB(
+        S.page,
+        S.s8,
+        S.page,
+        MediaQuery.of(context).viewInsets.bottom + S.s24,
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Reset Password',
+              style: tt.titleLarge?.copyWith(fontWeight: FontWeight.w700)),
+          const SizedBox(height: S.s8),
+          Text(
+            'Enter your email and we\'ll send you a link to reset your password.',
+            style: tt.bodySmall?.copyWith(
+              color: dark ? C.onDark2 : C.onLight2,
+            ),
+          ),
+          const SizedBox(height: S.s24),
+          TextField(
+            controller: widget.controller,
+            keyboardType: TextInputType.emailAddress,
+            autofocus: true,
+            style: tt.bodyMedium?.copyWith(
+              color: dark ? C.onDark1 : C.onLight1,
+            ),
+            decoration: InputDecoration(
+              hintText: 'Email address',
+              prefixIcon: Padding(
+                padding: const EdgeInsets.only(left: 16, right: 12),
+                child: Icon(CupertinoIcons.mail,
+                    size: 18, color: dark ? C.onDark3 : C.onLight3),
+              ),
+              prefixIconConstraints:
+                  const BoxConstraints(minWidth: 0, minHeight: 0),
+            ),
+          ),
+          const SizedBox(height: S.s24),
+          SizedBox(
+            width: double.infinity,
+            child: BounceTap(
+              onTap: _sending ? null : _send,
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                decoration: BoxDecoration(
+                  color: _sending
+                      ? (dark
+                          ? C.primarySoft.withValues(alpha: 0.5)
+                          : C.primary.withValues(alpha: 0.5))
+                      : (dark ? C.primarySoft : C.primary),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Center(
+                  child: _sending
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: C.white,
+                          ),
+                        )
+                      : Text(
+                          'Send Reset Link',
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                            color: C.white,
+                          ),
+                        ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

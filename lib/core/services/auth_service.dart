@@ -38,6 +38,30 @@ class AuthService {
     await _auth.signOut();
   }
 
+  /// Send a password reset email.
+  static Future<void> sendPasswordReset(String email) async {
+    await _auth.resetPasswordForEmail(
+      email,
+      redirectTo: 'io.supabase.selawathub://login-callback',
+    );
+  }
+
+  /// Verify the current password by re-authenticating.
+  /// Throws [AuthException] if the password is wrong.
+  static Future<void> verifyPassword(String currentPassword) async {
+    final email = _auth.currentUser?.email;
+    if (email == null) throw AuthException('No user email found');
+    await _auth.signInWithPassword(email: email, password: currentPassword);
+  }
+
+  /// Update the current user's password (must be authenticated).
+  static Future<void> updatePassword(String newPassword) async {
+    await _auth.updateUser(UserAttributes(password: newPassword));
+  }
+
+  /// Get the current user's email.
+  static String? get currentEmail => _auth.currentUser?.email;
+
   /// Listen to auth state changes.
   static Stream<AuthState> get onAuthStateChange => _auth.onAuthStateChange;
 }

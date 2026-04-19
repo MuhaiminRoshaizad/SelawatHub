@@ -254,6 +254,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                     controller: controller,
                     autofocus: true,
                     keyboardType: TextInputType.number,
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                     style: TextStyle(color: dark ? C.onDark1 : C.onLight1),
                     decoration: appInputDecoration(
                       context: ctx,

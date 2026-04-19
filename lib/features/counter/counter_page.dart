@@ -9,6 +9,7 @@ import 'package:selawathub/core/services/counter_service.dart';
 import 'package:selawathub/core/services/settings_service.dart';
 import 'package:selawathub/core/services/supabase_service.dart';
 import 'package:selawathub/core/theme/colors.dart';
+import 'package:selawathub/core/widgets/app_snackbar.dart';
 import 'package:selawathub/core/widgets/bead_circle.dart';
 import 'package:selawathub/features/counter/counter_settings_page.dart';
 import 'package:selawathub/features/counter/models/dhikr.dart';
@@ -214,6 +215,7 @@ class _CounterPageState extends State<CounterPage>
       _todayCounts[_dhikr.id] = 0;
       _saveTimer?.cancel();
       _persistCount();
+      if (mounted) showAppSnackBar(context, 'Counter reset');
     }
   }
 

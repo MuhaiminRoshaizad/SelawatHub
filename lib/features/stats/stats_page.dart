@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:selawathub/core/animations/bounce_tap.dart';
 import 'package:selawathub/core/animations/fade_in.dart';
 import 'package:selawathub/core/constants.dart';
@@ -8,6 +9,8 @@ import 'package:selawathub/core/services/settings_service.dart';
 import 'package:selawathub/core/services/supabase_service.dart';
 import 'package:selawathub/features/counter/models/dhikr.dart';
 import 'package:selawathub/core/theme/colors.dart';
+import 'package:selawathub/core/widgets/app_bottom_sheet.dart';
+import 'package:selawathub/core/widgets/app_snackbar.dart';
 import 'package:selawathub/core/widgets/frosted_bar.dart';
 import 'package:selawathub/features/stats/models/day_data.dart';
 import 'package:selawathub/features/stats/stats_utils.dart';
@@ -40,6 +43,7 @@ class _StatsPageState extends State<StatsPage> {
   int _bestStreak = 0;
   int _daysActive = 0;
   int _todayTotal = 0;
+  int _dailyGoal = SettingsService.dailyGoal;
 
   @override
   void initState() {
@@ -182,6 +186,84 @@ class _StatsPageState extends State<StatsPage> {
     });
   }
 
+  void _showEditGoal() {
+    final ctrl = TextEditingController(text: _dailyGoal.toString());
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    final tt = Theme.of(context).textTheme;
+    showAppFormSheet(
+      context: context,
+      builder: (ctx) => Padding(
+        padding: EdgeInsets.fromLTRB(
+          S.page, S.s8, S.page,
+          MediaQuery.of(ctx).viewInsets.bottom + S.page,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Daily Goal',
+                style: tt.titleLarge?.copyWith(fontWeight: FontWeight.w600)),
+            const SizedBox(height: S.s8),
+            Text(
+              'Set your daily recitation target.',
+              style: tt.bodySmall?.copyWith(
+                color: dark ? C.onDark2 : C.onLight2,
+              ),
+            ),
+            const SizedBox(height: S.s24),
+            TextField(
+              controller: ctrl,
+              keyboardType: TextInputType.number,
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              autofocus: true,
+              style: TextStyle(color: dark ? C.onDark1 : C.onLight1),
+              decoration: InputDecoration(
+                hintText: 'e.g. 100',
+                suffixText: 'counts',
+                suffixStyle: TextStyle(color: dark ? C.onDark3 : C.onLight3),
+              ),
+            ),
+            const SizedBox(height: S.s24),
+            SizedBox(
+              width: double.infinity,
+              child: BounceTap(
+                onTap: () {
+                  final val = int.tryParse(ctrl.text.trim());
+                  if (val == null || val <= 0) {
+                    showAppSnackBar(ctx, 'Enter a number greater than 0',
+                        backgroundColor: C.error);
+                    return;
+                  }
+                  SettingsService.dailyGoal = val;
+                  setState(() => _dailyGoal = val);
+                  Navigator.pop(ctx);
+                  showAppSnackBar(context, 'Daily goal updated');
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  decoration: BoxDecoration(
+                    color: dark ? C.primarySoft : C.primary,
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: Center(
+                    child: Text(
+                      'Save',
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                        color: C.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final dark = Theme.of(context).brightness == Brightness.dark;
@@ -244,6 +326,8 @@ class _StatsPageState extends State<StatsPage> {
                 tt: tt,
                 streakDays: _loading ? 7 : _currentStreak,
                 todayTotal: _loading ? 120 : _todayTotal,
+                dailyGoal: _dailyGoal,
+                onGoalTap: _showEditGoal,
               ),
             ),
           ),
@@ -324,6 +408,7 @@ class _StatsPageState extends State<StatsPage> {
                 dark: dark,
                 tt: tt,
                 weeklyData: _weeklyData,
+                dailyGoal: _dailyGoal,
               ),
             ),
           ),
