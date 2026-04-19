@@ -202,7 +202,7 @@ class TermsOfServicePage extends StatelessWidget {
                 '12. Contact Us',
                 'If you have questions about these Terms of Service, please contact '
                     'us at:\n\n'
-                    'Email: selawathub@gmail.com',
+                    'Email: aminmuhaimin192@gmail.com',
               ),
               const SizedBox(height: S.s48),
             ],

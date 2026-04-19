@@ -167,7 +167,7 @@ class PrivacyPolicyPage extends StatelessWidget {
                 '8. Contact Us',
                 'If you have questions about this Privacy Policy or wish to exercise '
                     'your data rights, please contact us at:\n\n'
-                    'Email: selawathub@gmail.com',
+                    'Email: aminmuhaimin192@gmail.com',
               ),
               const SizedBox(height: S.s48),
             ],
