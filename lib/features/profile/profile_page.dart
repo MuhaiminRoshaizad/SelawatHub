@@ -289,13 +289,6 @@ class _ProfilePageState extends State<ProfilePage> {
                     ),
                   ),
                   _divider(dark),
-                  ToggleRow(
-                    icon: CupertinoIcons.bell_fill,
-                    label: 'Notifications',
-                    value: true,
-                    onChanged: (_) {},
-                  ),
-                  _divider(dark),
                   MenuRow(
                     icon: CupertinoIcons.globe,
                     label: 'Language',
@@ -345,12 +338,6 @@ class _ProfilePageState extends State<ProfilePage> {
                     icon: CupertinoIcons.info_circle,
                     label: 'About SelawatHub',
                     onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AboutPage())),
-                  ),
-                  _divider(dark),
-                  MenuRow(
-                    icon: CupertinoIcons.share,
-                    label: 'Share App',
-                    onTap: () => showAppSnackBar(context, 'Share link copied to clipboard!'),
                   ),
                 ],
               ),

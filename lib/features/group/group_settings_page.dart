@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:selawathub/core/animations/fade_in.dart';
 import 'package:selawathub/core/constants.dart';
 import 'package:selawathub/core/services/group_service.dart';
@@ -575,7 +576,11 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                           icon: CupertinoIcons.share,
                           label: 'Share Invite Link',
                           onTap: () {
-                            // TODO: share invite
+                            SharePlus.instance.share(
+                              ShareParams(
+                                text: 'Join my group on SelawatHub! Use invite code: ${widget.inviteCode}',
+                              ),
+                            );
                           },
                         ),
                       ],
