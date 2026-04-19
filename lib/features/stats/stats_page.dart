@@ -29,7 +29,7 @@ class _DayData {
   }
 }
 
-// Pre-generated mock data for heatmap (16 weeks × 7 days = 112 days)
+// Pre-generated mock data for heatmap (52 weeks × 7 days = 364 days)
 final List<_DayData> _heatmapData = _generateHeatmapData();
 
 List<_DayData> _generateHeatmapData() {
@@ -47,7 +47,7 @@ List<_DayData> _generateHeatmapData() {
     ('Tahlil', 'Zikir'),
   ];
 
-  return List.generate(112, (i) {
+  return List.generate(364, (i) {
     final r = rng.nextDouble();
     if (r < 0.15) {
       return const _DayData(selawat: 0, zikir: 0, topDhikr: []);
@@ -125,7 +125,7 @@ class _StatsPageState extends State<StatsPage> {
 
     // Date label for selected day
     final now = DateTime.now();
-    final heatmapStart = now.subtract(const Duration(days: 111));
+    final heatmapStart = now.subtract(const Duration(days: 363));
     String? selectedDateLabel;
     if (_selectedHeatmapIdx != null) {
       final d = heatmapStart.add(Duration(days: _selectedHeatmapIdx!));
@@ -457,7 +457,39 @@ class _SummaryCard extends StatelessWidget {
   }
 }
 
-// ── Weekly bar chart (selawat vs zikir stacked, interactive) ──
+// ── Weekly chart data model ──
+class _WeekData {
+  final List<int> selawat;
+  final List<int> zikir;
+  final DateTime weekStart;
+
+  const _WeekData({
+    required this.selawat,
+    required this.zikir,
+    required this.weekStart,
+  });
+
+  int get total =>
+      List.generate(7, (i) => selawat[i] + zikir[i]).reduce((a, b) => a + b);
+}
+
+final List<_WeekData> _weeklyData = _generateWeeklyData();
+
+List<_WeekData> _generateWeeklyData() {
+  final rng = Random(42);
+  final now = DateTime.now();
+  // Find the Monday of the current week
+  final currentMonday = now.subtract(Duration(days: now.weekday - 1));
+
+  return List.generate(52, (weekIdx) {
+    final weekStart = currentMonday.subtract(Duration(days: (51 - weekIdx) * 7));
+    final sel = List.generate(7, (_) => rng.nextInt(1100) + 100);
+    final zik = List.generate(7, (_) => rng.nextInt(700) + 50);
+    return _WeekData(selawat: sel, zikir: zik, weekStart: weekStart);
+  });
+}
+
+// ── Weekly bar chart (selawat vs zikir stacked, interactive, scrollable) ──
 class _WeeklyChart extends StatefulWidget {
   const _WeeklyChart({required this.dark, required this.tt});
   final bool dark;
@@ -469,20 +501,50 @@ class _WeeklyChart extends StatefulWidget {
 
 class _WeeklyChartState extends State<_WeeklyChart> {
   static const _days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-  static const _selawat = [520, 800, 350, 900, 1200, 700, 850];
-  static const _zikir = [300, 400, 300, 600, 800, 400, 550];
   static const _maxVal = 2000;
+  static const _totalWeeks = 52;
+  static const _months = [
+    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+  ];
 
+  late final PageController _pageController;
+  late int _currentPage;
   int? _selectedIdx;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentPage = _totalWeeks - 1;
+    _pageController = PageController(initialPage: _currentPage);
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  String _weekLabel(DateTime weekStart) {
+    final weekEnd = weekStart.add(const Duration(days: 6));
+    return '${_months[weekStart.month - 1]} ${weekStart.day} – '
+        '${_months[weekEnd.month - 1]} ${weekEnd.day}';
+  }
+
+  void _goToPage(int page) {
+    if (page < 0 || page >= _totalWeeks) return;
+    _pageController.animateToPage(
+      page,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     final dark = widget.dark;
     final tt = widget.tt;
-    final totalWeek = List.generate(
-      7,
-      (i) => _selawat[i] + _zikir[i],
-    ).reduce((a, b) => a + b);
+    final week = _weeklyData[_currentPage];
 
     return Container(
       padding: const EdgeInsets.all(S.s20),
@@ -495,16 +557,50 @@ class _WeeklyChartState extends State<_WeeklyChart> {
         children: [
           Row(
             children: [
-              Text('This Week', style: tt.titleMedium),
-              const Spacer(),
-              Text(
-                '${_fmtNum(totalWeek)} total',
-                style: tt.bodySmall?.copyWith(
-                  color: dark ? C.primarySoft : C.primary,
-                  fontWeight: FontWeight.w600,
+              GestureDetector(
+                onTap: _currentPage > 0
+                    ? () => _goToPage(_currentPage - 1)
+                    : null,
+                child: Icon(
+                  CupertinoIcons.chevron_left,
+                  size: 16,
+                  color: _currentPage > 0
+                      ? (dark ? C.onDark2 : C.onLight2)
+                      : (dark ? C.onDark3 : C.onLight3).withValues(alpha: 0.3),
+                ),
+              ),
+              const SizedBox(width: S.s8),
+              Expanded(
+                child: Text(
+                  _weekLabel(week.weekStart),
+                  style: tt.titleMedium,
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              const SizedBox(width: S.s8),
+              GestureDetector(
+                onTap: _currentPage < _totalWeeks - 1
+                    ? () => _goToPage(_currentPage + 1)
+                    : null,
+                child: Icon(
+                  CupertinoIcons.chevron_right,
+                  size: 16,
+                  color: _currentPage < _totalWeeks - 1
+                      ? (dark ? C.onDark2 : C.onLight2)
+                      : (dark ? C.onDark3 : C.onLight3).withValues(alpha: 0.3),
                 ),
               ),
             ],
+          ),
+          const SizedBox(height: S.s4),
+          Center(
+            child: Text(
+              '${_fmtNum(week.total)} total',
+              style: tt.bodySmall?.copyWith(
+                color: dark ? C.primarySoft : C.primary,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
           ),
           const SizedBox(height: S.s8),
           Row(
@@ -521,110 +617,131 @@ class _WeeklyChartState extends State<_WeeklyChart> {
 
           SizedBox(
             height: 140,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: List.generate(7, (i) {
-                final sRatio = _selawat[i] / _maxVal;
-                final zRatio = _zikir[i] / _maxVal;
-                final isToday = i == DateTime.now().weekday - 1;
-                final isSelected = _selectedIdx == i;
-                final isActive =
-                    isSelected || (_selectedIdx == null && isToday);
-                return Expanded(
-                  child: GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _selectedIdx = _selectedIdx == i ? null : i;
-                      });
-                    },
-                    behavior: HitTestBehavior.opaque,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 2),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          if (isActive)
-                            Padding(
-                              padding: const EdgeInsets.only(bottom: S.s4),
-                              child: Text(
-                                '${_selawat[i] + _zikir[i]}',
-                                style: TextStyle(
-                                  fontSize: 9,
-                                  fontWeight: FontWeight.w600,
-                                  color: dark ? C.primarySoft : C.primary,
+            child: PageView.builder(
+              controller: _pageController,
+              itemCount: _totalWeeks,
+              onPageChanged: (page) {
+                setState(() {
+                  _currentPage = page;
+                  _selectedIdx = null;
+                });
+              },
+              itemBuilder:(context, pageIdx) {
+                final w = _weeklyData[pageIdx];
+                final isCurrentWeekPage = pageIdx == _totalWeeks - 1;
+                return Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: List.generate(7, (i) {
+                    final sRatio = w.selawat[i] / _maxVal;
+                    final zRatio = w.zikir[i] / _maxVal;
+                    final isToday = isCurrentWeekPage &&
+                        i == DateTime.now().weekday - 1;
+                    final isSelected =
+                        pageIdx == _currentPage && _selectedIdx == i;
+                    final isActive = isSelected ||
+                        (pageIdx == _currentPage &&
+                            _selectedIdx == null &&
+                            isToday);
+                    return Expanded(
+                      child: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _selectedIdx = _selectedIdx == i ? null : i;
+                          });
+                        },
+                        behavior: HitTestBehavior.opaque,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 2),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              if (isActive)
+                                Padding(
+                                  padding: const EdgeInsets.only(bottom: S.s4),
+                                  child: Text(
+                                    '${w.selawat[i] + w.zikir[i]}',
+                                    style: TextStyle(
+                                      fontSize: 9,
+                                      fontWeight: FontWeight.w600,
+                                      color: dark ? C.primarySoft : C.primary,
+                                    ),
+                                  ),
+                                ),
+                              Flexible(
+                                child: FractionallySizedBox(
+                                  heightFactor:
+                                      (sRatio + zRatio).clamp(0.05, 1.0),
+                                  child: Column(
+                                    children: [
+                                      Expanded(
+                                        flex: (w.zikir[i]).clamp(1, 9999),
+                                        child: AnimatedContainer(
+                                          duration: const Duration(
+                                            milliseconds: 200,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: isActive
+                                                ? C.gold
+                                                : C.gold.withValues(
+                                                    alpha: dark ? 0.3 : 0.25,
+                                                  ),
+                                            borderRadius:
+                                                const BorderRadius.vertical(
+                                                  top: Radius.circular(4),
+                                                ),
+                                          ),
+                                        ),
+                                      ),
+                                      Expanded(
+                                        flex: (w.selawat[i]).clamp(1, 9999),
+                                        child: AnimatedContainer(
+                                          duration: const Duration(
+                                            milliseconds: 200,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: isActive
+                                                ? (dark
+                                                    ? C.primarySoft
+                                                    : C.primary)
+                                                : (dark
+                                                    ? C.primarySoft.withValues(
+                                                        alpha: 0.3,
+                                                      )
+                                                    : C.primary.withValues(
+                                                        alpha: 0.2,
+                                                      )),
+                                            borderRadius:
+                                                const BorderRadius.vertical(
+                                                  bottom: Radius.circular(4),
+                                                ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
-                            ),
-                          Flexible(
-                            child: FractionallySizedBox(
-                              heightFactor: (sRatio + zRatio).clamp(0.05, 1.0),
-                              child: Column(
-                                children: [
-                                  Expanded(
-                                    flex: (_zikir[i]).clamp(1, 9999),
-                                    child: AnimatedContainer(
-                                      duration: const Duration(
-                                        milliseconds: 200,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: isActive
-                                            ? C.gold
-                                            : C.gold.withValues(
-                                                alpha: dark ? 0.3 : 0.25,
-                                              ),
-                                        borderRadius:
-                                            const BorderRadius.vertical(
-                                              top: Radius.circular(4),
-                                            ),
-                                      ),
-                                    ),
-                                  ),
-                                  Expanded(
-                                    flex: (_selawat[i]).clamp(1, 9999),
-                                    child: AnimatedContainer(
-                                      duration: const Duration(
-                                        milliseconds: 200,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: isActive
-                                            ? (dark ? C.primarySoft : C.primary)
-                                            : (dark
-                                                  ? C.primarySoft.withValues(
-                                                      alpha: 0.3,
-                                                    )
-                                                  : C.primary.withValues(
-                                                      alpha: 0.2,
-                                                    )),
-                                        borderRadius:
-                                            const BorderRadius.vertical(
-                                              bottom: Radius.circular(4),
-                                            ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
+                              const SizedBox(height: S.s8),
+                              Text(
+                                _days[i],
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: isActive
+                                      ? FontWeight.w700
+                                      : FontWeight.w400,
+                                  color: isActive
+                                      ? (dark ? C.onDark1 : C.onLight1)
+                                      : (dark ? C.onDark3 : C.onLight3),
+                                ),
                               ),
-                            ),
+                            ],
                           ),
-                          const SizedBox(height: S.s8),
-                          Text(
-                            _days[i],
-                            style: TextStyle(
-                              fontSize: 10,
-                              fontWeight: isActive
-                                  ? FontWeight.w700
-                                  : FontWeight.w400,
-                              color: isActive
-                                  ? (dark ? C.onDark1 : C.onLight1)
-                                  : (dark ? C.onDark3 : C.onLight3),
-                            ),
-                          ),
-                        ],
+                        ),
                       ),
-                    ),
-                  ),
+                    );
+                  }),
                 );
-              }),
+              },
             ),
           ),
 
@@ -635,8 +752,8 @@ class _WeeklyChartState extends State<_WeeklyChart> {
             child: _selectedIdx != null
                 ? _BarTooltip(
                     day: _days[_selectedIdx!],
-                    selawat: _selawat[_selectedIdx!],
-                    zikir: _zikir[_selectedIdx!],
+                    selawat: _weeklyData[_currentPage].selawat[_selectedIdx!],
+                    zikir: _weeklyData[_currentPage].zikir[_selectedIdx!],
                     dark: dark,
                   )
                 : const SizedBox.shrink(),
@@ -759,8 +876,8 @@ class _LegendDot extends StatelessWidget {
   }
 }
 
-// ── Contribution heatmap (GitHub-style, interactive) ──
-class _Heatmap extends StatelessWidget {
+// ── Contribution heatmap (GitHub-style, interactive, scrollable) ──
+class _Heatmap extends StatefulWidget {
   const _Heatmap({
     required this.dark,
     required this.tt,
@@ -772,12 +889,42 @@ class _Heatmap extends StatelessWidget {
   final int? selectedIdx;
   final ValueChanged<int?> onDaySelected;
 
-  static const _weeks = 16;
+  @override
+  State<_Heatmap> createState() => _HeatmapState();
+}
+
+class _HeatmapState extends State<_Heatmap> {
+  static const _weeks = 52;
   static const _daysPerWeek = 7;
+  static const _cellSize = 20.0;
+  static const _cellGap = 4.0;
+  static const _columnWidth = _cellSize + _cellGap;
+
+  late final ScrollController _scrollController;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_scrollController.hasClients) {
+        _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    // Compute month labels from actual dates
+    final dark = widget.dark;
+    final tt = widget.tt;
+    final selectedIdx = widget.selectedIdx;
+
     final now = DateTime.now();
     final startDate = now.subtract(
       const Duration(days: _weeks * _daysPerWeek - 1),
@@ -785,18 +932,8 @@ class _Heatmap extends StatelessWidget {
     final monthLabels = <(int weekIdx, String label)>[];
     int lastMonth = -1;
     const monthNames = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
+      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
     ];
     for (int w = 0; w < _weeks; w++) {
       final d = startDate.add(Duration(days: w * _daysPerWeek));
@@ -806,14 +943,15 @@ class _Heatmap extends StatelessWidget {
       }
     }
 
-    // Selected day info
     String? selectedLabel;
     int? selectedTotal;
     if (selectedIdx != null) {
-      final d = startDate.add(Duration(days: selectedIdx!));
+      final d = startDate.add(Duration(days: selectedIdx));
       selectedLabel = '${d.day} ${monthNames[d.month - 1]}';
-      selectedTotal = _heatmapData[selectedIdx!].total;
+      selectedTotal = _heatmapData[selectedIdx].total;
     }
+
+    final gridWidth = _weeks * _columnWidth;
 
     return Container(
       padding: const EdgeInsets.all(S.s20),
@@ -841,7 +979,6 @@ class _Heatmap extends StatelessWidget {
                   ],
                 ),
               ),
-              // Selected day badge
               if (selectedIdx != null)
                 AnimatedOpacity(
                   opacity: 1.0,
@@ -885,79 +1022,104 @@ class _Heatmap extends StatelessWidget {
           ),
           const SizedBox(height: S.s20),
 
-          // Month labels
-          Row(
-            children: List.generate(_weeks, (w) {
-              final match = monthLabels.where((m) => m.$1 == w);
-              return Expanded(
-                child: match.isNotEmpty
-                    ? Text(
-                        match.first.$2,
-                        style: TextStyle(
-                          fontSize: 10,
-                          color: dark ? C.onDark3 : C.onLight3,
-                        ),
-                      )
-                    : const SizedBox.shrink(),
-              );
-            }),
-          ),
-          const SizedBox(height: S.s8),
-
-          // Grid
-          SizedBox(
-            height: (_daysPerWeek * 14.0) + ((_daysPerWeek - 1) * 3.0),
-            child: Row(
-              children: List.generate(_weeks, (week) {
-                return Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 1.5),
-                    child: Column(
-                      children: List.generate(_daysPerWeek, (day) {
-                        final idx = week * _daysPerWeek + day;
-                        final data = idx < _heatmapData.length
-                            ? _heatmapData[idx]
-                            : null;
-                        final level = data?.level ?? 0;
-                        final isSelected = selectedIdx == idx;
-                        return Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.all(1.5),
-                            child: GestureDetector(
-                              onTap: () => onDaySelected(idx),
-                              child: AnimatedContainer(
-                                duration: const Duration(milliseconds: 150),
-                                decoration: BoxDecoration(
-                                  color: _levelColor(level, dark),
-                                  borderRadius: BorderRadius.circular(3),
-                                  border: isSelected
-                                      ? Border.all(
-                                          color: dark ? C.onDark1 : C.onLight1,
-                                          width: 1.5,
-                                        )
-                                      : null,
-                                  boxShadow: isSelected
-                                      ? [
-                                          BoxShadow(
-                                            color:
-                                                (dark
-                                                        ? C.primarySoft
-                                                        : C.primary)
-                                                    .withValues(alpha: 0.4),
-                                            blurRadius: 4,
-                                          ),
-                                        ]
-                                      : null,
-                                ),
+          SingleChildScrollView(
+            controller: _scrollController,
+            scrollDirection: Axis.horizontal,
+            child: SizedBox(
+              width: gridWidth,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Month labels — use Stack so text can overflow narrow columns
+                  SizedBox(
+                    height: 14,
+                    width: gridWidth,
+                    child: Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        for (final (wIdx, label) in monthLabels)
+                          Positioned(
+                            left: wIdx * _columnWidth,
+                            top: 0,
+                            child: Text(
+                              label,
+                              style: TextStyle(
+                                fontSize: 10,
+                                color: dark ? C.onDark3 : C.onLight3,
                               ),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: S.s8),
+
+                  // Grid
+                  SizedBox(
+                    height: (_daysPerWeek * _cellSize) +
+                        ((_daysPerWeek - 1) * _cellGap),
+                    child: Row(
+                      children: List.generate(_weeks, (week) {
+                        return SizedBox(
+                          width: _columnWidth,
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: _cellGap / 2,
+                            ),
+                            child: Column(
+                              children: List.generate(_daysPerWeek, (day) {
+                                final idx = week * _daysPerWeek + day;
+                                final data = idx < _heatmapData.length
+                                    ? _heatmapData[idx]
+                                    : null;
+                                final level = data?.level ?? 0;
+                                final isSelected = selectedIdx == idx;
+                                return Expanded(
+                                  child: Padding(
+                                    padding: EdgeInsets.all(_cellGap / 2),
+                                    child: GestureDetector(
+                                      onTap: () => widget.onDaySelected(idx),
+                                      child: AnimatedContainer(
+                                        duration:
+                                            const Duration(milliseconds: 150),
+                                        decoration: BoxDecoration(
+                                          color: _levelColor(level, dark),
+                                          borderRadius:
+                                              BorderRadius.circular(3),
+                                          border: isSelected
+                                              ? Border.all(
+                                                  color: dark
+                                                      ? C.onDark1
+                                                      : C.onLight1,
+                                                  width: 1.5,
+                                                )
+                                              : null,
+                                          boxShadow: isSelected
+                                              ? [
+                                                  BoxShadow(
+                                                    color: (dark
+                                                            ? C.primarySoft
+                                                            : C.primary)
+                                                        .withValues(
+                                                            alpha: 0.4),
+                                                    blurRadius: 4,
+                                                  ),
+                                                ]
+                                              : null,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              }),
                             ),
                           ),
                         );
                       }),
                     ),
                   ),
-                );
-              }),
+                ],
+              ),
             ),
           ),
 

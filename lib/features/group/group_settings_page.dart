@@ -41,6 +41,7 @@ class GroupSettingsPage extends StatefulWidget {
 class _GroupSettingsPageState extends State<GroupSettingsPage> {
   bool _muteNotifications = false;
   late String _groupName = widget.groupName;
+  int _dailyGoal = 25000; // mock default
 
   bool get _isLeader => widget.userRole == GroupRole.leader;
   bool get _isCoLeader => widget.userRole == GroupRole.coLeader;
@@ -189,6 +190,139 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
           ],
         ),
       ),
+      ),
+    );
+  }
+
+  void _editDailyGoal() {
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    final tt = Theme.of(context).textTheme;
+    final controller = TextEditingController(text: _dailyGoal.toString());
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: dark ? C.dark3 : C.light2,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (ctx) => SafeArea(
+        child: Padding(
+          padding: EdgeInsets.only(
+            left: S.s24,
+            right: S.s24,
+            top: S.s24,
+            bottom: MediaQuery.of(ctx).viewInsets.bottom + S.s24,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: (dark ? C.onDark3 : C.onLight3)
+                        .withValues(alpha: 0.3),
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              const SizedBox(height: S.s20),
+              Text(
+                'Set Daily Goal',
+                style: tt.titleLarge?.copyWith(fontWeight: FontWeight.w600),
+              ),
+              const SizedBox(height: S.s4),
+              Text(
+                'Set a daily selawat target for your group.',
+                style: tt.bodySmall?.copyWith(
+                  color: dark ? C.onDark3 : C.onLight3,
+                ),
+              ),
+              const SizedBox(height: S.s20),
+              TextField(
+                controller: controller,
+                autofocus: true,
+                keyboardType: TextInputType.number,
+                style: TextStyle(color: dark ? C.onDark1 : C.onLight1),
+                decoration: InputDecoration(
+                  hintText: 'e.g. 10000',
+                  hintStyle:
+                      TextStyle(color: dark ? C.onDark3 : C.onLight3),
+                  filled: true,
+                  fillColor: dark ? C.dark4 : C.light3,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14),
+                    borderSide: BorderSide.none,
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 20, vertical: 16),
+                  suffixText: 'selawat',
+                  suffixStyle:
+                      TextStyle(color: dark ? C.onDark3 : C.onLight3),
+                ),
+              ),
+              const SizedBox(height: S.s16),
+              Row(
+                children: [
+                  Expanded(
+                    child: BounceTap(
+                      onTap: () => Navigator.of(ctx).pop(),
+                      child: Container(
+                        padding:
+                            const EdgeInsets.symmetric(vertical: S.s12),
+                        decoration: BoxDecoration(
+                          color: dark ? C.dark4 : C.light3,
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        child: Center(
+                          child: Text(
+                            'Cancel',
+                            style: tt.bodyMedium?.copyWith(
+                              fontWeight: FontWeight.w600,
+                              color: dark ? C.onDark2 : C.onLight2,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: S.s12),
+                  Expanded(
+                    child: BounceTap(
+                      onTap: () {
+                        final val =
+                            int.tryParse(controller.text.trim()) ?? 0;
+                        if (val > 0) {
+                          setState(() => _dailyGoal = val);
+                        }
+                        Navigator.of(ctx).pop();
+                      },
+                      child: Container(
+                        padding:
+                            const EdgeInsets.symmetric(vertical: S.s12),
+                        decoration: BoxDecoration(
+                          color: dark ? C.primarySoft : C.primary,
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        child: Center(
+                          child: Text(
+                            'Save',
+                            style: tt.bodyMedium?.copyWith(
+                              fontWeight: FontWeight.w600,
+                              color: C.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -446,6 +580,27 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                             onTap: _editGroupName,
                           ),
                         if (_isLeader)
+                          Divider(
+                            height: 1,
+                            indent: 52,
+                            color: dark ? C.darkDivider : C.lightDivider,
+                          ),
+                        if (_canManage)
+                          _MenuRow(
+                            icon: CupertinoIcons.flag,
+                            label: 'Set Daily Goal',
+                            trailing: Text(
+                              _fmtGoal(_dailyGoal),
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                                color: dark ? C.onDark3 : C.onLight3,
+                              ),
+                            ),
+                            dark: dark,
+                            onTap: _editDailyGoal,
+                          ),
+                        if (_canManage)
                           Divider(
                             height: 1,
                             indent: 52,
@@ -1724,6 +1879,11 @@ class _MemberRadioRow extends StatelessWidget {
 // ─────────────────────────────────────────────────────────
 //  Section header
 // ─────────────────────────────────────────────────────────
+
+String _fmtGoal(int n) {
+  if (n >= 1000) return '${(n / 1000).toStringAsFixed(n % 1000 == 0 ? 0 : 1)}k';
+  return '$n';
+}
 
 class _SectionHeader extends StatelessWidget {
   const _SectionHeader({required this.label, required this.dark});
