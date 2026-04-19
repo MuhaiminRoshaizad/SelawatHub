@@ -82,5 +82,5 @@ class _RingPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _RingPainter old) =>
-      old.filled != filled || old.total != total;
+      old.filled != filled || old.total != total || old.filledColor != filledColor;
 }

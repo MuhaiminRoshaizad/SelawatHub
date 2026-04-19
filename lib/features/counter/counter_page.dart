@@ -1,8 +1,13 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:selawathub/core/animations/fade_in.dart';
 import 'package:selawathub/core/constants.dart';
+import 'package:selawathub/core/services/counter_service.dart';
+import 'package:selawathub/core/services/settings_service.dart';
+import 'package:selawathub/core/services/supabase_service.dart';
 import 'package:selawathub/core/theme/colors.dart';
 import 'package:selawathub/core/widgets/bead_circle.dart';
 import 'package:selawathub/features/counter/counter_settings_page.dart';
@@ -31,6 +36,10 @@ class _CounterPageState extends State<CounterPage>
   Map<String, int> _customTargets = {};
   int _colorThemeIndex = 0;
 
+  Map<String, int> _todayCounts = {};
+  Timer? _saveTimer;
+  int _tapsSinceLastSave = 0;
+
   late final AnimationController _pulse;
 
   Color get _accentColor => colorThemes[_colorThemeIndex].$2;
@@ -42,10 +51,63 @@ class _CounterPageState extends State<CounterPage>
       vsync: this,
       duration: const Duration(milliseconds: 200),
     );
+    _loadState();
+  }
+
+  Future<void> _loadState() async {
+    final haptic = SettingsService.hapticEnabled;
+    final intensity = SettingsService.hapticIntensity;
+    final style = SettingsService.counterStyle;
+    final colorIdx = SettingsService.colorThemeIndex;
+    final targets = SettingsService.getAllCustomTargets(
+      Dhikr.all.map((d) => d.id).toList(),
+    );
+
+    Map<String, int> todayCounts = {};
+    if (SupabaseService.isAuthenticated) {
+      todayCounts = await CounterService.getTodayCounts();
+    } else {
+      todayCounts = SettingsService.getLocalTodayCounts(
+        Dhikr.all.map((d) => d.id).toList(),
+      );
+    }
+
+    if (!mounted) return;
+    setState(() {
+      _hapticEnabled = haptic;
+      _hapticIntensity = intensity;
+      _counterStyle = style;
+      _colorThemeIndex = colorIdx;
+      _customTargets = targets;
+      _todayCounts = todayCounts;
+      _total = _todayCounts[_dhikr.id] ?? 0;
+    });
+  }
+
+  void _scheduleSave() {
+    _saveTimer?.cancel();
+    _saveTimer = Timer(const Duration(seconds: 2), _persistCount);
+  }
+
+  void _persistCount() {
+    _tapsSinceLastSave = 0;
+    // Always save locally
+    final now = DateTime.now();
+    final today = '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
+    SettingsService.saveLocalCount(_dhikr.id, _dhikr.category.name, _total, today);
+    // Also save to Supabase if authenticated
+    if (!SupabaseService.isAuthenticated) return;
+    CounterService.upsertCount(
+      dhikrId: _dhikr.id,
+      category: _dhikr.category.name,
+      count: _total,
+    );
   }
 
   @override
   void dispose() {
+    _saveTimer?.cancel();
+    _persistCount();
     _pulse.dispose();
     super.dispose();
   }
@@ -70,6 +132,14 @@ class _CounterPageState extends State<CounterPage>
         if (_hapticEnabled) HapticFeedback.heavyImpact();
       }
     });
+    _todayCounts[_dhikr.id] = _total;
+    _tapsSinceLastSave++;
+    if (_tapsSinceLastSave >= 5) {
+      _saveTimer?.cancel();
+      _persistCount();
+    } else {
+      _scheduleSave();
+    }
   }
 
   void _openSettings() async {
@@ -93,17 +163,24 @@ class _CounterPageState extends State<CounterPage>
         _customTargets = result.$4;
         _colorThemeIndex = result.$5;
       });
+      SettingsService.hapticEnabled = _hapticEnabled;
+      SettingsService.hapticIntensity = _hapticIntensity;
+      SettingsService.counterStyle = _counterStyle;
+      SettingsService.colorThemeIndex = _colorThemeIndex;
+      SettingsService.saveAllCustomTargets(_customTargets);
     }
   }
 
   void _openSelector() async {
     final picked = await DhikrSelectorSheet.show(context, _dhikr);
     if (picked != null && picked.id != _dhikr.id) {
+      _saveTimer?.cancel();
+      _persistCount();
       setState(() {
         _dhikr = picked;
         _count = 0;
         _round = 0;
-        _total = 0;
+        _total = _todayCounts[picked.id] ?? 0;
         _arabicExpanded = false;
       });
     }
@@ -134,6 +211,9 @@ class _CounterPageState extends State<CounterPage>
         _round = 0;
         _total = 0;
       });
+      _todayCounts[_dhikr.id] = 0;
+      _saveTimer?.cancel();
+      _persistCount();
     }
   }
 

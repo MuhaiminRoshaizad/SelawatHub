@@ -5,8 +5,10 @@ import 'package:selawathub/core/constants.dart';
 import 'package:selawathub/core/theme/colors.dart';
 import 'package:selawathub/core/widgets/action_buttons.dart';
 import 'package:selawathub/core/widgets/app_bottom_sheet.dart';
+import 'package:selawathub/core/widgets/app_snackbar.dart';
 import 'package:selawathub/core/widgets/bead_circle.dart';
-import 'package:selawathub/core/widgets/frosted_bar.dart';
+import 'package:selawathub/core/widgets/frosted_app_bar.dart';
+import 'package:selawathub/core/widgets/section_header.dart';
 import 'package:selawathub/features/counter/models/dhikr.dart';
 import 'package:selawathub/features/counter/widgets/digital_counter.dart';
 import 'package:selawathub/features/counter/widgets/minimal_counter.dart';
@@ -109,8 +111,11 @@ class _CounterSettingsPageState extends State<CounterSettingsPage> {
                   final val = int.tryParse(controller.text);
                   if (val != null && val > 0) {
                     setState(() => _customTargets[d.id] = val);
+                    Navigator.pop(ctx);
+                    showAppSnackBar(context, 'Target updated to $val');
+                  } else {
+                    showAppSnackBar(ctx, 'Enter a valid number', backgroundColor: C.error);
                   }
-                  Navigator.pop(ctx);
                 },
               ),
             ],
@@ -137,7 +142,7 @@ class _CounterSettingsPageState extends State<CounterSettingsPage> {
 
               // ── General ──
               if (!kIsWeb) ...[
-                _SectionHeader(title: 'General'),
+                SectionHeader(text: 'General', style: SectionHeaderStyle.title),
                 _MenuContainer(
                   dark: dark,
                   children: [
@@ -195,7 +200,7 @@ class _CounterSettingsPageState extends State<CounterSettingsPage> {
               ],
 
               // ── Appearance ──
-              _SectionHeader(title: 'Appearance'),
+              SectionHeader(text: 'Appearance', style: SectionHeaderStyle.title),
               _MenuContainer(
                 dark: dark,
                 children: [
@@ -307,9 +312,10 @@ class _CounterSettingsPageState extends State<CounterSettingsPage> {
               const SizedBox(height: S.s24),
 
               // ── Targets ──
-              _SectionHeader(
-                title: 'Targets',
+              SectionHeader(
+                text: 'Targets',
                 subtitle: 'Customize the target count for each dhikr',
+                style: SectionHeaderStyle.title,
               ),
 
               Padding(
@@ -351,30 +357,9 @@ class _CounterSettingsPageState extends State<CounterSettingsPage> {
           // ── Frosted app bar ──
           Positioned(
             top: 0, left: 0, right: 0,
-            child: FrostedBar(
-              child: SizedBox(
-                height: 56,
-                child: Row(
-                  children: [
-                    GestureDetector(
-                      onTap: _pop,
-                      child: const Padding(
-                        padding: EdgeInsets.all(S.s16),
-                        child: Icon(CupertinoIcons.back, size: 22),
-                      ),
-                    ),
-                    Text(
-                      'Tasbih Settings',
-                      style: TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.w600,
-                        color: dark ? C.onDark1 : C.onLight1,
-                      ),
-                    ),
-                    const Spacer(),
-                  ],
-                ),
-              ),
+            child: FrostedAppBar(
+              title: 'Tasbih Settings',
+              onBack: _pop,
             ),
           ),
         ],
@@ -428,43 +413,6 @@ class _CounterSettingsPageState extends State<CounterSettingsPage> {
 }
 
 // ── Helpers ──
-
-class _SectionHeader extends StatelessWidget {
-  const _SectionHeader({required this.title, this.subtitle});
-  final String title;
-  final String? subtitle;
-
-  @override
-  Widget build(BuildContext context) {
-    final dark = Theme.of(context).brightness == Brightness.dark;
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(S.page, S.s4, S.page, S.s8),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            title,
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w700,
-              color: dark ? C.onDark1 : C.onLight1,
-            ),
-          ),
-          if (subtitle != null) ...[
-            const SizedBox(height: S.s2),
-            Text(
-              subtitle!,
-              style: TextStyle(
-                fontSize: 12,
-                color: dark ? C.onDark3 : C.onLight3,
-              ),
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-}
 
 class _MenuContainer extends StatelessWidget {
   const _MenuContainer({required this.dark, required this.children});

@@ -5,7 +5,6 @@ import 'package:selawathub/core/animations/fade_in.dart';
 import 'package:selawathub/core/constants.dart';
 import 'package:selawathub/core/services/group_service.dart';
 import 'package:selawathub/core/theme/colors.dart';
-import 'package:selawathub/core/widgets/action_buttons.dart';
 import 'package:selawathub/core/widgets/app_bottom_sheet.dart';
 import 'package:selawathub/core/widgets/app_snackbar.dart';
 
@@ -43,67 +42,57 @@ class _NoGroupViewState extends State<NoGroupView> {
         return;
       }
       final groupName = group['name'] as String? ?? 'Group';
-
       final dark = Theme.of(context).brightness == Brightness.dark;
       final tt = Theme.of(context).textTheme;
       final onJoined = widget.onJoined;
 
-    showAppFormSheet(
-      context: context,
-      isScrollControlled: false,
-      builder: (ctx) => SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(S.page, S.s8, S.page, S.page),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                CupertinoIcons.checkmark_circle_fill,
-                size: 56,
-                color: C.success,
-              ),
-              const SizedBox(height: S.s16),
-              Text("You've joined the group!", style: tt.titleLarge),
-              const SizedBox(height: S.s8),
-              Text(
-                'Welcome to $groupName',
-                style: tt.bodyMedium?.copyWith(
-                  color: dark ? C.onDark2 : C.onLight2,
+      showAppFormSheet(
+        context: context,
+        isScrollControlled: false,
+        builder: (ctx) => SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(S.page, S.s8, S.page, S.page),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(CupertinoIcons.checkmark_circle_fill, size: 56, color: C.success),
+                const SizedBox(height: S.s16),
+                Text("You've joined the group!", style: tt.titleLarge),
+                const SizedBox(height: S.s8),
+                Text(
+                  'Welcome to $groupName',
+                  style: tt.bodyMedium?.copyWith(color: dark ? C.onDark2 : C.onLight2),
                 ),
-              ),
-              const SizedBox(height: S.s24),
-              SizedBox(
-                width: double.infinity,
-                child: BounceTap(
-                  onTap: () {
-                    Navigator.pop(ctx);
-                    onJoined();
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    decoration: BoxDecoration(
-                      color: dark ? C.primarySoft : C.primary,
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    child: Center(
-                      child: Text(
-                        'Continue',
-                        style: TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w600,
-                          color: C.white,
+                const SizedBox(height: S.s24),
+                SizedBox(
+                  width: double.infinity,
+                  child: BounceTap(
+                    onTap: () {
+                      Navigator.pop(ctx);
+                      onJoined();
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      decoration: BoxDecoration(
+                        color: dark ? C.primarySoft : C.primary,
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      child: Center(
+                        child: Text(
+                          'Continue',
+                          style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: C.white),
                         ),
                       ),
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
-      ),
-    );
+      );
     } catch (e) {
+      debugPrint('[JoinGroup] error: $e');
       if (mounted) {
         setState(() => _joining = false);
         showAppSnackBar(context, 'Failed to join group');
@@ -111,79 +100,130 @@ class _NoGroupViewState extends State<NoGroupView> {
     }
   }
 
-  void _createGroup() {
+  Future<void> _createGroup() async {
+    final dark = Theme.of(context).brightness == Brightness.dark;
     final tt = Theme.of(context).textTheme;
-    final onJoined = widget.onJoined;
 
     showAppFormSheet(
       context: context,
       builder: (ctx) {
         final nameCtrl = TextEditingController();
         final descCtrl = TextEditingController();
-        bool creating = false;
+        bool sheetCreating = false;
         return StatefulBuilder(
           builder: (ctx, setSheetState) => Padding(
-          padding: EdgeInsets.only(
-            left: S.page,
-            right: S.page,
-            top: S.s8,
-            bottom: MediaQuery.of(ctx).viewInsets.bottom +
-                MediaQuery.of(ctx).padding.bottom +
-                S.page,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Create New Group',
-                style: tt.titleLarge?.copyWith(fontWeight: FontWeight.w600),
-              ),
-              const SizedBox(height: S.s24),
-              TextField(
-                controller: nameCtrl,
-                decoration: const InputDecoration(
-                  hintText: 'Enter group name',
+            padding: EdgeInsets.only(
+              left: S.page,
+              right: S.page,
+              top: S.s8,
+              bottom: MediaQuery.of(ctx).viewInsets.bottom +
+                  MediaQuery.of(ctx).padding.bottom +
+                  S.page,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Create New Group',
+                  style: tt.titleLarge?.copyWith(fontWeight: FontWeight.w600),
                 ),
-              ),
-              const SizedBox(height: S.s16),
-              TextField(
-                controller: descCtrl,
-                maxLines: 3,
-                decoration: const InputDecoration(
-                  hintText: 'Add a description (optional)',
+                const SizedBox(height: S.s24),
+                TextField(
+                  controller: nameCtrl,
+                  decoration: const InputDecoration(hintText: 'Enter group name'),
                 ),
-              ),
-              const SizedBox(height: S.s24),
-              ActionButtons(
-                cancelLabel: 'Cancel',
-                confirmLabel: creating ? 'Creating...' : 'Create',
-                onCancel: () => Navigator.pop(ctx),
-                onConfirm: creating ? () {} : () {
-                  if (nameCtrl.text.trim().isEmpty) {
-                    showAppSnackBar(ctx, 'Please enter a group name');
-                    return;
-                  }
-                  setSheetState(() => creating = true);
-                  GroupService.createGroup(
-                    name: nameCtrl.text.trim(),
-                    description: descCtrl.text.trim(),
-                  ).then((group) {
-                    if (ctx.mounted) Navigator.pop(ctx);
-                    if (group != null) {
-                      onJoined();
-                    } else {
-                      if (ctx.mounted) showAppSnackBar(ctx, 'Failed to create group');
-                    }
-                  }).catchError((_) {
-                    setSheetState(() => creating = false);
-                    if (ctx.mounted) showAppSnackBar(ctx, 'Failed to create group');
-                  });
-                },
-              ),
-            ],
+                const SizedBox(height: S.s16),
+                TextField(
+                  controller: descCtrl,
+                  maxLines: 3,
+                  decoration: const InputDecoration(hintText: 'Add a description (optional)'),
+                ),
+                const SizedBox(height: S.s24),
+                Row(
+                  children: [
+                    Expanded(
+                      child: BounceTap(
+                        onTap: sheetCreating ? null : () => Navigator.pop(ctx),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: dark ? C.darkDivider : C.lightDivider),
+                          ),
+                          child: Center(
+                            child: Text(
+                              'Cancel',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                                color: dark ? C.onDark2 : C.onLight2,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: S.s12),
+                    Expanded(
+                      child: BounceTap(
+                        onTap: sheetCreating
+                            ? null
+                            : () async {
+                                if (nameCtrl.text.trim().isEmpty) {
+                                  showAppSnackBar(ctx, 'Please enter a group name');
+                                  return;
+                                }
+                                setSheetState(() => sheetCreating = true);
+                                try {
+                                  final group = await GroupService.createGroup(
+                                    name: nameCtrl.text.trim(),
+                                    description: descCtrl.text.trim(),
+                                  );
+                                  if (!ctx.mounted) return;
+                                  if (group != null) {
+                                    Navigator.pop(ctx);
+                                    widget.onJoined();
+                                  } else {
+                                    setSheetState(() => sheetCreating = false);
+                                    showAppSnackBar(ctx, 'Failed to create group');
+                                  }
+                                } catch (e) {
+                                  debugPrint('[CreateGroup] error: $e');
+                                  if (ctx.mounted) {
+                                    setSheetState(() => sheetCreating = false);
+                                    showAppSnackBar(ctx, 'Error: ${e.toString()}');
+                                  }
+                                }
+                              },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          decoration: BoxDecoration(
+                            color: sheetCreating
+                                ? (dark ? C.primarySoft.withValues(alpha: 0.5) : C.primary.withValues(alpha: 0.5))
+                                : (dark ? C.primarySoft : C.primary),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Center(
+                            child: sheetCreating
+                                ? const SizedBox(
+                                    width: 18,
+                                    height: 18,
+                                    child: CircularProgressIndicator(strokeWidth: 2, color: C.white),
+                                  )
+                                : Text(
+                                    'Create',
+                                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: C.white),
+                                  ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
-        ),
         );
       },
     );
@@ -200,18 +240,12 @@ class _NoGroupViewState extends State<NoGroupView> {
         children: [
           const Spacer(flex: 2),
 
-          FadeIn(
-            child: Text('🤝', style: TextStyle(fontSize: 56)),
-          ),
+          FadeIn(child: Text('🤝', style: TextStyle(fontSize: 56))),
           const SizedBox(height: S.s24),
 
           FadeIn(
             delay: const Duration(milliseconds: 80),
-            child: Text(
-              'Join a Group',
-              style: tt.headlineLarge,
-              textAlign: TextAlign.center,
-            ),
+            child: Text('Join a Group', style: tt.headlineLarge, textAlign: TextAlign.center),
           ),
           const SizedBox(height: S.s8),
 
@@ -240,40 +274,39 @@ class _NoGroupViewState extends State<NoGroupView> {
               ),
               decoration: InputDecoration(
                 hintText: 'ENTER CODE',
-                hintStyle: TextStyle(
-                  fontSize: 14,
-                  letterSpacing: 3,
-                  color: dark ? C.onDark3 : C.onLight3,
-                ),
+                hintStyle: TextStyle(fontSize: 14, letterSpacing: 3, color: dark ? C.onDark3 : C.onLight3),
               ),
             ),
           ),
 
           const SizedBox(height: S.s16),
 
+          // Join button with loading spinner
           FadeIn(
             delay: const Duration(milliseconds: 260),
             child: SizedBox(
               width: double.infinity,
               child: BounceTap(
-                onTap: _joinGroup,
+                onTap: _joining ? null : _joinGroup,
                 child: Container(
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   decoration: BoxDecoration(
-                    color: dark ? C.primarySoft : C.primary,
+                    color: _joining
+                        ? (dark ? C.primarySoft.withValues(alpha: 0.5) : C.primary.withValues(alpha: 0.5))
+                        : (dark ? C.primarySoft : C.primary),
                     borderRadius: BorderRadius.circular(14),
                   ),
                   child: Center(
                     child: _joining
-                        ? const CupertinoActivityIndicator(color: C.white)
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2, color: C.white),
+                          )
                         : Text(
-                      'Join Group',
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                        color: C.white,
-                      ),
-                    ),
+                            'Join Group',
+                            style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: C.white),
+                          ),
                   ),
                 ),
               ),
@@ -298,6 +331,7 @@ class _NoGroupViewState extends State<NoGroupView> {
 
           const SizedBox(height: S.s20),
 
+          // Create button
           FadeIn(
             delay: const Duration(milliseconds: 380),
             child: SizedBox(

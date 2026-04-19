@@ -11,12 +11,14 @@ class ActionButtons extends StatelessWidget {
     required this.onConfirm,
     this.cancelLabel = 'Cancel',
     this.confirmLabel = 'Save',
+    this.saving = false,
   });
 
   final VoidCallback onCancel;
   final VoidCallback onConfirm;
   final String cancelLabel;
   final String confirmLabel;
+  final bool saving;
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +28,7 @@ class ActionButtons extends StatelessWidget {
       children: [
         Expanded(
           child: BounceTap(
-            onTap: onCancel,
+            onTap: saving ? null : onCancel,
             child: Container(
               padding: const EdgeInsets.symmetric(vertical: S.s12),
               decoration: BoxDecoration(
@@ -48,7 +50,7 @@ class ActionButtons extends StatelessWidget {
         const SizedBox(width: S.s12),
         Expanded(
           child: BounceTap(
-            onTap: onConfirm,
+            onTap: saving ? null : onConfirm,
             child: Container(
               padding: const EdgeInsets.symmetric(vertical: S.s12),
               decoration: BoxDecoration(
@@ -56,13 +58,22 @@ class ActionButtons extends StatelessWidget {
                 borderRadius: BorderRadius.circular(14),
               ),
               child: Center(
-                child: Text(
-                  confirmLabel,
-                  style: tt.bodyMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: C.white,
-                  ),
-                ),
+                child: saving
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: C.white,
+                        ),
+                      )
+                    : Text(
+                        confirmLabel,
+                        style: tt.bodyMedium?.copyWith(
+                          fontWeight: FontWeight.w600,
+                          color: C.white,
+                        ),
+                      ),
               ),
             ),
           ),

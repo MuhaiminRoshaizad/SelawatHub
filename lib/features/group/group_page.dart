@@ -1,12 +1,14 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 import 'package:selawathub/core/animations/bounce_tap.dart';
 import 'package:selawathub/core/animations/fade_in.dart';
 import 'package:selawathub/core/constants.dart';
 import 'package:selawathub/core/services/group_service.dart';
 import 'package:selawathub/core/services/supabase_service.dart';
 import 'package:selawathub/core/theme/colors.dart';
+import 'package:selawathub/core/widgets/app_bottom_sheet.dart';
 import 'package:selawathub/core/widgets/app_snackbar.dart';
 import 'package:selawathub/core/widgets/frosted_bar.dart';
 import 'package:selawathub/features/group/group_settings_page.dart';
@@ -160,6 +162,156 @@ class _GroupViewState extends State<_GroupView> {
     if (role == 'leader') return GroupRole.leader;
     if (role == 'co_leader') return GroupRole.coLeader;
     return GroupRole.member;
+  }
+
+  void _showGroupInfo(BuildContext context) {
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    final tt = Theme.of(context).textTheme;
+    final groupName = widget.group['name'] as String? ?? 'Group';
+    final description = widget.group['description'] as String? ?? '';
+    final inviteCode = widget.group['invite_code'] as String? ?? '';
+    final createdAt = widget.group['created_at'] as String?;
+
+    String formattedDate = '';
+    if (createdAt != null) {
+      try {
+        final date = DateTime.parse(createdAt);
+        formattedDate = DateFormat('d MMM yyyy').format(date);
+      } catch (_) {}
+    }
+
+    showAppFormSheet(
+      context: context,
+      builder: (ctx) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(S.page, S.s8, S.page, S.page),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Group name
+              Text(
+                groupName,
+                style: tt.headlineMedium?.copyWith(fontWeight: FontWeight.w700),
+              ),
+              const SizedBox(height: S.s16),
+
+              // Description
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(S.s16),
+                decoration: BoxDecoration(
+                  color: dark ? C.dark3 : C.light3,
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Description',
+                      style: tt.labelSmall?.copyWith(
+                        color: dark ? C.onDark3 : C.onLight3,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: S.s6),
+                    Text(
+                      description.isEmpty ? 'No description' : description,
+                      style: tt.bodyMedium?.copyWith(
+                        color: description.isEmpty
+                            ? (dark ? C.onDark3 : C.onLight3)
+                            : (dark ? C.onDark1 : C.onLight1),
+                        fontStyle: description.isEmpty ? FontStyle.italic : null,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: S.s12),
+
+              // Info row: members + created date
+              Row(
+                children: [
+                  _InfoChip(
+                    icon: CupertinoIcons.person_2_fill,
+                    label: '${_members.length} members',
+                    dark: dark,
+                  ),
+                  const SizedBox(width: S.s8),
+                  if (formattedDate.isNotEmpty)
+                    _InfoChip(
+                      icon: CupertinoIcons.calendar,
+                      label: 'Created $formattedDate',
+                      dark: dark,
+                    ),
+                ],
+              ),
+
+              const SizedBox(height: S.s16),
+
+              // Invite code row
+              BounceTap(
+                onTap: () {
+                  Clipboard.setData(ClipboardData(text: inviteCode));
+                  showAppSnackBar(ctx, 'Invite code copied!');
+                },
+                child: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: S.s16,
+                    vertical: S.s12,
+                  ),
+                  decoration: BoxDecoration(
+                    color: dark
+                        ? C.primaryMuted.withValues(alpha: 0.2)
+                        : C.primary.withValues(alpha: 0.06),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        CupertinoIcons.ticket,
+                        size: 16,
+                        color: dark ? C.primarySoft : C.primary,
+                      ),
+                      const SizedBox(width: S.s12),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Invite Code',
+                            style: tt.labelSmall?.copyWith(
+                              color: dark ? C.onDark3 : C.onLight3,
+                            ),
+                          ),
+                          const SizedBox(height: S.s2),
+                          Text(
+                            inviteCode,
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                              color: dark ? C.primarySoft : C.primary,
+                              letterSpacing: 2,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const Spacer(),
+                      Icon(
+                        CupertinoIcons.doc_on_clipboard,
+                        size: 14,
+                        color: dark ? C.onDark3 : C.onLight3,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   @override
@@ -397,6 +549,7 @@ class _GroupViewState extends State<_GroupView> {
             rank: rank,
             role: _parseRole(m['role'] as String?),
             isYou: m['is_me'] as bool? ?? false,
+            avatarUrl: m['avatar_url'] as String?,
             animationDelay: Duration(milliseconds: 240 + rank * 40),
           );
         }),
@@ -416,16 +569,31 @@ class _GroupViewState extends State<_GroupView> {
                 child: Row(
                   children: [
                     Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(groupName, style: tt.headlineLarge),
-                          const SizedBox(height: S.s4),
-                          Text(
-                            '${_members.length} members',
-                            style: tt.bodyMedium,
-                          ),
-                        ],
+                      child: GestureDetector(
+                        onTap: () => _showGroupInfo(context),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(groupName, style: tt.headlineLarge),
+                                  const SizedBox(height: S.s4),
+                                  Text(
+                                    '${_members.length} members',
+                                    style: tt.bodyMedium,
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Icon(
+                              CupertinoIcons.chevron_right,
+                              size: 14,
+                              color: dark ? C.onDark3 : C.onLight3,
+                            ),
+                            const SizedBox(width: S.s12),
+                          ],
+                        ),
                       ),
                     ),
                     BounceTap(
@@ -598,6 +766,45 @@ class _GoalProgressBar extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+// ── Info chip for group info sheet ──
+class _InfoChip extends StatelessWidget {
+  const _InfoChip({
+    required this.icon,
+    required this.label,
+    required this.dark,
+  });
+
+  final IconData icon;
+  final String label;
+  final bool dark;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: S.s12, vertical: S.s8),
+      decoration: BoxDecoration(
+        color: dark ? C.dark3 : C.light3,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 13, color: dark ? C.onDark3 : C.onLight3),
+          const SizedBox(width: S.s6),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+              color: dark ? C.onDark2 : C.onLight2,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

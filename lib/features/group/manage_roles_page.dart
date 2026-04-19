@@ -1,11 +1,10 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:selawathub/core/animations/bounce_tap.dart';
 import 'package:selawathub/core/constants.dart';
 import 'package:selawathub/core/services/group_service.dart';
 import 'package:selawathub/core/theme/colors.dart';
 import 'package:selawathub/core/widgets/app_snackbar.dart';
-import 'package:selawathub/core/widgets/frosted_bar.dart';
+import 'package:selawathub/core/widgets/frosted_app_bar.dart';
 import 'package:selawathub/features/group/models/group_role.dart';
 
 // ─────────────────────────────────────────────────────────
@@ -164,34 +163,7 @@ class _ManageRolesPageState extends State<ManageRolesPage> {
             top: 0,
             left: 0,
             right: 0,
-            child: FrostedBar(
-              child: SizedBox(
-                height: 56,
-                child: Row(
-                  children: [
-                    GestureDetector(
-                      onTap: () => Navigator.pop(context),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: S.s16),
-                        child: Icon(
-                          CupertinoIcons.chevron_left,
-                          size: 20,
-                          color: dark ? C.onDark1 : C.onLight1,
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      child: Text(
-                        'Manage Roles',
-                        style: tt.titleLarge
-                            ?.copyWith(fontWeight: FontWeight.w600),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+            child: FrostedAppBar(title: 'Manage Roles'),
           ),
         ],
       ),

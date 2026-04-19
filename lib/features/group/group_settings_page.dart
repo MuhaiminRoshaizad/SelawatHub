@@ -1,14 +1,18 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:selawathub/core/animations/bounce_tap.dart';
 import 'package:selawathub/core/animations/fade_in.dart';
 import 'package:selawathub/core/constants.dart';
 import 'package:selawathub/core/services/group_service.dart';
 import 'package:selawathub/core/theme/colors.dart';
 import 'package:selawathub/core/widgets/app_bottom_sheet.dart';
 import 'package:selawathub/core/widgets/app_snackbar.dart';
-import 'package:selawathub/core/widgets/frosted_bar.dart';
+import 'package:selawathub/core/widgets/confirmation_dialog.dart';
+import 'package:selawathub/core/widgets/action_buttons.dart';
+import 'package:selawathub/core/widgets/app_text_field.dart';
+import 'package:selawathub/core/widgets/frosted_app_bar.dart';
+import 'package:selawathub/core/widgets/section_header.dart';
+import 'package:selawathub/features/profile/widgets/profile_rows.dart';
 import 'package:selawathub/features/group/manage_roles_page.dart';
 import 'package:selawathub/features/group/models/group_role.dart';
 import 'package:selawathub/features/group/remove_member_page.dart';
@@ -51,6 +55,7 @@ class GroupSettingsPage extends StatefulWidget {
 class _GroupSettingsPageState extends State<GroupSettingsPage> {
   bool _muteNotifications = false;
   late String _groupName = widget.groupName;
+  late String _groupDescription = widget.groupDescription;
   late int _dailyGoal = widget.dailyGoal;
 
   bool get _isLeader => widget.userRole == GroupRole.leader;
@@ -105,25 +110,15 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                     autofocus: true,
                     maxLength: 30,
                     style: TextStyle(color: dark ? C.onDark1 : C.onLight1),
-                    decoration: InputDecoration(
+                    decoration: appInputDecoration(
+                      context: ctx,
                       hintText: 'Enter group name',
-                      hintStyle: TextStyle(color: dark ? C.onDark3 : C.onLight3),
-                      filled: true,
-                      fillColor: dark ? C.dark4 : C.light3,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(14),
-                        borderSide: BorderSide.none,
-                      ),
-                      contentPadding:
-                          const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                      counterStyle:
-                          TextStyle(color: dark ? C.onDark3 : C.onLight3),
+                      showCounter: true,
                     ),
                   ),
                   const SizedBox(height: S.s16),
-                  _SaveCancelButtons(
+                  ActionButtons(
                     saving: saving,
-                    dark: dark,
                     onCancel: () => Navigator.of(ctx).pop(),
                     onConfirm: () async {
                       final name = controller.text.trim();
@@ -139,6 +134,79 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                       } catch (_) {
                         setSheetState(() => saving = false);
                         if (ctx.mounted) showAppSnackBar(ctx, 'Failed to update name', backgroundColor: C.error);
+                      }
+                    },
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  void _editDescription() {
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    final tt = Theme.of(context).textTheme;
+    final controller = TextEditingController(text: _groupDescription);
+    bool saving = false;
+    showAppFormSheet(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setSheetState) {
+          return SafeArea(
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(
+                S.page, S.s8, S.page,
+                MediaQuery.of(ctx).viewInsets.bottom + S.page,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Edit Description',
+                    style: tt.titleLarge?.copyWith(fontWeight: FontWeight.w600),
+                  ),
+                  const SizedBox(height: S.s4),
+                  Text(
+                    'Describe what your group is about.',
+                    style: tt.bodySmall?.copyWith(
+                      color: dark ? C.onDark3 : C.onLight3,
+                    ),
+                  ),
+                  const SizedBox(height: S.s20),
+                  TextField(
+                    controller: controller,
+                    autofocus: true,
+                    maxLength: 150,
+                    maxLines: 3,
+                    minLines: 2,
+                    style: TextStyle(color: dark ? C.onDark1 : C.onLight1),
+                    decoration: appInputDecoration(
+                      context: ctx,
+                      hintText: 'Enter group description',
+                      showCounter: true,
+                    ),
+                  ),
+                  const SizedBox(height: S.s16),
+                  ActionButtons(
+                    saving: saving,
+                    onCancel: () => Navigator.of(ctx).pop(),
+                    onConfirm: () async {
+                      final desc = controller.text.trim();
+                      setSheetState(() => saving = true);
+                      try {
+                        await GroupService.updateGroup(widget.groupId, description: desc);
+                        setState(() => _groupDescription = desc);
+                        if (ctx.mounted) {
+                          Navigator.of(ctx).pop();
+                          showAppSnackBar(ctx, 'Description updated');
+                        }
+                      } catch (_) {
+                        setSheetState(() => saving = false);
+                        if (ctx.mounted) showAppSnackBar(ctx, 'Failed to update description', backgroundColor: C.error);
                       }
                     },
                   ),
@@ -187,27 +255,18 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                     autofocus: true,
                     keyboardType: TextInputType.number,
                     style: TextStyle(color: dark ? C.onDark1 : C.onLight1),
-                    decoration: InputDecoration(
+                    decoration: appInputDecoration(
+                      context: ctx,
                       hintText: 'e.g. 10000',
-                      hintStyle:
-                          TextStyle(color: dark ? C.onDark3 : C.onLight3),
-                      filled: true,
-                      fillColor: dark ? C.dark4 : C.light3,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(14),
-                        borderSide: BorderSide.none,
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 20, vertical: 16),
+                    ).copyWith(
                       suffixText: 'selawat',
                       suffixStyle:
                           TextStyle(color: dark ? C.onDark3 : C.onLight3),
                     ),
                   ),
                   const SizedBox(height: S.s16),
-                  _SaveCancelButtons(
+                  ActionButtons(
                     saving: saving,
-                    dark: dark,
                     onCancel: () => Navigator.of(ctx).pop(),
                     onConfirm: () async {
                       final val = int.tryParse(controller.text.trim()) ?? 0;
@@ -320,90 +379,38 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
       _showNeedCoLeaderDialog();
       return;
     }
-    final dark = Theme.of(context).brightness == Brightness.dark;
-    showDialog<bool>(
+    showConfirmDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: dark ? C.dark3 : C.light2,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Text(
-          'Leave group?',
-          style: TextStyle(
-            fontWeight: FontWeight.w600,
-            color: dark ? C.onDark1 : C.onLight1,
-          ),
-        ),
-        content: Text(
-          _isLeader
-              ? 'Leadership will be automatically transferred to the next co-leader or oldest member.'
-              : 'You will no longer see this group\'s progress or contribute to the count.',
-          style: TextStyle(color: dark ? C.onDark2 : C.onLight2),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: Text(
-              'Cancel',
-              style: TextStyle(color: dark ? C.primarySoft : C.primary),
-            ),
-          ),
-          TextButton(
-            onPressed: () async {
-              Navigator.of(ctx).pop();
-              try {
-                await GroupService.leaveGroup(widget.groupId);
-              } catch (_) {}
-              if (!mounted) return;
-              Navigator.of(context).pop();
-              widget.onLeave();
-            },
-            child: Text('Leave', style: TextStyle(color: C.error)),
-          ),
-        ],
-      ),
+      title: 'Leave group?',
+      message: _isLeader
+          ? 'Leadership will be automatically transferred to the next co-leader or oldest member.'
+          : 'You will no longer see this group\'s progress or contribute to the count.',
+      actionLabel: 'Leave',
+      errorMessage: 'Failed to leave group',
+      onConfirm: () async {
+        await GroupService.leaveGroup(widget.groupId);
+        if (!mounted) return;
+        showAppSnackBar(context, 'You left the group');
+        Navigator.of(context).pop();
+        widget.onLeave();
+      },
     );
   }
 
   void _confirmDelete() {
-    final dark = Theme.of(context).brightness == Brightness.dark;
-    showDialog<bool>(
+    showConfirmDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: dark ? C.dark3 : C.light2,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Text(
-          'Delete group?',
-          style: TextStyle(
-            fontWeight: FontWeight.w600,
-            color: dark ? C.onDark1 : C.onLight1,
-          ),
-        ),
-        content: Text(
-          'This will permanently delete the group for all members. This action cannot be undone.',
-          style: TextStyle(color: dark ? C.onDark2 : C.onLight2),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: Text(
-              'Cancel',
-              style: TextStyle(color: dark ? C.primarySoft : C.primary),
-            ),
-          ),
-          TextButton(
-            onPressed: () async {
-              Navigator.of(ctx).pop();
-              try {
-                await GroupService.leaveGroup(widget.groupId);
-              } catch (_) {}
-              if (!mounted) return;
-              Navigator.of(context).pop();
-              widget.onLeave();
-            },
-            child: Text('Delete', style: TextStyle(color: C.error)),
-          ),
-        ],
-      ),
+      title: 'Delete group?',
+      message: 'This will permanently delete the group for all members. This action cannot be undone.',
+      actionLabel: 'Delete',
+      errorMessage: 'Failed to delete group',
+      onConfirm: () async {
+        await GroupService.leaveGroup(widget.groupId);
+        if (!mounted) return;
+        showAppSnackBar(context, 'Group deleted');
+        Navigator.of(context).pop();
+        widget.onLeave();
+      },
     );
   }
 
@@ -476,7 +483,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
               const SizedBox(height: S.s24),
 
               // ── General section ──
-              _SectionHeader(label: 'GENERAL', dark: dark),
+              SectionHeader(text: 'GENERAL'),
               const SizedBox(height: S.s8),
 
               FadeIn(
@@ -491,10 +498,9 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                     child: Column(
                       children: [
                         if (_isLeader)
-                          _MenuRow(
+                          MenuRow(compact: true,
                             icon: CupertinoIcons.pencil,
                             label: 'Edit Group Name',
-                            dark: dark,
                             onTap: _editGroupName,
                           ),
                         if (_isLeader)
@@ -503,11 +509,33 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                             indent: 52,
                             color: dark ? C.darkDivider : C.lightDivider,
                           ),
+                        if (_isLeader)
+                          MenuRow(compact: true,
+                            icon: CupertinoIcons.text_alignleft,
+                            label: 'Edit Description',
+                            trailingWidget: Text(
+                              _groupDescription.isEmpty ? 'None' : _groupDescription,
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                                color: dark ? C.onDark3 : C.onLight3,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              maxLines: 1,
+                            ),
+                            onTap: _editDescription,
+                          ),
+                        if (_isLeader)
+                          Divider(
+                            height: 1,
+                            indent: 52,
+                            color: dark ? C.darkDivider : C.lightDivider,
+                          ),
                         if (_canManage)
-                          _MenuRow(
+                          MenuRow(compact: true,
                             icon: CupertinoIcons.flag,
                             label: 'Set Daily Goal',
-                            trailing: Text(
+                            trailingWidget: Text(
                               _fmtGoal(_dailyGoal),
                               style: TextStyle(
                                 fontSize: 12,
@@ -515,7 +543,6 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                                 color: dark ? C.onDark3 : C.onLight3,
                               ),
                             ),
-                            dark: dark,
                             onTap: _editDailyGoal,
                           ),
                         if (_canManage)
@@ -524,10 +551,10 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                             indent: 52,
                             color: dark ? C.darkDivider : C.lightDivider,
                           ),
-                        _MenuRow(
+                        MenuRow(compact: true,
                           icon: CupertinoIcons.doc_on_clipboard,
                           label: 'Copy Invite Code',
-                          trailing: Text(
+                          trailingWidget: Text(
                             widget.inviteCode,
                             style: TextStyle(
                               fontSize: 12,
@@ -536,7 +563,6 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                               letterSpacing: 1.5,
                             ),
                           ),
-                          dark: dark,
                           onTap: _copyInviteCode,
                         ),
                         Divider(
@@ -544,10 +570,9 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                           indent: 52,
                           color: dark ? C.darkDivider : C.lightDivider,
                         ),
-                        _MenuRow(
+                        MenuRow(compact: true,
                           icon: CupertinoIcons.share,
                           label: 'Share Invite Link',
-                          dark: dark,
                           onTap: () {
                             // TODO: share invite
                           },
@@ -561,7 +586,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
               const SizedBox(height: S.s24),
 
               // ── Notifications section ──
-              _SectionHeader(label: 'NOTIFICATIONS', dark: dark),
+              SectionHeader(text: 'NOTIFICATIONS'),
               const SizedBox(height: S.s8),
 
               FadeIn(
@@ -608,7 +633,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
               const SizedBox(height: S.s24),
 
               // ── Roles & Permissions section ──
-              _SectionHeader(label: 'ROLES & PERMISSIONS', dark: dark),
+              SectionHeader(text: 'ROLES & PERMISSIONS'),
               const SizedBox(height: S.s8),
 
               FadeIn(
@@ -627,7 +652,6 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                           roleName: 'Leader',
                           description:
                               'Full group control. Edit name, manage roles, remove any member, transfer leadership, delete group.',
-                          dark: dark,
                         ),
                         Divider(
                           height: 1,
@@ -640,7 +664,6 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                           roleName: 'Co-leader',
                           description:
                               'Can remove regular members and manage invites. Auto-promoted to leader if leader leaves.',
-                          dark: dark,
                         ),
                         Divider(
                           height: 1,
@@ -653,7 +676,6 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                           roleName: 'Member',
                           description:
                               'Can participate in group selawat counting and view group progress.',
-                          dark: dark,
                         ),
                       ],
                     ),
@@ -665,7 +687,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
               if (_canManage) ...[
                 const SizedBox(height: S.s24),
 
-                _SectionHeader(label: 'MANAGE', dark: dark),
+                SectionHeader(text: 'MANAGE'),
                 const SizedBox(height: S.s8),
 
                 FadeIn(
@@ -681,10 +703,9 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                       child: Column(
                         children: [
                           if (_isLeader) ...[
-                            _MenuRow(
+                            MenuRow(compact: true,
                               icon: CupertinoIcons.person_2,
                               label: 'Manage Roles',
-                              dark: dark,
                               onTap: _openManageRoles,
                             ),
                             Divider(
@@ -694,10 +715,9 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                                   dark ? C.darkDivider : C.lightDivider,
                             ),
                           ],
-                          _MenuRow(
+                          MenuRow(compact: true,
                             icon: CupertinoIcons.person_badge_minus,
                             label: 'Remove Member',
-                            dark: dark,
                             onTap: _openRemoveMember,
                           ),
                           if (_isLeader) ...[
@@ -707,10 +727,9 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                               color:
                                   dark ? C.darkDivider : C.lightDivider,
                             ),
-                            _MenuRow(
+                            MenuRow(compact: true,
                               icon: CupertinoIcons.arrow_right_arrow_left,
                               label: 'Transfer Leadership',
-                              dark: dark,
                               onTap: _openTransferLeadership,
                             ),
                           ],
@@ -735,10 +754,9 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                     ),
                     child: Column(
                       children: [
-                        _MenuRow(
+                        MenuRow(compact: true,
                           icon: CupertinoIcons.arrow_left_square,
                           label: 'Leave Group',
-                          dark: dark,
                           isDestructive: true,
                           onTap: _confirmLeave,
                         ),
@@ -749,10 +767,9 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                             color:
                                 dark ? C.darkDivider : C.lightDivider,
                           ),
-                          _MenuRow(
+                          MenuRow(compact: true,
                             icon: CupertinoIcons.trash,
                             label: 'Delete Group',
-                            dark: dark,
                             isDestructive: true,
                             onTap: _confirmDelete,
                           ),
@@ -774,34 +791,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
             top: 0,
             left: 0,
             right: 0,
-            child: FrostedBar(
-              child: SizedBox(
-                height: 56,
-                child: Row(
-                  children: [
-                    GestureDetector(
-                      onTap: () => Navigator.pop(context),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: S.s16),
-                        child: Icon(
-                          CupertinoIcons.chevron_left,
-                          size: 20,
-                          color: dark ? C.onDark1 : C.onLight1,
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      child: Text(
-                        'Group Settings',
-                        style: tt.titleLarge
-                            ?.copyWith(fontWeight: FontWeight.w600),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+            child: FrostedAppBar(title: 'Group Settings'),
           ),
         ],
       ),
@@ -818,16 +808,15 @@ class _RoleInfoRow extends StatelessWidget {
     required this.emoji,
     required this.roleName,
     required this.description,
-    required this.dark,
   });
 
   final String emoji;
   final String roleName;
   final String description;
-  final bool dark;
 
   @override
   Widget build(BuildContext context) {
+    final dark = Theme.of(context).brightness == Brightness.dark;
     final tt = Theme.of(context).textTheme;
     return Padding(
       padding: const EdgeInsets.symmetric(
@@ -873,160 +862,7 @@ String _fmtGoal(int n) {
   return '$n';
 }
 
-class _SectionHeader extends StatelessWidget {
-  const _SectionHeader({required this.label, required this.dark});
-  final String label;
-  final bool dark;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: S.page),
-      child: Text(
-        label,
-        style: TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.w600,
-          letterSpacing: 0.8,
-          color: dark ? C.onDark3 : C.onLight3,
-        ),
-      ),
-    );
-  }
-}
-
 // ─────────────────────────────────────────────────────────
 //  Menu row
-// ─────────────────────────────────────────────────────────
 
-class _MenuRow extends StatelessWidget {
-  const _MenuRow({
-    required this.icon,
-    required this.label,
-    required this.dark,
-    required this.onTap,
-    this.trailing,
-    this.isDestructive = false,
-  });
 
-  final IconData icon;
-  final String label;
-  final bool dark;
-  final VoidCallback onTap;
-  final Widget? trailing;
-  final bool isDestructive;
-
-  @override
-  Widget build(BuildContext context) {
-    final tt = Theme.of(context).textTheme;
-    final color = isDestructive
-        ? C.error
-        : (dark ? C.onDark1 : C.onLight1);
-    final iconColor = isDestructive
-        ? C.error
-        : (dark ? C.onDark2 : C.onLight2);
-
-    return BounceTap(
-      onTap: onTap,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(
-            horizontal: S.s16, vertical: S.s12),
-        child: Row(
-          children: [
-            Icon(icon, size: 18, color: iconColor),
-            const SizedBox(width: S.s12),
-            Expanded(
-              child: Text(
-                label,
-                style: tt.bodyMedium?.copyWith(color: color),
-              ),
-            ),
-            ?trailing,
-            if (!isDestructive && trailing == null)
-              Icon(
-                CupertinoIcons.chevron_right,
-                size: 14,
-                color: dark ? C.onDark3 : C.onLight3,
-              ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// ─────────────────────────────────────────────────────────
-//  Save / Cancel buttons with loading state
-// ─────────────────────────────────────────────────────────
-
-class _SaveCancelButtons extends StatelessWidget {
-  const _SaveCancelButtons({
-    required this.saving,
-    required this.dark,
-    required this.onCancel,
-    required this.onConfirm,
-  });
-
-  final bool saving;
-  final bool dark;
-  final VoidCallback onCancel;
-  final VoidCallback onConfirm;
-
-  @override
-  Widget build(BuildContext context) {
-    final tt = Theme.of(context).textTheme;
-    return Row(
-      children: [
-        Expanded(
-          child: BounceTap(
-            onTap: saving ? null : onCancel,
-            child: Container(
-              padding: const EdgeInsets.symmetric(vertical: S.s12),
-              decoration: BoxDecoration(
-                color: dark ? C.dark4 : C.light3,
-                borderRadius: BorderRadius.circular(14),
-              ),
-              child: Center(
-                child: Text(
-                  'Cancel',
-                  style: tt.bodyMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: dark ? C.onDark2 : C.onLight2,
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-        const SizedBox(width: S.s12),
-        Expanded(
-          child: BounceTap(
-            onTap: saving ? null : onConfirm,
-            child: Container(
-              padding: const EdgeInsets.symmetric(vertical: S.s12),
-              decoration: BoxDecoration(
-                color: dark ? C.primarySoft : C.primary,
-                borderRadius: BorderRadius.circular(14),
-              ),
-              child: Center(
-                child: saving
-                    ? const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2, color: C.white),
-                      )
-                    : Text(
-                        'Save',
-                        style: tt.bodyMedium?.copyWith(
-                          fontWeight: FontWeight.w600,
-                          color: C.white,
-                        ),
-                      ),
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}

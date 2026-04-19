@@ -1,8 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:selawathub/core/animations/bounce_tap.dart';
 import 'package:selawathub/core/animations/fade_in.dart';
 import 'package:selawathub/core/constants.dart';
+import 'package:selawathub/core/services/profile_service.dart';
 import 'package:selawathub/core/theme/colors.dart';
 import 'package:selawathub/core/widgets/app_snackbar.dart';
 import 'package:selawathub/core/widgets/frosted_bar.dart';
@@ -16,12 +18,12 @@ class EditProfilePage extends StatefulWidget {
     super.key,
     required this.name,
     required this.bio,
-    required this.email,
+    this.avatarUrl,
   });
 
   final String name;
   final String bio;
-  final String email;
+  final String? avatarUrl;
 
   @override
   State<EditProfilePage> createState() => _EditProfilePageState();
@@ -30,34 +32,34 @@ class EditProfilePage extends StatefulWidget {
 class _EditProfilePageState extends State<EditProfilePage> {
   late final TextEditingController _nameCtrl;
   late final TextEditingController _bioCtrl;
-  late final TextEditingController _emailCtrl;
   late final FocusNode _nameFocus;
   late final FocusNode _bioFocus;
-  late final FocusNode _emailFocus;
 
   static const _bioMax = 80;
+  static const _maxImageBytes = 2 * 1024 * 1024; // 2 MB
 
   bool _hasChanges = false;
+  bool _saving = false;
+  String? _avatarUrl;
+  bool _uploadingAvatar = false;
 
   @override
   void initState() {
     super.initState();
     _nameCtrl = TextEditingController(text: widget.name);
     _bioCtrl = TextEditingController(text: widget.bio);
-    _emailCtrl = TextEditingController(text: widget.email);
     _nameFocus = FocusNode();
     _bioFocus = FocusNode();
-    _emailFocus = FocusNode();
+    _avatarUrl = widget.avatarUrl;
 
     _nameCtrl.addListener(_onChanged);
     _bioCtrl.addListener(_onChanged);
-    _emailCtrl.addListener(_onChanged);
   }
 
   void _onChanged() {
     final changed = _nameCtrl.text.trim() != widget.name ||
         _bioCtrl.text.trim() != widget.bio ||
-        _emailCtrl.text.trim() != widget.email;
+        _avatarUrl != widget.avatarUrl;
     if (changed != _hasChanges) {
       setState(() => _hasChanges = changed);
     }
@@ -67,10 +69,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
   void dispose() {
     _nameCtrl.dispose();
     _bioCtrl.dispose();
-    _emailCtrl.dispose();
     _nameFocus.dispose();
     _bioFocus.dispose();
-    _emailFocus.dispose();
     super.dispose();
   }
 
@@ -81,19 +81,143 @@ class _EditProfilePageState extends State<EditProfilePage> {
     return '${parts.first[0]}${parts.last[0]}'.toUpperCase();
   }
 
-  void _save() {
-    if (!_hasChanges) return;
+  Future<void> _pickImage(ImageSource source) async {
+    try {
+      final picked = await ImagePicker().pickImage(
+        source: source,
+        maxWidth: 512,
+        maxHeight: 512,
+        imageQuality: 80,
+      );
+      if (picked == null) return;
+
+      final bytes = await picked.readAsBytes();
+      if (bytes.length > _maxImageBytes) {
+        if (!mounted) return;
+        showAppSnackBar(context, 'Image must be under 2 MB',
+            backgroundColor: C.error);
+        return;
+      }
+
+      final ext = picked.path.split('.').last.toLowerCase();
+      if (!['jpg', 'jpeg', 'png', 'webp'].contains(ext)) {
+        if (!mounted) return;
+        showAppSnackBar(context, 'Only JPG, PNG, or WebP allowed',
+            backgroundColor: C.error);
+        return;
+      }
+
+      setState(() => _uploadingAvatar = true);
+      final url = await ProfileService.uploadAvatar(bytes, ext);
+      if (!mounted) return;
+
+      if (url != null) {
+        setState(() {
+          _avatarUrl = '$url?t=${DateTime.now().millisecondsSinceEpoch}';
+          _uploadingAvatar = false;
+        });
+        _onChanged();
+        showAppSnackBar(context, 'Photo updated');
+      } else {
+        setState(() => _uploadingAvatar = false);
+        showAppSnackBar(context, 'Failed to upload photo',
+            backgroundColor: C.error);
+      }
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _uploadingAvatar = false);
+      showAppSnackBar(context, 'Failed to upload photo',
+          backgroundColor: C.error);
+    }
+  }
+
+  void _showImageSourcePicker() {
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: dark ? C.dark2 : C.light1,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (ctx) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: S.s16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 36,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: dark ? C.onDark3 : C.onLight3,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              const SizedBox(height: S.s16),
+              ListTile(
+                leading: Icon(CupertinoIcons.camera,
+                    color: dark ? C.onDark1 : C.onLight1),
+                title: Text('Take Photo',
+                    style: TextStyle(color: dark ? C.onDark1 : C.onLight1)),
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _pickImage(ImageSource.camera);
+                },
+              ),
+              ListTile(
+                leading: Icon(CupertinoIcons.photo,
+                    color: dark ? C.onDark1 : C.onLight1),
+                title: Text('Choose from Gallery',
+                    style: TextStyle(color: dark ? C.onDark1 : C.onLight1)),
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _pickImage(ImageSource.gallery);
+                },
+              ),
+              if (_avatarUrl != null && _avatarUrl!.isNotEmpty)
+                ListTile(
+                  leading: const Icon(CupertinoIcons.trash, color: C.error),
+                  title:
+                      const Text('Remove Photo', style: TextStyle(color: C.error)),
+                  onTap: () {
+                    Navigator.pop(ctx);
+                    setState(() => _avatarUrl = null);
+                    _onChanged();
+                  },
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _save() async {
+    if (!_hasChanges || _saving) return;
     final name = _nameCtrl.text.trim();
     if (name.isEmpty) {
       _nameFocus.requestFocus();
       showAppSnackBar(context, 'Name cannot be empty', backgroundColor: C.error);
       return;
     }
-    Navigator.of(context).pop({
-      'name': name,
-      'bio': _bioCtrl.text.trim(),
-      'email': _emailCtrl.text.trim(),
-    });
+    setState(() => _saving = true);
+    try {
+      await ProfileService.updateProfile(
+        name: name,
+        bio: _bioCtrl.text.trim(),
+      );
+      if (!mounted) return;
+      showAppSnackBar(context, 'Profile updated');
+      Navigator.of(context).pop({
+        'name': name,
+        'bio': _bioCtrl.text.trim(),
+        if (_avatarUrl != widget.avatarUrl) 'avatar_url': _avatarUrl ?? '',
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _saving = false);
+      showAppSnackBar(context, 'Failed to save profile', backgroundColor: C.error);
+    }
   }
 
   void _confirmDiscard() {
@@ -146,7 +270,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     final muted = dark ? C.onDark3 : C.onLight3;
 
     return PopScope(
-      canPop: !_hasChanges,
+      canPop: !_hasChanges && !_saving,
       onPopInvokedWithResult: (didPop, _) {
         if (!didPop) _confirmDiscard();
       },
@@ -171,9 +295,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       child: Column(
                         children: [
                           BounceTap(
-                            onTap: () {
-                              // TODO: image picker
-                            },
+                            onTap: _uploadingAvatar ? null : _showImageSourcePicker,
                             child: Stack(
                               children: [
                                 Container(
@@ -198,19 +320,46 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                       ),
                                     ],
                                   ),
-                                  child: ListenableBuilder(
-                                    listenable: _nameCtrl,
-                                    builder: (context, _) => Center(
-                                      child: Text(
-                                        _initials,
-                                        style: TextStyle(
-                                          fontSize: 30,
-                                          fontWeight: FontWeight.w700,
-                                          color: accent,
+                                  child: _uploadingAvatar
+                                      ? const Center(
+                                          child: SizedBox(
+                                            width: 28,
+                                            height: 28,
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 2.5,
+                                            ),
+                                          ),
+                                        )
+                                      : ListenableBuilder(
+                                          listenable: _nameCtrl,
+                                          builder: (context, _) => Center(
+                                            child: _avatarUrl != null && _avatarUrl!.isNotEmpty
+                                                ? ClipOval(
+                                                    child: Image.network(
+                                                      _avatarUrl!,
+                                                      width: 96,
+                                                      height: 96,
+                                                      fit: BoxFit.cover,
+                                                      errorBuilder: (c, e, s) => Text(
+                                                        _initials,
+                                                        style: TextStyle(
+                                                          fontSize: 30,
+                                                          fontWeight: FontWeight.w700,
+                                                          color: accent,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  )
+                                                : Text(
+                                                    _initials,
+                                                    style: TextStyle(
+                                                      fontSize: 30,
+                                                      fontWeight: FontWeight.w700,
+                                                      color: accent,
+                                                    ),
+                                                  ),
+                                          ),
                                         ),
-                                      ),
-                                    ),
-                                  ),
                                 ),
                                 Positioned(
                                   right: 0,
@@ -240,9 +389,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                           ),
                           const SizedBox(height: S.s8),
                           BounceTap(
-                            onTap: () {
-                              // TODO: image picker
-                            },
+                            onTap: _uploadingAvatar ? null : _showImageSourcePicker,
                             child: Text(
                               'Edit photo',
                               style: TextStyle(
@@ -276,6 +423,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                             controller: _nameCtrl,
                             focusNode: _nameFocus,
                             dark: dark,
+                            keyboardType: TextInputType.name,
                             textInputAction: TextInputAction.next,
                             onSubmitted: (_) => FocusScope.of(context)
                                 .requestFocus(_bioFocus),
@@ -298,10 +446,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                 focusNode: _bioFocus,
                                 dark: dark,
                                 maxLength: _bioMax,
-                                textInputAction: TextInputAction.next,
-                                onSubmitted: (_) =>
-                                    FocusScope.of(context)
-                                        .requestFocus(_emailFocus),
+                                textInputAction: TextInputAction.done,
+                                onSubmitted: (_) => _save(),
                               ),
                               Padding(
                                 padding: const EdgeInsets.only(
@@ -331,23 +477,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                 ),
                               ),
                             ],
-                          ),
-                        ),
-                        const SizedBox(height: S.s16),
-
-                        // Email
-                        FadeIn(
-                          delay: const Duration(milliseconds: 200),
-                          child: _Field(
-                            label: 'Email',
-                            hint: 'Enter your email',
-                            icon: CupertinoIcons.mail,
-                            controller: _emailCtrl,
-                            focusNode: _emailFocus,
-                            dark: dark,
-                            keyboardType: TextInputType.emailAddress,
-                            textInputAction: TextInputAction.done,
-                            onSubmitted: (_) => _save(),
                           ),
                         ),
                       ],
@@ -398,25 +527,34 @@ class _EditProfilePageState extends State<EditProfilePage> {
                         const Spacer(),
                         // Done
                         BounceTap(
-                          onTap: _hasChanges ? _save : null,
+                          onTap: _hasChanges && !_saving ? _save : null,
                           child: Padding(
                             padding: const EdgeInsets.symmetric(
                                 horizontal: S.s8),
                             child: AnimatedOpacity(
-                              opacity: _hasChanges ? 1.0 : 0.35,
+                              opacity: _hasChanges && !_saving ? 1.0 : 0.35,
                               duration:
                                   const Duration(milliseconds: 200),
-                              child: Text(
-                                'Done',
-                                style: TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.w700,
-                                  color: accent,
-                                ),
+                              child: _saving
+                                  ? SizedBox(
+                                      width: 16,
+                                      height: 16,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        color: accent,
+                                      ),
+                                    )
+                                  : Text(
+                                      'Done',
+                                      style: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w700,
+                                        color: accent,
+                                      ),
+                                    ),
                               ),
                             ),
                           ),
-                        ),
                       ],
                     ),
                   ),

@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:selawathub/core/animations/bounce_tap.dart';
 import 'package:selawathub/core/animations/fade_in.dart';
@@ -12,9 +13,11 @@ class OnboardingPage extends StatefulWidget {
   State<OnboardingPage> createState() => _OnboardingPageState();
 }
 
-class _OnboardingPageState extends State<OnboardingPage> {
+class _OnboardingPageState extends State<OnboardingPage>
+    with SingleTickerProviderStateMixin {
   final _controller = PageController();
   int _page = 0;
+  late final AnimationController _gradientCtrl;
 
   static const _slides = [
     (
@@ -41,10 +44,15 @@ class _OnboardingPageState extends State<OnboardingPage> {
       final page = _controller.page?.round() ?? 0;
       if (page != _page) setState(() => _page = page);
     });
+    _gradientCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 8),
+    )..repeat();
   }
 
   @override
   void dispose() {
+    _gradientCtrl.dispose();
     _controller.dispose();
     super.dispose();
   }
@@ -63,135 +71,184 @@ class _OnboardingPageState extends State<OnboardingPage> {
     final isLast = _page == _slides.length - 1;
 
     return Scaffold(
-      body: SafeArea(
-        child: Column(
-          children: [
-            // Skip button
-            Align(
-              alignment: Alignment.centerRight,
-              child: Padding(
-                padding: const EdgeInsets.only(top: S.s12, right: S.s16),
-                child: GestureDetector(
-                  onTap: _goToWelcome,
+      body: Stack(
+        children: [
+          // ── Animated gradient background ──
+          AnimatedBuilder(
+            animation: _gradientCtrl,
+            builder: (context, _) {
+              final t = _gradientCtrl.value;
+              final angle = t * 2 * math.pi;
+              final cx = 0.5 + 0.3 * math.cos(angle);
+              final cy = 0.5 + 0.3 * math.sin(angle);
+              final cx2 = 0.5 + 0.3 * math.cos(angle + math.pi * 0.7);
+              final cy2 = 0.5 + 0.3 * math.sin(angle + math.pi * 0.7);
+
+              return Container(
+                decoration: BoxDecoration(
+                  gradient: RadialGradient(
+                    center: Alignment(cx * 2 - 1, cy * 2 - 1),
+                    radius: 1.2,
+                    colors: [
+                      (dark ? C.primary : C.primarySoft)
+                          .withValues(alpha: dark ? 0.15 : 0.10),
+                      Colors.transparent,
+                    ],
+                  ),
+                ),
+                foregroundDecoration: BoxDecoration(
+                  gradient: RadialGradient(
+                    center: Alignment(cx2 * 2 - 1, cy2 * 2 - 1),
+                    radius: 1.0,
+                    colors: [
+                      (dark
+                              ? const Color(0xFFC4A44E)
+                              : const Color(0xFFD4B96E))
+                          .withValues(alpha: dark ? 0.10 : 0.07),
+                      Colors.transparent,
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+
+          // ── Content ──
+          SafeArea(
+            child: Column(
+              children: [
+                // Skip button
+                Align(
+                  alignment: Alignment.centerRight,
                   child: Padding(
-                    padding: const EdgeInsets.all(S.s8),
-                    child: Text(
-                      'Skip',
-                      style: tt.bodyMedium?.copyWith(
-                        color: dark ? C.onDark3 : C.onLight3,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-
-            // PageView
-            Expanded(
-              child: PageView.builder(
-                controller: _controller,
-                itemCount: _slides.length,
-                itemBuilder: (context, index) {
-                  final slide = _slides[index];
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: S.page),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        FadeIn(
-                          child: Text(
-                            slide.emoji,
-                            style: const TextStyle(fontSize: 56),
-                          ),
-                        ),
-                        const SizedBox(height: S.s32),
-                        FadeIn(
-                          delay: const Duration(milliseconds: 100),
-                          child: Text(
-                            slide.title,
-                            style: tt.headlineLarge?.copyWith(
-                              color: dark ? C.onDark1 : C.onLight1,
-                              fontWeight: FontWeight.w800,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                        const SizedBox(height: S.s12),
-                        FadeIn(
-                          delay: const Duration(milliseconds: 200),
-                          child: Text(
-                            slide.subtitle,
-                            style: tt.bodyMedium?.copyWith(
-                              color: dark ? C.onDark2 : C.onLight2,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              ),
-            ),
-
-            // Dot indicator
-            Padding(
-              padding: const EdgeInsets.only(bottom: S.s24),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(_slides.length, (i) {
-                  final active = i == _page;
-                  return AnimatedContainer(
-                    duration: const Duration(milliseconds: 300),
-                    margin: const EdgeInsets.symmetric(horizontal: S.s4),
-                    width: active ? 24 : 8,
-                    height: 8,
-                    decoration: BoxDecoration(
-                      color: active
-                          ? C.primary
-                          : (dark ? C.onDark3 : C.onLight3),
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                  );
-                }),
-              ),
-            ),
-
-            // Get Started button (last slide only)
-            if (isLast)
-              FadeIn(
-                offset: const Offset(0, 30),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: S.page),
-                  child: SizedBox(
-                    width: double.infinity,
-                    child: BounceTap(
+                    padding: const EdgeInsets.only(top: S.s12, right: S.s16),
+                    child: GestureDetector(
                       onTap: _goToWelcome,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        decoration: BoxDecoration(
-                          color: dark ? C.primarySoft : C.primary,
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                        child: Center(
-                          child: Text(
-                            'Get Started',
-                            style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w600,
-                              color: C.white,
-                            ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(S.s8),
+                        child: Text(
+                          'Skip',
+                          style: tt.bodyMedium?.copyWith(
+                            color: dark ? C.onDark3 : C.onLight3,
                           ),
                         ),
                       ),
                     ),
                   ),
                 ),
-              ),
 
-            SizedBox(height: isLast ? S.s32 : S.s64),
-          ],
-        ),
+                // PageView
+                Expanded(
+                  child: PageView.builder(
+                    controller: _controller,
+                    itemCount: _slides.length,
+                    itemBuilder: (context, index) {
+                      final slide = _slides[index];
+                      return Padding(
+                        padding:
+                            const EdgeInsets.symmetric(horizontal: S.page),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            FadeIn(
+                              child: Text(
+                                slide.emoji,
+                                style: const TextStyle(fontSize: 56),
+                              ),
+                            ),
+                            const SizedBox(height: S.s32),
+                            FadeIn(
+                              delay: const Duration(milliseconds: 100),
+                              child: Text(
+                                slide.title,
+                                style: tt.headlineLarge?.copyWith(
+                                  color: dark ? C.onDark1 : C.onLight1,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                            const SizedBox(height: S.s12),
+                            FadeIn(
+                              delay: const Duration(milliseconds: 200),
+                              child: Text(
+                                slide.subtitle,
+                                style: tt.bodyMedium?.copyWith(
+                                  color: dark ? C.onDark2 : C.onLight2,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ),
+
+                // Dot indicator
+                Padding(
+                  padding: const EdgeInsets.only(bottom: S.s24),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: List.generate(_slides.length, (i) {
+                      final active = i == _page;
+                      return AnimatedContainer(
+                        duration: const Duration(milliseconds: 300),
+                        margin:
+                            const EdgeInsets.symmetric(horizontal: S.s4),
+                        width: active ? 24 : 8,
+                        height: 8,
+                        decoration: BoxDecoration(
+                          color: active
+                              ? C.primary
+                              : (dark ? C.onDark3 : C.onLight3),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                      );
+                    }),
+                  ),
+                ),
+
+                // Get Started button (last slide only)
+                if (isLast)
+                  FadeIn(
+                    offset: const Offset(0, 30),
+                    child: Padding(
+                      padding:
+                          const EdgeInsets.symmetric(horizontal: S.page),
+                      child: SizedBox(
+                        width: double.infinity,
+                        child: BounceTap(
+                          onTap: _goToWelcome,
+                          child: Container(
+                            padding:
+                                const EdgeInsets.symmetric(vertical: 16),
+                            decoration: BoxDecoration(
+                              color: dark ? C.primarySoft : C.primary,
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                            child: Center(
+                              child: Text(
+                                'Get Started',
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w600,
+                                  color: C.white,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+
+                SizedBox(height: isLast ? S.s32 : S.s64),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

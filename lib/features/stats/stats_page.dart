@@ -4,7 +4,9 @@ import 'package:selawathub/core/animations/bounce_tap.dart';
 import 'package:selawathub/core/animations/fade_in.dart';
 import 'package:selawathub/core/constants.dart';
 import 'package:selawathub/core/services/counter_service.dart';
+import 'package:selawathub/core/services/settings_service.dart';
 import 'package:selawathub/core/services/supabase_service.dart';
+import 'package:selawathub/features/counter/models/dhikr.dart';
 import 'package:selawathub/core/theme/colors.dart';
 import 'package:selawathub/core/widgets/frosted_bar.dart';
 import 'package:selawathub/features/stats/models/day_data.dart';
@@ -18,7 +20,8 @@ import 'package:selawathub/features/stats/widgets/weekly_chart.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 class StatsPage extends StatefulWidget {
-  const StatsPage({super.key});
+  const StatsPage({super.key, this.onGoToTasbih});
+  final VoidCallback? onGoToTasbih;
 
   @override
   State<StatsPage> createState() => _StatsPageState();
@@ -45,20 +48,22 @@ class _StatsPageState extends State<StatsPage> {
   }
 
   Future<void> _loadStats() async {
-    if (!SupabaseService.isAuthenticated) {
-      setState(() {
-        _loading = false;
-        _hasData = false;
-      });
-      return;
-    }
-
     final now = DateTime.now();
     final start = now.subtract(const Duration(days: 363));
-    final sessions = await CounterService.getSessionsInRange(
-      start: start,
-      end: now,
-    );
+
+    List<Map<String, dynamic>> sessions;
+    if (SupabaseService.isAuthenticated) {
+      sessions = await CounterService.getSessionsInRange(
+        start: start,
+        end: now,
+      );
+    } else {
+      sessions = SettingsService.getLocalSessionsInRange(
+        Dhikr.all.map((d) => d.id).toList(),
+        start,
+        now,
+      );
+    }
 
     // Group sessions by date
     final byDate = <String, List<Map<String, dynamic>>>{};
@@ -382,9 +387,28 @@ class _StatsPageState extends State<StatsPage> {
       )
         else
           SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: S.page),
-              child: _EmptyStatsView(),
+            child: RefreshIndicator(
+              color: dark ? C.primarySoft : C.primary,
+              onRefresh: () async {
+                await _loadStats();
+              },
+              child: ListView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                children: [
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height -
+                        MediaQuery.of(context).padding.top -
+                        MediaQuery.of(context).padding.bottom -
+                        120,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: S.page),
+                      child: _EmptyStatsView(
+                        onGoToTasbih: widget.onGoToTasbih ?? () {},
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         Positioned(
@@ -414,7 +438,8 @@ class _StatsPageState extends State<StatsPage> {
 
 // ── Empty state ──
 class _EmptyStatsView extends StatelessWidget {
-  const _EmptyStatsView();
+  const _EmptyStatsView({required this.onGoToTasbih});
+  final VoidCallback onGoToTasbih;
 
   @override
   Widget build(BuildContext context) {
@@ -452,7 +477,7 @@ class _EmptyStatsView extends StatelessWidget {
           child: SizedBox(
             width: double.infinity,
             child: BounceTap(
-              onTap: () {},
+              onTap: onGoToTasbih,
               child: Container(
                 padding: const EdgeInsets.symmetric(vertical: S.s16),
                 decoration: BoxDecoration(

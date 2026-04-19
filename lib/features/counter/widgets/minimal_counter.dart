@@ -81,5 +81,5 @@ class _TickPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _TickPainter old) =>
-      old.filled != filled || old.total != total;
+      old.filled != filled || old.total != total || old.filledColor != filledColor;
 }

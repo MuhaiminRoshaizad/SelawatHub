@@ -7,11 +7,13 @@ import 'package:selawathub/core/constants.dart';
 import 'package:selawathub/core/services/auth_service.dart';
 import 'package:selawathub/core/services/profile_service.dart';
 import 'package:selawathub/core/services/supabase_service.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:selawathub/core/theme/colors.dart';
 import 'package:selawathub/core/theme/theme.dart';
 import 'package:selawathub/core/widgets/action_buttons.dart';
 import 'package:selawathub/core/widgets/app_bottom_sheet.dart';
 import 'package:selawathub/core/widgets/app_snackbar.dart';
+import 'package:selawathub/core/widgets/confirmation_dialog.dart';
 import 'package:selawathub/features/auth/welcome_page.dart';
 import 'package:selawathub/features/profile/about_page.dart';
 import 'package:selawathub/features/profile/edit_profile_page.dart';
@@ -40,6 +42,7 @@ class _ProfilePageState extends State<ProfilePage> {
   int _daysActive = 0;
   late final bool _isGuest = widget.isGuest;
   String _language = 'English';
+
 
   static final _numFmt = NumberFormat.decimalPattern();
 
@@ -110,6 +113,26 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
+  void _showAvatarFullscreen(String url) {
+    showDialog(
+      context: context,
+      builder: (ctx) => GestureDetector(
+        onTap: () => Navigator.pop(ctx),
+        child: Dialog(
+          backgroundColor: Colors.transparent,
+          insetPadding: const EdgeInsets.all(S.s24),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: Image.network(
+              url,
+              fit: BoxFit.contain,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final dark = Theme.of(context).brightness == Brightness.dark;
@@ -140,6 +163,9 @@ class _ProfilePageState extends State<ProfilePage> {
             initials: _initials,
             accent: accent,
             onEditTap: _openEditProfile,
+            onAvatarTap: _avatarUrl != null && _avatarUrl!.isNotEmpty
+                ? () => _showAvatarFullscreen(_avatarUrl!)
+                : null,
           ),
         ),
 
@@ -181,7 +207,6 @@ class _ProfilePageState extends State<ProfilePage> {
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: S.page),
             child: ProfileStatsRow(
-              dark: dark,
               accent: accent,
               totalDhikr: _numFmt.format(_totalDhikr),
               streak: _numFmt.format(_streak),
@@ -214,14 +239,12 @@ class _ProfilePageState extends State<ProfilePage> {
                     icon: CupertinoIcons.mail,
                     label: 'Email',
                     value: _email,
-                    dark: dark,
                   ),
                   _divider(dark),
                   InfoRow(
                     icon: CupertinoIcons.calendar,
                     label: 'Member Since',
                     value: _memberSince,
-                    dark: dark,
                   ),
                 ],
               ),
@@ -261,7 +284,6 @@ class _ProfilePageState extends State<ProfilePage> {
                       icon: CupertinoIcons.moon_fill,
                       label: 'Dark Mode',
                       value: dark,
-                      dark: dark,
                       onChanged: (v) => themeCtrl.value =
                           v ? ThemeMode.dark : ThemeMode.light,
                     ),
@@ -271,7 +293,6 @@ class _ProfilePageState extends State<ProfilePage> {
                     icon: CupertinoIcons.bell_fill,
                     label: 'Notifications',
                     value: true,
-                    dark: dark,
                     onChanged: (_) {},
                   ),
                   _divider(dark),
@@ -279,7 +300,6 @@ class _ProfilePageState extends State<ProfilePage> {
                     icon: CupertinoIcons.globe,
                     label: 'Language',
                     trailing: _language,
-                    dark: dark,
                     onTap: () => _showLanguagePicker(context),
                   ),
                   if (!_isGuest) ...[
@@ -287,7 +307,6 @@ class _ProfilePageState extends State<ProfilePage> {
                     MenuRow(
                       icon: CupertinoIcons.lock_fill,
                       label: 'Change Password',
-                      dark: dark,
                       onTap: () => _showChangePassword(context),
                     ),
                   ],
@@ -319,21 +338,18 @@ class _ProfilePageState extends State<ProfilePage> {
                   MenuRow(
                     icon: CupertinoIcons.question_circle,
                     label: 'Help & FAQ',
-                    dark: dark,
                     onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const HelpFaqPage())),
                   ),
                   _divider(dark),
                   MenuRow(
                     icon: CupertinoIcons.info_circle,
                     label: 'About SelawatHub',
-                    dark: dark,
                     onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AboutPage())),
                   ),
                   _divider(dark),
                   MenuRow(
                     icon: CupertinoIcons.share,
                     label: 'Share App',
-                    dark: dark,
                     onTap: () => showAppSnackBar(context, 'Share link copied to clipboard!'),
                   ),
                 ],
@@ -385,18 +401,23 @@ class _ProfilePageState extends State<ProfilePage> {
                     ),
                   )
                 : BounceTap(
-                    onTap: () async {
-                      try {
-                        await AuthService.signOut();
-                        if (!context.mounted) return;
-                        Navigator.of(context).pushAndRemoveUntil(
-                          MaterialPageRoute(
-                              builder: (_) => const WelcomePage()),
-                          (_) => false,
-                        );
-                      } catch (_) {
-                        if (context.mounted) showAppSnackBar(context, 'Failed to sign out', backgroundColor: C.error);
-                      }
+                    onTap: () {
+                      showConfirmDialog(
+                        context: context,
+                        title: 'Sign out?',
+                        message: 'Are you sure you want to sign out of your account?',
+                        actionLabel: 'Sign Out',
+                        errorMessage: 'Failed to sign out',
+                        onConfirm: () async {
+                          await AuthService.signOut();
+                          if (!context.mounted) return;
+                          Navigator.of(context).pushAndRemoveUntil(
+                            MaterialPageRoute(
+                                builder: (_) => const WelcomePage()),
+                            (_) => false,
+                          );
+                        },
+                      );
                     },
                     child: Container(
                       padding: const EdgeInsets.symmetric(vertical: S.s16),
@@ -589,6 +610,7 @@ class _ChangePasswordSheetState extends State<_ChangePasswordSheet> {
   bool _showCurrent = false;
   bool _showNew = false;
   bool _showConfirm = false;
+  bool _saving = false;
 
   @override
   Widget build(BuildContext context) {
@@ -651,8 +673,31 @@ class _ChangePasswordSheetState extends State<_ChangePasswordSheet> {
           ),
           const SizedBox(height: S.s24),
           ActionButtons(
+            saving: _saving,
             onCancel: () => Navigator.pop(context),
-            onConfirm: widget.onSaved,
+            onConfirm: () async {
+              final newPw = widget.newCtrl.text;
+              final confirmPw = widget.confirmCtrl.text;
+              if (newPw.length < 6) {
+                showAppSnackBar(context, 'Password must be at least 6 characters', backgroundColor: C.error);
+                return;
+              }
+              if (newPw != confirmPw) {
+                showAppSnackBar(context, 'Passwords do not match', backgroundColor: C.error);
+                return;
+              }
+              setState(() => _saving = true);
+              try {
+                await Supabase.instance.client.auth.updateUser(
+                  UserAttributes(password: newPw),
+                );
+                widget.onSaved();
+              } catch (e) {
+                if (!context.mounted) return;
+                setState(() => _saving = false);
+                showAppSnackBar(context, 'Failed to change password', backgroundColor: C.error);
+              }
+            },
           ),
           SizedBox(height: MediaQuery.of(context).padding.bottom),
         ],

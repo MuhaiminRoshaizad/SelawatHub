@@ -1,11 +1,11 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:selawathub/core/animations/bounce_tap.dart';
 import 'package:selawathub/core/constants.dart';
 import 'package:selawathub/core/services/group_service.dart';
 import 'package:selawathub/core/theme/colors.dart';
 import 'package:selawathub/core/widgets/app_snackbar.dart';
-import 'package:selawathub/core/widgets/frosted_bar.dart';
+import 'package:selawathub/core/widgets/confirmation_dialog.dart';
+import 'package:selawathub/core/widgets/frosted_app_bar.dart';
 import 'package:selawathub/features/group/models/group_role.dart';
 
 // ─────────────────────────────────────────────────────────
@@ -33,55 +33,20 @@ class _TransferLeadershipPageState extends State<TransferLeadershipPage> {
 
   void _confirmTransfer() {
     if (_selectedId == null) return;
-    final dark = Theme.of(context).brightness == Brightness.dark;
     final name = _selectedName;
-    showDialog(
+    showConfirmDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: dark ? C.dark3 : C.light2,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Text(
-          'Transfer leadership?',
-          style: TextStyle(
-            fontWeight: FontWeight.w600,
-            color: dark ? C.onDark1 : C.onLight1,
-          ),
-        ),
-        content: Text(
-          'Leadership will be transferred to $name. You will become a co-leader.',
-          style: TextStyle(color: dark ? C.onDark2 : C.onLight2),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: Text(
-              'Cancel',
-              style: TextStyle(color: dark ? C.primarySoft : C.primary),
-            ),
-          ),
-          TextButton(
-            onPressed: () async {
-              Navigator.of(ctx).pop();
-              try {
-                await GroupService.updateMemberRole(widget.groupId, _selectedId!, 'leader');
-                if (mounted) {
-                  Navigator.of(context).pop();
-                  showAppSnackBar(context, 'Leadership transferred to $name');
-                }
-              } catch (_) {
-                if (mounted) showAppSnackBar(context, 'Failed to transfer leadership', backgroundColor: C.error);
-              }
-            },
-            child: Text(
-              'Transfer',
-              style: TextStyle(
-                color: dark ? C.primarySoft : C.primary,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        ],
-      ),
+      title: 'Transfer leadership?',
+      message: 'Leadership will be transferred to $name. You will become a co-leader.',
+      actionLabel: 'Transfer',
+      isDestructive: false,
+      errorMessage: 'Failed to transfer leadership',
+      onConfirm: () async {
+        await GroupService.updateMemberRole(widget.groupId, _selectedId!, 'leader');
+        if (!mounted) return;
+        Navigator.of(context).pop();
+        showAppSnackBar(context, 'Leadership transferred to $name');
+      },
     );
   }
 
@@ -187,34 +152,7 @@ class _TransferLeadershipPageState extends State<TransferLeadershipPage> {
             top: 0,
             left: 0,
             right: 0,
-            child: FrostedBar(
-              child: SizedBox(
-                height: 56,
-                child: Row(
-                  children: [
-                    GestureDetector(
-                      onTap: () => Navigator.pop(context),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: S.s16),
-                        child: Icon(
-                          CupertinoIcons.chevron_left,
-                          size: 20,
-                          color: dark ? C.onDark1 : C.onLight1,
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      child: Text(
-                        'Transfer Leadership',
-                        style: tt.titleLarge
-                            ?.copyWith(fontWeight: FontWeight.w600),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+            child: FrostedAppBar(title: 'Transfer Leadership'),
           ),
         ],
       ),

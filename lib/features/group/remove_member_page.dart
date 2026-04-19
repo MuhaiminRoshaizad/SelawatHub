@@ -1,11 +1,11 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:selawathub/core/animations/bounce_tap.dart';
 import 'package:selawathub/core/constants.dart';
 import 'package:selawathub/core/services/group_service.dart';
 import 'package:selawathub/core/theme/colors.dart';
 import 'package:selawathub/core/widgets/app_snackbar.dart';
-import 'package:selawathub/core/widgets/frosted_bar.dart';
+import 'package:selawathub/core/widgets/confirmation_dialog.dart';
+import 'package:selawathub/core/widgets/frosted_app_bar.dart';
 import 'package:selawathub/features/group/models/group_role.dart';
 
 // ─────────────────────────────────────────────────────────
@@ -40,51 +40,21 @@ class _RemoveMemberPageState extends State<RemoveMemberPage> {
 
   void _confirmRemove() {
     if (_selectedIds.isEmpty) return;
-    final dark = Theme.of(context).brightness == Brightness.dark;
     final count = _selectedIds.length;
-    showDialog(
+    showConfirmDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: dark ? C.dark3 : C.light2,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Text(
-          'Remove $count member${count > 1 ? 's' : ''}?',
-          style: TextStyle(
-            fontWeight: FontWeight.w600,
-            color: dark ? C.onDark1 : C.onLight1,
-          ),
-        ),
-        content: Text(
-          'The following will be removed:\n${_selectedNames()}',
-          style: TextStyle(color: dark ? C.onDark2 : C.onLight2),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: Text(
-              'Cancel',
-              style: TextStyle(color: dark ? C.primarySoft : C.primary),
-            ),
-          ),
-          TextButton(
-            onPressed: () async {
-              Navigator.of(ctx).pop();
-              try {
-                for (final userId in _selectedIds) {
-                  await GroupService.removeMember(widget.groupId, userId);
-                }
-                if (mounted) {
-                  Navigator.of(context).pop();
-                  showAppSnackBar(context, '$count member${count > 1 ? 's' : ''} removed');
-                }
-              } catch (_) {
-                if (mounted) showAppSnackBar(context, 'Failed to remove members', backgroundColor: C.error);
-              }
-            },
-            child: Text('Remove', style: TextStyle(color: C.error)),
-          ),
-        ],
-      ),
+      title: 'Remove $count member${count > 1 ? 's' : ''}?',
+      message: 'The following will be removed:\n${_selectedNames()}',
+      actionLabel: 'Remove',
+      errorMessage: 'Failed to remove members',
+      onConfirm: () async {
+        for (final userId in _selectedIds) {
+          await GroupService.removeMember(widget.groupId, userId);
+        }
+        if (!mounted) return;
+        Navigator.of(context).pop();
+        showAppSnackBar(context, '$count member${count > 1 ? 's' : ''} removed');
+      },
     );
   }
 
@@ -200,34 +170,7 @@ class _RemoveMemberPageState extends State<RemoveMemberPage> {
             top: 0,
             left: 0,
             right: 0,
-            child: FrostedBar(
-              child: SizedBox(
-                height: 56,
-                child: Row(
-                  children: [
-                    GestureDetector(
-                      onTap: () => Navigator.pop(context),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: S.s16),
-                        child: Icon(
-                          CupertinoIcons.chevron_left,
-                          size: 20,
-                          color: dark ? C.onDark1 : C.onLight1,
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      child: Text(
-                        'Remove Member',
-                        style: tt.titleLarge
-                            ?.copyWith(fontWeight: FontWeight.w600),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+            child: FrostedAppBar(title: 'Remove Member'),
           ),
         ],
       ),
