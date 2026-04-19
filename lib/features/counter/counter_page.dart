@@ -234,7 +234,7 @@ class _CounterPageState extends State<CounterPage>
                                 shape: BoxShape.circle,
                                 boxShadow: [
                                   BoxShadow(
-                                    color: C.primaryGlow,
+                                    color: _accentColor.withValues(alpha: 0.2),
                                     blurRadius: 80,
                                     spreadRadius: 20,
                                   ),

@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:selawathub/core/constants.dart';
 import 'package:selawathub/core/theme/colors.dart';
@@ -139,48 +140,62 @@ class _CounterSettingsPageState extends State<CounterSettingsPage> {
               const SizedBox(height: S.s16),
 
               // ── General ──
-              _SectionHeader(title: 'General'),
-              _MenuContainer(
-                dark: dark,
-                children: [
-                  _SwitchRow(
-                    label: 'Haptic Feedback',
-                    value: _hapticEnabled,
-                    onChanged: (v) => setState(() => _hapticEnabled = v),
-                  ),
-                  if (_hapticEnabled) ...[
-                    Divider(
-                      height: 1,
-                      color: dark ? C.darkDivider : C.lightDivider,
+              if (!kIsWeb) ...[
+                _SectionHeader(title: 'General'),
+                _MenuContainer(
+                  dark: dark,
+                  children: [
+                    _SwitchRow(
+                      label: 'Haptic Feedback',
+                      value: _hapticEnabled,
+                      onChanged: (v) => setState(() => _hapticEnabled = v),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: S.s16, vertical: S.s12,
+                    if (_hapticEnabled) ...[
+                      Divider(
+                        height: 1,
+                        color: dark ? C.darkDivider : C.lightDivider,
                       ),
-                      child: Row(
-                        children: [
-                          Text(
-                            'Intensity',
-                            style: TextStyle(
-                              color: dark ? C.onDark1 : C.onLight1,
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: S.s16, vertical: S.s12,
+                        ),
+                        child: Row(
+                          children: [
+                            Text(
+                              'Intensity',
+                              style: TextStyle(
+                                color: dark ? C.onDark1 : C.onLight1,
+                              ),
                             ),
-                          ),
-                          const Spacer(),
-                          _SegmentedControl<int>(
-                            dark: dark,
-                            value: _hapticIntensity,
-                            items: const {0: 'Light', 1: 'Medium', 2: 'Heavy'},
-                            onChanged: (v) =>
-                                setState(() => _hapticIntensity = v),
-                          ),
-                        ],
+                            const Spacer(),
+                            _SegmentedControl<int>(
+                              dark: dark,
+                              value: _hapticIntensity,
+                              items: const {0: 'Light', 1: 'Medium', 2: 'Heavy'},
+                              onChanged: (v) =>
+                                  setState(() => _hapticIntensity = v),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: S.s20),
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: S.s6),
+                    child: Text(
+                      'May not be available on all devices',
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: dark ? C.onDark3 : C.onLight3,
                       ),
                     ),
-                  ],
-                ],
-              ),
-
-              const SizedBox(height: S.s24),
+                  ),
+                ),
+                const SizedBox(height: S.s24),
+              ],
 
               // ── Appearance ──
               _SectionHeader(title: 'Appearance'),

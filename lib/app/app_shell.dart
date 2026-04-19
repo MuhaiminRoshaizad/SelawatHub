@@ -10,7 +10,8 @@ import 'package:selawathub/features/hadith/hadith_page.dart';
 import 'package:selawathub/features/profile/profile_page.dart';
 
 class AppShell extends StatefulWidget {
-  const AppShell({super.key});
+  const AppShell({super.key, this.isGuest = false});
+  final bool isGuest;
 
   @override
   State<AppShell> createState() => _AppShellState();
@@ -19,12 +20,12 @@ class AppShell extends StatefulWidget {
 class _AppShellState extends State<AppShell> {
   int _tab = 0;
 
-  static const _pages = [
-    CounterPage(),
-    GroupPage(),
-    StatsPage(),
-    HadithPage(),
-    ProfilePage(),
+  late final _pages = [
+    const CounterPage(),
+    const GroupPage(),
+    const StatsPage(),
+    const HadithPage(),
+    ProfilePage(isGuest: widget.isGuest),
   ];
 
   static const _items = [

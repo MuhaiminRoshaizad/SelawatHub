@@ -148,7 +148,7 @@ class WelcomePage extends StatelessWidget {
                 child: GestureDetector(
                   onTap: () => Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (_) => const AppShell()),
+                    MaterialPageRoute(builder: (_) => const AppShell(isGuest: true)),
                   ),
                   child: Padding(
                     padding: const EdgeInsets.all(S.s8),

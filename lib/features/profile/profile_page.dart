@@ -6,10 +6,15 @@ import 'package:selawathub/core/animations/fade_in.dart';
 import 'package:selawathub/core/constants.dart';
 import 'package:selawathub/core/theme/colors.dart';
 import 'package:selawathub/core/theme/theme.dart';
+import 'package:selawathub/core/widgets/action_buttons.dart';
+import 'package:selawathub/features/auth/welcome_page.dart';
+import 'package:selawathub/features/profile/about_page.dart';
 import 'package:selawathub/features/profile/edit_profile_page.dart';
+import 'package:selawathub/features/profile/help_faq_page.dart';
 
 class ProfilePage extends StatefulWidget {
-  const ProfilePage({super.key});
+  const ProfilePage({super.key, this.isGuest = false});
+  final bool isGuest;
 
   @override
   State<ProfilePage> createState() => _ProfilePageState();
@@ -19,6 +24,8 @@ class _ProfilePageState extends State<ProfilePage> {
   String _name = 'Amin Muhaimin';
   String _bio = 'Striving for consistency ✨';
   String _email = 'amin@example.com';
+  late final bool _isGuest = widget.isGuest;
+  String _language = 'English';
 
   String get _initials {
     final parts = _name.trim().split(RegExp(r'\s+'));
@@ -178,14 +185,19 @@ class _ProfilePageState extends State<ProfilePage> {
                           shape: BoxShape.circle,
                         ),
                         child: Center(
-                          child: Text(
-                            _initials,
-                            style: TextStyle(
-                              fontSize: 30,
-                              fontWeight: FontWeight.w700,
-                              color: accent,
-                            ),
-                          ),
+                          child: _isGuest
+                              ? const Text(
+                                  '👤',
+                                  style: TextStyle(fontSize: 30),
+                                )
+                              : Text(
+                                  _initials,
+                                  style: TextStyle(
+                                    fontSize: 30,
+                                    fontWeight: FontWeight.w700,
+                                    color: accent,
+                                  ),
+                                ),
                         ),
                       ),
                     ),
@@ -205,20 +217,22 @@ class _ProfilePageState extends State<ProfilePage> {
               children: [
                 const SizedBox(height: S.s4),
                 Text(
-                  _name,
+                  _isGuest ? 'Guest' : _name,
                   style: tt.headlineMedium?.copyWith(
                     fontWeight: FontWeight.w700,
                   ),
                   textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: S.s4),
-                Text(
-                  _bio,
-                  style: tt.bodyMedium?.copyWith(
-                    color: dark ? C.onDark2 : C.onLight2,
+                if (!_isGuest) ...[
+                  const SizedBox(height: S.s4),
+                  Text(
+                    _bio,
+                    style: tt.bodyMedium?.copyWith(
+                      color: dark ? C.onDark2 : C.onLight2,
+                    ),
+                    textAlign: TextAlign.center,
                   ),
-                  textAlign: TextAlign.center,
-                ),
+                ],
               ],
             ),
           ),
@@ -313,51 +327,53 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
         ),
 
-        const SizedBox(height: S.s24),
+        if (!_isGuest) ...[
+          const SizedBox(height: S.s24),
 
-        // ── Group section ──
-        _sectionHeader('Group', 280, dark),
-        FadeIn(
-          delay: const Duration(milliseconds: 320),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: S.page),
-            child: Container(
-              decoration: BoxDecoration(
-                color: dark ? C.dark3 : C.light2,
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(
-                  color: dark ? C.darkDivider : C.lightDivider,
-                  width: 0.5,
+          // ── Group section ──
+          _sectionHeader('Group', 280, dark),
+          FadeIn(
+            delay: const Duration(milliseconds: 320),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: S.page),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: dark ? C.dark3 : C.light2,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: dark ? C.darkDivider : C.lightDivider,
+                    width: 0.5,
+                  ),
                 ),
-              ),
-              child: Column(
-                children: [
-                  _InfoRow(
-                    icon: CupertinoIcons.person_3_fill,
-                    label: 'Group',
-                    value: 'SelawatHub Family',
-                    dark: dark,
-                  ),
-                  _divider(dark),
-                  _InfoRow(
-                    icon: CupertinoIcons.number,
-                    label: 'Code',
-                    value: 'SLWT-7861',
-                    dark: dark,
-                  ),
-                  _divider(dark),
-                  _InfoRow(
-                    icon: CupertinoIcons.star_fill,
-                    label: 'Role',
-                    value: 'Leader',
-                    dark: dark,
-                    valueColor: C.gold,
-                  ),
-                ],
+                child: Column(
+                  children: [
+                    _InfoRow(
+                      icon: CupertinoIcons.person_3_fill,
+                      label: 'Group',
+                      value: 'SelawatHub Family',
+                      dark: dark,
+                    ),
+                    _divider(dark),
+                    _InfoRow(
+                      icon: CupertinoIcons.number,
+                      label: 'Code',
+                      value: 'SLWT-7861',
+                      dark: dark,
+                    ),
+                    _divider(dark),
+                    _InfoRow(
+                      icon: CupertinoIcons.star_fill,
+                      label: 'Role',
+                      value: 'Leader',
+                      dark: dark,
+                      valueColor: C.gold,
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
-        ),
+        ],
 
         const SizedBox(height: S.s24),
 
@@ -401,17 +417,19 @@ class _ProfilePageState extends State<ProfilePage> {
                   _MenuRow(
                     icon: CupertinoIcons.globe,
                     label: 'Language',
-                    trailing: 'English',
+                    trailing: _language,
                     dark: dark,
-                    onTap: () {},
+                    onTap: () => _showLanguagePicker(context),
                   ),
-                  _divider(dark),
-                  _MenuRow(
-                    icon: CupertinoIcons.lock_fill,
-                    label: 'Change Password',
-                    dark: dark,
-                    onTap: () {},
-                  ),
+                  if (!_isGuest) ...[
+                    _divider(dark),
+                    _MenuRow(
+                      icon: CupertinoIcons.lock_fill,
+                      label: 'Change Password',
+                      dark: dark,
+                      onTap: () => _showChangePassword(context),
+                    ),
+                  ],
                 ],
               ),
             ),
@@ -441,21 +459,23 @@ class _ProfilePageState extends State<ProfilePage> {
                     icon: CupertinoIcons.question_circle,
                     label: 'Help & FAQ',
                     dark: dark,
-                    onTap: () {},
+                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const HelpFaqPage())),
                   ),
                   _divider(dark),
                   _MenuRow(
                     icon: CupertinoIcons.info_circle,
                     label: 'About SelawatHub',
                     dark: dark,
-                    onTap: () {},
+                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AboutPage())),
                   ),
                   _divider(dark),
                   _MenuRow(
                     icon: CupertinoIcons.share,
                     label: 'Share App',
                     dark: dark,
-                    onTap: () {},
+                    onTap: () => ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Share link copied to clipboard!')),
+                    ),
                   ),
                 ],
               ),
@@ -465,44 +485,79 @@ class _ProfilePageState extends State<ProfilePage> {
 
         const SizedBox(height: S.s24),
 
-        // ── Sign Out ──
+        // ── Sign Out / Sign In ──
         FadeIn(
           delay: const Duration(milliseconds: 540),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: S.page),
-            child: BounceTap(
-              child: Container(
-                padding: const EdgeInsets.symmetric(vertical: S.s16),
-                decoration: BoxDecoration(
-                  color: dark
-                      ? C.error.withValues(alpha: 0.08)
-                      : C.error.withValues(alpha: 0.04),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: C.error.withValues(alpha: 0.15),
-                  ),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      CupertinoIcons.square_arrow_right,
-                      size: 16,
-                      color: C.error,
-                    ),
-                    const SizedBox(width: S.s8),
-                    Text(
-                      'Sign Out',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: C.error,
+            child: _isGuest
+                ? BounceTap(
+                    onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const WelcomePage())),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: S.s16),
+                      decoration: BoxDecoration(
+                        color: dark
+                            ? C.primary.withValues(alpha: 0.08)
+                            : C.primary.withValues(alpha: 0.04),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: C.primary.withValues(alpha: 0.15),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            CupertinoIcons.square_arrow_left,
+                            size: 16,
+                            color: dark ? C.primarySoft : C.primary,
+                          ),
+                          const SizedBox(width: S.s8),
+                          Text(
+                            'Sign In',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: dark ? C.primarySoft : C.primary,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                  ],
-                ),
-              ),
-            ),
+                  )
+                : BounceTap(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: S.s16),
+                      decoration: BoxDecoration(
+                        color: dark
+                            ? C.error.withValues(alpha: 0.08)
+                            : C.error.withValues(alpha: 0.04),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: C.error.withValues(alpha: 0.15),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            CupertinoIcons.square_arrow_right,
+                            size: 16,
+                            color: C.error,
+                          ),
+                          const SizedBox(width: S.s8),
+                          Text(
+                            'Sign Out',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: C.error,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
           ),
         ),
 
@@ -529,6 +584,138 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   // ── Helpers ──
+
+  void _showLanguagePicker(BuildContext context) {
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: dark ? C.dark2 : C.light1,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (ctx, setSheetState) {
+            final tt = Theme.of(ctx).textTheme;
+            return Padding(
+              padding: const EdgeInsets.all(S.page),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Language', style: tt.titleLarge?.copyWith(fontWeight: FontWeight.w600)),
+                  const SizedBox(height: S.s24),
+                  for (final lang in ['English', 'Bahasa Melayu'])
+                    BounceTap(
+                      onTap: () {
+                        setState(() => _language = lang);
+                        setSheetState(() {});
+                        Navigator.pop(ctx);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Language changed to $lang')),
+                        );
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: S.s16),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 24,
+                              height: 24,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(
+                                  color: _language == lang
+                                      ? (dark ? C.primarySoft : C.primary)
+                                      : (dark ? C.onDark3 : C.onLight3),
+                                  width: 2,
+                                ),
+                                color: _language == lang
+                                    ? (dark ? C.primarySoft : C.primary)
+                                    : Colors.transparent,
+                              ),
+                              child: _language == lang
+                                  ? const Icon(Icons.check, size: 16, color: C.white)
+                                  : null,
+                            ),
+                            const SizedBox(width: S.s16),
+                            Text(lang, style: tt.bodyLarge),
+                          ],
+                        ),
+                      ),
+                    ),
+                  SizedBox(height: MediaQuery.of(ctx).padding.bottom),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _showChangePassword(BuildContext context) {
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    final currentCtrl = TextEditingController();
+    final newCtrl = TextEditingController();
+    final confirmCtrl = TextEditingController();
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: dark ? C.dark2 : C.light1,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
+      builder: (ctx) {
+        final tt = Theme.of(ctx).textTheme;
+        return Padding(
+          padding: EdgeInsets.fromLTRB(S.page, S.page, S.page, MediaQuery.of(ctx).viewInsets.bottom + S.page),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Change Password', style: tt.titleLarge?.copyWith(fontWeight: FontWeight.w600)),
+              const SizedBox(height: S.s24),
+              TextField(
+                controller: currentCtrl,
+                obscureText: true,
+                decoration: const InputDecoration(
+                  labelText: 'Current Password',
+                ),
+              ),
+              const SizedBox(height: S.s16),
+              TextField(
+                controller: newCtrl,
+                obscureText: true,
+                decoration: const InputDecoration(
+                  labelText: 'New Password',
+                ),
+              ),
+              const SizedBox(height: S.s16),
+              TextField(
+                controller: confirmCtrl,
+                obscureText: true,
+                decoration: const InputDecoration(
+                  labelText: 'Confirm Password',
+                ),
+              ),
+              const SizedBox(height: S.s24),
+              ActionButtons(
+                onCancel: () => Navigator.pop(ctx),
+                onConfirm: () {
+                  Navigator.pop(ctx);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Password changed successfully')),
+                  );
+                },
+              ),
+              SizedBox(height: MediaQuery.of(ctx).padding.bottom),
+            ],
+          ),
+        );
+      },
+    );
+  }
 
   static Widget _sectionHeader(String text, int delay, bool dark) {
     return FadeIn(
