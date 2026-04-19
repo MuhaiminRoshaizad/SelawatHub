@@ -5,6 +5,7 @@ import 'package:selawathub/core/animations/bounce_tap.dart';
 import 'package:selawathub/core/animations/fade_in.dart';
 import 'package:selawathub/core/constants.dart';
 import 'package:selawathub/core/theme/colors.dart';
+import 'package:selawathub/core/widgets/action_buttons.dart';
 import 'package:selawathub/core/widgets/frosted_bar.dart';
 
 enum GroupRole { leader, coLeader, member }
@@ -134,58 +135,15 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
               ),
             ),
             const SizedBox(height: S.s16),
-            Row(
-              children: [
-                Expanded(
-                  child: BounceTap(
-                    onTap: () => Navigator.of(ctx).pop(),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: S.s12),
-                      decoration: BoxDecoration(
-                        color: dark ? C.dark4 : C.light3,
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                      child: Center(
-                        child: Text(
-                          'Cancel',
-                          style: tt.bodyMedium?.copyWith(
-                            fontWeight: FontWeight.w600,
-                            color: dark ? C.onDark2 : C.onLight2,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: S.s12),
-                Expanded(
-                  child: BounceTap(
-                    onTap: () {
-                      final name = controller.text.trim();
-                      if (name.isNotEmpty) {
-                        setState(() => _groupName = name);
-                      }
-                      Navigator.of(ctx).pop();
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: S.s12),
-                      decoration: BoxDecoration(
-                        color: dark ? C.primarySoft : C.primary,
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                      child: Center(
-                        child: Text(
-                          'Save',
-                          style: tt.bodyMedium?.copyWith(
-                            fontWeight: FontWeight.w600,
-                            color: C.white,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
+            ActionButtons(
+              onCancel: () => Navigator.of(ctx).pop(),
+              onConfirm: () {
+                final name = controller.text.trim();
+                if (name.isNotEmpty) {
+                  setState(() => _groupName = name);
+                }
+                Navigator.of(ctx).pop();
+              },
             ),
           ],
         ),
@@ -264,61 +222,16 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                 ),
               ),
               const SizedBox(height: S.s16),
-              Row(
-                children: [
-                  Expanded(
-                    child: BounceTap(
-                      onTap: () => Navigator.of(ctx).pop(),
-                      child: Container(
-                        padding:
-                            const EdgeInsets.symmetric(vertical: S.s12),
-                        decoration: BoxDecoration(
-                          color: dark ? C.dark4 : C.light3,
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                        child: Center(
-                          child: Text(
-                            'Cancel',
-                            style: tt.bodyMedium?.copyWith(
-                              fontWeight: FontWeight.w600,
-                              color: dark ? C.onDark2 : C.onLight2,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: S.s12),
-                  Expanded(
-                    child: BounceTap(
-                      onTap: () {
-                        final val =
-                            int.tryParse(controller.text.trim()) ?? 0;
-                        if (val > 0) {
-                          setState(() => _dailyGoal = val);
-                        }
-                        Navigator.of(ctx).pop();
-                      },
-                      child: Container(
-                        padding:
-                            const EdgeInsets.symmetric(vertical: S.s12),
-                        decoration: BoxDecoration(
-                          color: dark ? C.primarySoft : C.primary,
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                        child: Center(
-                          child: Text(
-                            'Save',
-                            style: tt.bodyMedium?.copyWith(
-                              fontWeight: FontWeight.w600,
-                              color: C.white,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+              ActionButtons(
+                onCancel: () => Navigator.of(ctx).pop(),
+                onConfirm: () {
+                  final val =
+                      int.tryParse(controller.text.trim()) ?? 0;
+                  if (val > 0) {
+                    setState(() => _dailyGoal = val);
+                  }
+                  Navigator.of(ctx).pop();
+                },
               ),
             ],
           ),

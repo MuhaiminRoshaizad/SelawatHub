@@ -5,8 +5,11 @@ import 'package:selawathub/core/animations/fade_in.dart';
 import 'package:selawathub/core/constants.dart';
 import 'package:selawathub/core/theme/colors.dart';
 import 'package:selawathub/core/widgets/bead_circle.dart';
+import 'package:selawathub/features/counter/counter_settings_page.dart';
 import 'package:selawathub/features/counter/models/dhikr.dart';
 import 'package:selawathub/features/counter/widgets/dhikr_selector_sheet.dart';
+import 'package:selawathub/features/counter/widgets/digital_counter.dart';
+import 'package:selawathub/features/counter/widgets/minimal_counter.dart';
 
 class CounterPage extends StatefulWidget {
   const CounterPage({super.key});
@@ -21,8 +24,16 @@ class _CounterPageState extends State<CounterPage>
   int _round = 0;
   int _total = 0;
   Dhikr _dhikr = Dhikr.selawatList.first;
+  bool _arabicExpanded = false;
+  bool _hapticEnabled = true;
+  int _hapticIntensity = 1;
+  int _counterStyle = 0;
+  Map<String, int> _customTargets = {};
+  int _colorThemeIndex = 0;
 
   late final AnimationController _pulse;
+
+  Color get _accentColor => colorThemes[_colorThemeIndex].$2;
 
   @override
   void initState() {
@@ -39,10 +50,16 @@ class _CounterPageState extends State<CounterPage>
     super.dispose();
   }
 
-  int get _target => _dhikr.defaultTarget;
+  int get _target => _customTargets[_dhikr.id] ?? _dhikr.defaultTarget;
 
   void _tap() {
-    HapticFeedback.lightImpact();
+    if (_hapticEnabled) {
+      switch (_hapticIntensity) {
+        case 0: HapticFeedback.lightImpact();
+        case 1: HapticFeedback.mediumImpact();
+        default: HapticFeedback.heavyImpact();
+      }
+    }
     _pulse.forward(from: 0);
     setState(() {
       _count++;
@@ -50,9 +67,33 @@ class _CounterPageState extends State<CounterPage>
       if (_count >= _target) {
         _count = 0;
         _round++;
-        HapticFeedback.mediumImpact();
+        if (_hapticEnabled) HapticFeedback.heavyImpact();
       }
     });
+  }
+
+  void _openSettings() async {
+    final result = await Navigator.push<(bool, int, int, Map<String, int>, int)>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => CounterSettingsPage(
+          hapticEnabled: _hapticEnabled,
+          hapticIntensity: _hapticIntensity,
+          counterStyle: _counterStyle,
+          customTargets: Map.of(_customTargets),
+          colorThemeIndex: _colorThemeIndex,
+        ),
+      ),
+    );
+    if (result != null) {
+      setState(() {
+        _hapticEnabled = result.$1;
+        _hapticIntensity = result.$2;
+        _counterStyle = result.$3;
+        _customTargets = result.$4;
+        _colorThemeIndex = result.$5;
+      });
+    }
   }
 
   void _openSelector() async {
@@ -63,6 +104,7 @@ class _CounterPageState extends State<CounterPage>
         _count = 0;
         _round = 0;
         _total = 0;
+        _arabicExpanded = false;
       });
     }
   }
@@ -106,33 +148,56 @@ class _CounterPageState extends State<CounterPage>
         children: [
           // ── Compact dhikr selector ──
           FadeIn(
-            child: GestureDetector(
-              onTap: _openSelector,
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(S.page, S.s12, S.page, 0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Flexible(
-                      child: Text(
-                        _dhikr.name,
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: dark ? C.onDark1 : C.onLight1,
-                        ),
-                        overflow: TextOverflow.ellipsis,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(S.page, S.s12, S.page, 0),
+              child: Row(
+                children: [
+                  const SizedBox(width: 36),
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: _openSelector,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Flexible(
+                            child: Text(
+                              _dhikr.name,
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: dark ? C.onDark1 : C.onLight1,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          const SizedBox(width: S.s8),
+                          Icon(
+                            CupertinoIcons.chevron_down,
+                            size: 14,
+                            color: dark ? C.onDark3 : C.onLight3,
+                          ),
+                        ],
                       ),
                     ),
-                    const SizedBox(width: S.s8),
-                    Icon(
-                      CupertinoIcons.chevron_down,
-                      size: 14,
-                      color: dark ? C.onDark3 : C.onLight3,
+                  ),
+                  GestureDetector(
+                    onTap: _openSettings,
+                    child: Container(
+                      width: 36,
+                      height: 36,
+                      decoration: BoxDecoration(
+                        color: dark ? C.dark3 : C.light3,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        CupertinoIcons.gear,
+                        size: 16,
+                        color: dark ? C.onDark2 : C.onLight2,
+                      ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -176,11 +241,27 @@ class _CounterPageState extends State<CounterPage>
                                 ],
                               ),
                             ),
-                            BeadCircle(
-                              total: _target,
-                              filled: _count,
-                              size: beadSize,
-                            ),
+                            if (_counterStyle == 0)
+                              BeadCircle(
+                                total: _target,
+                                filled: _count,
+                                size: beadSize,
+                                accentColor: _accentColor,
+                              )
+                            else if (_counterStyle == 1)
+                              DigitalCounter(
+                                total: _target,
+                                filled: _count,
+                                size: beadSize,
+                                accentColor: _accentColor,
+                              )
+                            else
+                              MinimalCounter(
+                                total: _target,
+                                filled: _count,
+                                size: beadSize,
+                                accentColor: _accentColor,
+                              ),
                             // Center: count only
                             Column(
                               mainAxisSize: MainAxisSize.min,
@@ -204,7 +285,7 @@ class _CounterPageState extends State<CounterPage>
                                     style: TextStyle(
                                       fontSize: 60,
                                       fontWeight: FontWeight.w800,
-                                      color: C.primarySoft,
+                                      color: _accentColor,
                                       letterSpacing: -2,
                                     ),
                                   ),
@@ -223,7 +304,7 @@ class _CounterPageState extends State<CounterPage>
             ),
           ),
 
-          // ── Arabic text ──
+          // ── Arabic text (expandable only if truncated) ──
           FadeIn(
             delay: const Duration(milliseconds: 150),
             child: Padding(
@@ -236,30 +317,75 @@ class _CounterPageState extends State<CounterPage>
                   opacity: anim,
                   child: child,
                 ),
-                child: Container(
+                child: LayoutBuilder(
                   key: ValueKey(_dhikr.id),
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: S.s20,
-                    vertical: S.s12,
-                  ),
-                  decoration: BoxDecoration(
-                    color: dark ? C.dark3 : C.light3,
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Text(
-                    _dhikr.arabic,
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontFamily: 'serif',
-                      height: 1.8,
-                      color: dark ? C.onDark1 : C.onLight1,
-                    ),
-                    textAlign: TextAlign.center,
-                    textDirection: TextDirection.rtl,
-                    maxLines: 3,
-                    overflow: TextOverflow.ellipsis,
-                  ),
+                  builder: (context, constraints) {
+                    final textSpan = TextSpan(
+                      text: _dhikr.arabic,
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontFamily: 'serif',
+                        height: 1.8,
+                        color: dark ? C.onDark1 : C.onLight1,
+                      ),
+                    );
+                    final tp = TextPainter(
+                      text: textSpan,
+                      maxLines: 3,
+                      textDirection: TextDirection.rtl,
+                    )..layout(maxWidth: constraints.maxWidth - S.s20 * 2);
+                    final isOverflowing = tp.didExceedMaxLines;
+
+                    return GestureDetector(
+                      onTap: isOverflowing
+                          ? () => setState(() => _arabicExpanded = !_arabicExpanded)
+                          : null,
+                      child: AnimatedSize(
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeOut,
+                        child: Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: S.s20,
+                            vertical: S.s12,
+                          ),
+                          decoration: BoxDecoration(
+                            color: dark ? C.dark3 : C.light3,
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: Column(
+                            children: [
+                              Text(
+                                _dhikr.arabic,
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontFamily: 'serif',
+                                  height: 1.8,
+                                  color: dark ? C.onDark1 : C.onLight1,
+                                ),
+                                textAlign: TextAlign.center,
+                                textDirection: TextDirection.rtl,
+                                maxLines: _arabicExpanded ? null : 3,
+                                overflow: _arabicExpanded ? null : TextOverflow.ellipsis,
+                              ),
+                              if (isOverflowing) ...[
+                                const SizedBox(height: S.s4),
+                                AnimatedRotation(
+                                  turns: _arabicExpanded ? 0.5 : 0,
+                                  duration: const Duration(milliseconds: 200),
+                                  child: Icon(
+                                    CupertinoIcons.chevron_down,
+                                    size: 12,
+                                    color: dark ? C.onDark3 : C.onLight3,
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  },
                 ),
               ),
             ),

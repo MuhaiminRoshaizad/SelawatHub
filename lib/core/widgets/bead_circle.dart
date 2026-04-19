@@ -9,12 +9,14 @@ class BeadCircle extends StatelessWidget {
     required this.filled,
     this.size = 280,
     this.beadRadius = 8,
+    this.accentColor = C.primarySoft,
   });
 
   final int total;
   final int filled;
   final double size;
   final double beadRadius;
+  final Color accentColor;
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +29,7 @@ class BeadCircle extends StatelessWidget {
           total: total,
           filled: filled,
           beadRadius: beadRadius,
-          filledColor: C.primarySoft,
+          filledColor: accentColor,
           emptyColor: dark ? C.white.withValues(alpha: 0.06) : C.black.withValues(alpha: 0.06),
           threadColor: dark ? C.white.withValues(alpha: 0.03) : C.black.withValues(alpha: 0.04),
           glowColor: C.primaryGlow,
