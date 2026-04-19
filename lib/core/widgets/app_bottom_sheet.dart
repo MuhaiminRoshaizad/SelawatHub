@@ -3,6 +3,51 @@ import 'package:flutter/material.dart';
 import 'package:selawathub/core/constants.dart';
 import 'package:selawathub/core/theme/colors.dart';
 
+/// Lightweight bottom sheet with a drag handle auto-included.
+/// Use for simple form-style sheets (text fields, confirmations, pickers).
+///
+/// ```dart
+/// showAppFormSheet(
+///   context: context,
+///   builder: (ctx) => Column(children: [...]),
+/// );
+/// ```
+Future<T?> showAppFormSheet<T>({
+  required BuildContext context,
+  required Widget Function(BuildContext) builder,
+  bool isDismissible = true,
+  bool enableDrag = true,
+  bool isScrollControlled = true,
+}) {
+  final dark = Theme.of(context).brightness == Brightness.dark;
+  return showModalBottomSheet<T>(
+    context: context,
+    isDismissible: isDismissible,
+    enableDrag: enableDrag,
+    isScrollControlled: isScrollControlled,
+    backgroundColor: dark ? C.dark2 : C.light1,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+    ),
+    builder: (ctx) => Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const SizedBox(height: S.s12),
+        Container(
+          width: 36,
+          height: 4,
+          decoration: BoxDecoration(
+            color: dark ? C.dark4 : C.lightDivider,
+            borderRadius: BorderRadius.circular(2),
+          ),
+        ),
+        const SizedBox(height: S.s8),
+        builder(ctx),
+      ],
+    ),
+  );
+}
+
 /// Standardised bottom sheet with a pinned header (drag handle, header row,
 /// divider) and scrollable content beneath.  Every bottom sheet in the app
 /// should use this so the UX stays consistent.

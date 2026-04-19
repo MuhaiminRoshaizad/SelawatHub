@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:selawathub/core/animations/bounce_tap.dart';
 import 'package:selawathub/core/constants.dart';
 import 'package:selawathub/core/theme/colors.dart';
+import 'package:selawathub/core/widgets/app_bottom_sheet.dart';
 import 'package:selawathub/features/counter/models/dhikr.dart';
 
 /// A bottom sheet that lets the user pick a selawat or zikir.
@@ -17,13 +18,13 @@ class DhikrSelectorSheet extends StatefulWidget {
 
   /// Shows the selector as a modal bottom sheet and returns the chosen [Dhikr].
   static Future<Dhikr?> show(BuildContext context, Dhikr current) {
-    return showModalBottomSheet<Dhikr>(
+    return showAppFormSheet<Dhikr>(
       context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (ctx) => DhikrSelectorSheet(
-        current: current,
-        onSelected: (d) => Navigator.pop(ctx, d),
+      builder: (ctx) => Flexible(
+        child: DhikrSelectorSheet(
+          current: current,
+          onSelected: (d) => Navigator.pop(ctx, d),
+        ),
       ),
     );
   }
@@ -59,26 +60,11 @@ class _DhikrSelectorSheetState extends State<DhikrSelectorSheet>
       constraints: BoxConstraints(
         maxHeight: MediaQuery.of(context).size.height * 0.7,
       ),
-      decoration: BoxDecoration(
-        color: dark ? C.dark2 : C.light2,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-      ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // ── Handle ──
-          const SizedBox(height: S.s12),
-          Container(
-            width: 40,
-            height: 4,
-            decoration: BoxDecoration(
-              color: dark ? C.dark4 : C.lightDivider,
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
-          const SizedBox(height: S.s16),
-
           // ── Title ──
+          const SizedBox(height: S.s8),
           Text(
             'Choose Dhikr',
             style: TextStyle(

@@ -4,15 +4,18 @@ import 'package:flutter/services.dart';
 import 'package:selawathub/core/animations/bounce_tap.dart';
 import 'package:selawathub/core/animations/fade_in.dart';
 import 'package:selawathub/core/constants.dart';
+import 'package:selawathub/core/services/group_service.dart';
 import 'package:selawathub/core/theme/colors.dart';
 import 'package:selawathub/core/widgets/action_buttons.dart';
+import 'package:selawathub/core/widgets/app_bottom_sheet.dart';
 import 'package:selawathub/core/widgets/app_snackbar.dart';
 import 'package:selawathub/core/widgets/frosted_bar.dart';
+import 'package:selawathub/features/group/manage_roles_page.dart';
+import 'package:selawathub/features/group/models/group_role.dart';
+import 'package:selawathub/features/group/remove_member_page.dart';
+import 'package:selawathub/features/group/transfer_leadership_page.dart';
 
-enum GroupRole { leader, coLeader, member }
-
-// Member tuple: (name, count, isYou, role)
-typedef GroupMember = (String, int, bool, GroupRole);
+export 'package:selawathub/features/group/models/group_role.dart';
 
 // ─────────────────────────────────────────────────────────
 //  Group Settings Page
@@ -21,16 +24,22 @@ typedef GroupMember = (String, int, bool, GroupRole);
 class GroupSettingsPage extends StatefulWidget {
   const GroupSettingsPage({
     super.key,
+    required this.groupId,
     required this.groupName,
+    required this.groupDescription,
     required this.inviteCode,
+    required this.dailyGoal,
     required this.memberCount,
     required this.userRole,
     required this.members,
     required this.onLeave,
   });
 
+  final String groupId;
   final String groupName;
+  final String groupDescription;
   final String inviteCode;
+  final int dailyGoal;
   final int memberCount;
   final GroupRole userRole;
   final List<GroupMember> members;
@@ -43,7 +52,7 @@ class GroupSettingsPage extends StatefulWidget {
 class _GroupSettingsPageState extends State<GroupSettingsPage> {
   bool _muteNotifications = false;
   late String _groupName = widget.groupName;
-  int _dailyGoal = 25000; // mock default
+  late int _dailyGoal = widget.dailyGoal;
 
   bool get _isLeader => widget.userRole == GroupRole.leader;
   bool get _isCoLeader => widget.userRole == GroupRole.coLeader;
@@ -65,35 +74,18 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
     final dark = Theme.of(context).brightness == Brightness.dark;
     final tt = Theme.of(context).textTheme;
     final controller = TextEditingController(text: _groupName);
-    showModalBottomSheet(
+    showAppFormSheet(
       context: context,
-      isScrollControlled: true,
-      backgroundColor: dark ? C.dark2 : C.light1,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
       builder: (ctx) => SafeArea(
         child: Padding(
           padding: EdgeInsets.fromLTRB(
-            S.page, S.s16, S.page,
+            S.page, S.s8, S.page,
             MediaQuery.of(ctx).viewInsets.bottom + S.page,
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-            // Drag handle
-            Center(
-              child: Container(
-                width: 36,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: dark ? C.dark4 : C.lightDivider,
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-            ),
-            const SizedBox(height: S.s16),
             Text(
               'Edit Group Name',
               style: tt.titleLarge?.copyWith(fontWeight: FontWeight.w600),
@@ -132,7 +124,11 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
               onConfirm: () {
                 final name = controller.text.trim();
                 if (name.isNotEmpty) {
-                  setState(() => _groupName = name);
+                  GroupService.updateGroup(widget.groupId, name: name).then((_) {
+                    setState(() => _groupName = name);
+                  }).catchError((_) {
+                    if (ctx.mounted) showAppSnackBar(ctx, 'Failed to update name');
+                  });
                 }
                 Navigator.of(ctx).pop();
               },
@@ -148,34 +144,18 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
     final dark = Theme.of(context).brightness == Brightness.dark;
     final tt = Theme.of(context).textTheme;
     final controller = TextEditingController(text: _dailyGoal.toString());
-    showModalBottomSheet(
+    showAppFormSheet(
       context: context,
-      isScrollControlled: true,
-      backgroundColor: dark ? C.dark2 : C.light1,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
       builder: (ctx) => SafeArea(
         child: Padding(
           padding: EdgeInsets.fromLTRB(
-            S.page, S.s16, S.page,
+            S.page, S.s8, S.page,
             MediaQuery.of(ctx).viewInsets.bottom + S.page,
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Center(
-                child: Container(
-                  width: 36,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: dark ? C.dark4 : C.lightDivider,
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-              ),
-              const SizedBox(height: S.s16),
               Text(
                 'Set Daily Goal',
                 style: tt.titleLarge?.copyWith(fontWeight: FontWeight.w600),
@@ -217,7 +197,11 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                   final val =
                       int.tryParse(controller.text.trim()) ?? 0;
                   if (val > 0) {
-                    setState(() => _dailyGoal = val);
+                    GroupService.updateGroup(widget.groupId, dailyGoal: val).then((_) {
+                      setState(() => _dailyGoal = val);
+                    }).catchError((_) {
+                      if (ctx.mounted) showAppSnackBar(ctx, 'Failed to update goal');
+                    });
                   }
                   Navigator.of(ctx).pop();
                 },
@@ -238,7 +222,8 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => _RemoveMemberPage(
+        builder: (_) => RemoveMemberPage(
+          groupId: widget.groupId,
           members: members,
           userRole: widget.userRole,
         ),
@@ -250,7 +235,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => _TransferLeadershipPage(members: _otherMembers),
+        builder: (_) => TransferLeadershipPage(groupId: widget.groupId, members: _otherMembers),
       ),
     );
   }
@@ -259,7 +244,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => _ManageRolesPage(members: _otherMembers),
+        builder: (_) => ManageRolesPage(groupId: widget.groupId, members: _otherMembers),
       ),
     );
   }
@@ -341,8 +326,12 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
             ),
           ),
           TextButton(
-            onPressed: () {
+            onPressed: () async {
               Navigator.of(ctx).pop();
+              try {
+                await GroupService.leaveGroup(widget.groupId);
+              } catch (_) {}
+              if (!mounted) return;
               Navigator.of(context).pop();
               widget.onLeave();
             },
@@ -380,8 +369,12 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
             ),
           ),
           TextButton(
-            onPressed: () {
+            onPressed: () async {
               Navigator.of(ctx).pop();
+              try {
+                await GroupService.leaveGroup(widget.groupId);
+              } catch (_) {}
+              if (!mounted) return;
               Navigator.of(context).pop();
               widget.onLeave();
             },
@@ -844,911 +837,6 @@ class _RoleInfoRow extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-// ─────────────────────────────────────────────────────────
-//  Manage Roles Page (leader only)
-// ─────────────────────────────────────────────────────────
-
-class _ManageRolesPage extends StatefulWidget {
-  const _ManageRolesPage({required this.members});
-  final List<GroupMember> members;
-
-  @override
-  State<_ManageRolesPage> createState() => _ManageRolesPageState();
-}
-
-class _ManageRolesPageState extends State<_ManageRolesPage> {
-  late final Map<String, GroupRole> _roles;
-
-  @override
-  void initState() {
-    super.initState();
-    _roles = {
-      for (final m in widget.members) m.$1: m.$4,
-    };
-  }
-
-  void _toggleRole(String name) {
-    setState(() {
-      _roles[name] = _roles[name] == GroupRole.coLeader
-          ? GroupRole.member
-          : GroupRole.coLeader;
-    });
-  }
-
-  void _saveChanges() {
-    Navigator.pop(context);
-    showAppSnackBar(context, 'Roles updated');
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final dark = Theme.of(context).brightness == Brightness.dark;
-    final tt = Theme.of(context).textTheme;
-
-    return Scaffold(
-      backgroundColor: dark ? C.dark1 : C.light1,
-      body: Stack(
-        children: [
-          ListView(
-            padding: EdgeInsets.zero,
-            children: [
-              SizedBox(height: MediaQuery.of(context).padding.top + 56),
-              const SizedBox(height: S.s24),
-
-              // Instruction
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: S.page),
-                child: Text(
-                  'Tap a member to toggle between co-leader and member.',
-                  style: tt.bodyMedium?.copyWith(
-                    color: dark ? C.onDark2 : C.onLight2,
-                  ),
-                ),
-              ),
-              const SizedBox(height: S.s16),
-
-              // Member list
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: S.page),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: dark ? C.dark3 : C.light2,
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Column(
-                    children: [
-                      for (var i = 0; i < widget.members.length; i++) ...[
-                        if (i > 0)
-                          Divider(
-                            height: 1,
-                            indent: 56,
-                            color: dark ? C.darkDivider : C.lightDivider,
-                          ),
-                        _ManageRoleRow(
-                          name: widget.members[i].$1,
-                          count: widget.members[i].$2,
-                          role: _roles[widget.members[i].$1]!,
-                          dark: dark,
-                          onTap: () => _toggleRole(widget.members[i].$1),
-                        ),
-                      ],
-                    ],
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: S.s32),
-
-              // Save button
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: S.page),
-                child: BounceTap(
-                  onTap: _saveChanges,
-                  child: Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.symmetric(vertical: S.s16),
-                    decoration: BoxDecoration(
-                      color: dark ? C.primarySoft : C.primary,
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Center(
-                      child: Text(
-                        'Save Changes',
-                        style: tt.bodyLarge?.copyWith(
-                          fontWeight: FontWeight.w600,
-                          color: C.white,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-
-              SizedBox(
-                  height: MediaQuery.of(context).padding.bottom + S.s32),
-            ],
-          ),
-
-          // ── Frosted app bar ──
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            child: FrostedBar(
-              child: SizedBox(
-                height: 56,
-                child: Row(
-                  children: [
-                    GestureDetector(
-                      onTap: () => Navigator.pop(context),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: S.s16),
-                        child: Icon(
-                          CupertinoIcons.chevron_left,
-                          size: 20,
-                          color: dark ? C.onDark1 : C.onLight1,
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      child: Text(
-                        'Manage Roles',
-                        style: tt.titleLarge
-                            ?.copyWith(fontWeight: FontWeight.w600),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ─────────────────────────────────────────────────────────
-//  Manage role row (toggle co-leader / member)
-// ─────────────────────────────────────────────────────────
-
-class _ManageRoleRow extends StatelessWidget {
-  const _ManageRoleRow({
-    required this.name,
-    required this.count,
-    required this.role,
-    required this.dark,
-    required this.onTap,
-  });
-
-  final String name;
-  final int count;
-  final GroupRole role;
-  final bool dark;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final tt = Theme.of(context).textTheme;
-    final isCoLeader = role == GroupRole.coLeader;
-    return BounceTap(
-      onTap: onTap,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(
-            horizontal: S.s16, vertical: S.s12),
-        child: Row(
-          children: [
-            // Avatar
-            Container(
-              width: 36,
-              height: 36,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: dark
-                    ? C.primaryMuted.withValues(alpha: 0.3)
-                    : C.primary.withValues(alpha: 0.1),
-              ),
-              child: Center(
-                child: Text(
-                  name[0].toUpperCase(),
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: dark ? C.primarySoft : C.primary,
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(width: S.s12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Text(
-                        name,
-                        style: tt.bodyMedium?.copyWith(
-                          fontWeight: FontWeight.w500,
-                          color: dark ? C.onDark1 : C.onLight1,
-                        ),
-                      ),
-                    ],
-                  ),
-                  Text(
-                    '$count selawat',
-                    style: tt.bodySmall?.copyWith(
-                      color: dark ? C.onDark3 : C.onLight3,
-                      fontSize: 12,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            // Role badge chip
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: S.s8, vertical: S.s4),
-              decoration: BoxDecoration(
-                color: isCoLeader
-                    ? (dark
-                        ? C.primaryMuted.withValues(alpha: 0.3)
-                        : C.primary.withValues(alpha: 0.1))
-                    : (dark ? C.dark4 : C.light3),
-                borderRadius: BorderRadius.circular(S.s8),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    isCoLeader ? '⭐' : '👤',
-                    style: const TextStyle(fontSize: 12),
-                  ),
-                  const SizedBox(width: S.s4),
-                  Text(
-                    isCoLeader ? 'Co-leader' : 'Member',
-                    style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
-                      color: isCoLeader
-                          ? (dark ? C.primarySoft : C.primary)
-                          : (dark ? C.onDark3 : C.onLight3),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// ─────────────────────────────────────────────────────────
-//  Remove Member Page (multi-select)
-// ─────────────────────────────────────────────────────────
-
-class _RemoveMemberPage extends StatefulWidget {
-  const _RemoveMemberPage({
-    required this.members,
-    required this.userRole,
-  });
-  final List<GroupMember> members;
-  final GroupRole userRole;
-
-  @override
-  State<_RemoveMemberPage> createState() => _RemoveMemberPageState();
-}
-
-class _RemoveMemberPageState extends State<_RemoveMemberPage> {
-  final Set<String> _selected = {};
-
-  void _confirmRemove() {
-    if (_selected.isEmpty) return;
-    final dark = Theme.of(context).brightness == Brightness.dark;
-    final count = _selected.length;
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: dark ? C.dark3 : C.light2,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Text(
-          'Remove $count member${count > 1 ? 's' : ''}?',
-          style: TextStyle(
-            fontWeight: FontWeight.w600,
-            color: dark ? C.onDark1 : C.onLight1,
-          ),
-        ),
-        content: Text(
-          'The following will be removed:\n${_selected.join(', ')}',
-          style: TextStyle(color: dark ? C.onDark2 : C.onLight2),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: Text(
-              'Cancel',
-              style: TextStyle(color: dark ? C.primarySoft : C.primary),
-            ),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(ctx).pop();
-              Navigator.of(context).pop();
-              showAppSnackBar(context, '$count member${count > 1 ? 's' : ''} removed');
-            },
-            child: Text('Remove', style: TextStyle(color: C.error)),
-          ),
-        ],
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final dark = Theme.of(context).brightness == Brightness.dark;
-    final tt = Theme.of(context).textTheme;
-
-    return Scaffold(
-      backgroundColor: dark ? C.dark1 : C.light1,
-      body: Stack(
-        children: [
-          ListView(
-            padding: EdgeInsets.zero,
-            children: [
-              SizedBox(height: MediaQuery.of(context).padding.top + 56),
-              const SizedBox(height: S.s24),
-
-              // Instruction
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: S.page),
-                child: Text(
-                  'Select members to remove from the group.',
-                  style: tt.bodyMedium?.copyWith(
-                    color: dark ? C.onDark2 : C.onLight2,
-                  ),
-                ),
-              ),
-              const SizedBox(height: S.s16),
-
-              // Member list
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: S.page),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: dark ? C.dark3 : C.light2,
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Column(
-                    children: [
-                      for (var i = 0; i < widget.members.length; i++) ...[
-                        if (i > 0)
-                          Divider(
-                            height: 1,
-                            indent: 56,
-                            color: dark ? C.darkDivider : C.lightDivider,
-                          ),
-                        _MemberCheckRow(
-                          name: widget.members[i].$1,
-                          count: widget.members[i].$2,
-                          role: widget.members[i].$4,
-                          selected:
-                              _selected.contains(widget.members[i].$1),
-                          dark: dark,
-                          onTap: () {
-                            setState(() {
-                              final name = widget.members[i].$1;
-                              if (_selected.contains(name)) {
-                                _selected.remove(name);
-                              } else {
-                                _selected.add(name);
-                              }
-                            });
-                          },
-                        ),
-                      ],
-                    ],
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: S.s32),
-
-              // Remove button
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: S.page),
-                child: BounceTap(
-                  onTap: _confirmRemove,
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
-                    width: double.infinity,
-                    padding: const EdgeInsets.symmetric(vertical: S.s16),
-                    decoration: BoxDecoration(
-                      color: _selected.isNotEmpty
-                          ? C.error
-                          : (dark ? C.dark4 : C.light3),
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Center(
-                      child: Text(
-                        _selected.isEmpty
-                            ? 'Select members'
-                            : 'Remove ${_selected.length} member${_selected.length > 1 ? 's' : ''}',
-                        style: tt.bodyLarge?.copyWith(
-                          fontWeight: FontWeight.w600,
-                          color: _selected.isNotEmpty
-                              ? C.white
-                              : (dark ? C.onDark3 : C.onLight3),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-
-              SizedBox(
-                  height: MediaQuery.of(context).padding.bottom + S.s32),
-            ],
-          ),
-
-          // ── Frosted app bar ──
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            child: FrostedBar(
-              child: SizedBox(
-                height: 56,
-                child: Row(
-                  children: [
-                    GestureDetector(
-                      onTap: () => Navigator.pop(context),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: S.s16),
-                        child: Icon(
-                          CupertinoIcons.chevron_left,
-                          size: 20,
-                          color: dark ? C.onDark1 : C.onLight1,
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      child: Text(
-                        'Remove Member',
-                        style: tt.titleLarge
-                            ?.copyWith(fontWeight: FontWeight.w600),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ─────────────────────────────────────────────────────────
-//  Transfer Leadership Page (single-select)
-// ─────────────────────────────────────────────────────────
-
-class _TransferLeadershipPage extends StatefulWidget {
-  const _TransferLeadershipPage({required this.members});
-
-  final List<GroupMember> members;
-
-  @override
-  State<_TransferLeadershipPage> createState() =>
-      _TransferLeadershipPageState();
-}
-
-class _TransferLeadershipPageState extends State<_TransferLeadershipPage> {
-  String? _selected;
-
-  void _confirmTransfer() {
-    if (_selected == null) return;
-    final dark = Theme.of(context).brightness == Brightness.dark;
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: dark ? C.dark3 : C.light2,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Text(
-          'Transfer leadership?',
-          style: TextStyle(
-            fontWeight: FontWeight.w600,
-            color: dark ? C.onDark1 : C.onLight1,
-          ),
-        ),
-        content: Text(
-          'Leadership will be transferred to $_selected. You will become a co-leader.',
-          style: TextStyle(color: dark ? C.onDark2 : C.onLight2),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: Text(
-              'Cancel',
-              style: TextStyle(color: dark ? C.primarySoft : C.primary),
-            ),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(ctx).pop();
-              Navigator.of(context).pop();
-              showAppSnackBar(context, 'Leadership transferred to $_selected');
-            },
-            child: Text(
-              'Transfer',
-              style: TextStyle(
-                color: dark ? C.primarySoft : C.primary,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final dark = Theme.of(context).brightness == Brightness.dark;
-    final tt = Theme.of(context).textTheme;
-
-    return Scaffold(
-      backgroundColor: dark ? C.dark1 : C.light1,
-      body: Stack(
-        children: [
-          ListView(
-            padding: EdgeInsets.zero,
-            children: [
-              SizedBox(height: MediaQuery.of(context).padding.top + 56),
-              const SizedBox(height: S.s24),
-
-              // Instruction
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: S.page),
-                child: Text(
-                  'Choose a member to become the new group leader.',
-                  style: tt.bodyMedium?.copyWith(
-                    color: dark ? C.onDark2 : C.onLight2,
-                  ),
-                ),
-              ),
-              const SizedBox(height: S.s16),
-
-              // Member list
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: S.page),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: dark ? C.dark3 : C.light2,
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Column(
-                    children: [
-                      for (var i = 0; i < widget.members.length; i++) ...[
-                        if (i > 0)
-                          Divider(
-                            height: 1,
-                            indent: 56,
-                            color: dark ? C.darkDivider : C.lightDivider,
-                          ),
-                        _MemberRadioRow(
-                          name: widget.members[i].$1,
-                          count: widget.members[i].$2,
-                          selected: _selected == widget.members[i].$1,
-                          dark: dark,
-                          onTap: () => setState(
-                              () => _selected = widget.members[i].$1),
-                        ),
-                      ],
-                    ],
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: S.s32),
-
-              // Transfer button
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: S.page),
-                child: BounceTap(
-                  onTap: _confirmTransfer,
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
-                    width: double.infinity,
-                    padding: const EdgeInsets.symmetric(vertical: S.s16),
-                    decoration: BoxDecoration(
-                      color: _selected != null
-                          ? (dark ? C.primarySoft : C.primary)
-                          : (dark ? C.dark4 : C.light3),
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Center(
-                      child: Text(
-                        _selected == null
-                            ? 'Select a member'
-                            : 'Transfer to $_selected',
-                        style: tt.bodyLarge?.copyWith(
-                          fontWeight: FontWeight.w600,
-                          color: _selected != null
-                              ? C.white
-                              : (dark ? C.onDark3 : C.onLight3),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-
-              SizedBox(
-                  height: MediaQuery.of(context).padding.bottom + S.s32),
-            ],
-          ),
-
-          // ── Frosted app bar ──
-          Positioned(
-            top: 0,
-            left: 0,
-            right: 0,
-            child: FrostedBar(
-              child: SizedBox(
-                height: 56,
-                child: Row(
-                  children: [
-                    GestureDetector(
-                      onTap: () => Navigator.pop(context),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: S.s16),
-                        child: Icon(
-                          CupertinoIcons.chevron_left,
-                          size: 20,
-                          color: dark ? C.onDark1 : C.onLight1,
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      child: Text(
-                        'Transfer Leadership',
-                        style: tt.titleLarge
-                            ?.copyWith(fontWeight: FontWeight.w600),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ─────────────────────────────────────────────────────────
-//  Member row with checkbox (for remove member)
-// ─────────────────────────────────────────────────────────
-
-class _MemberCheckRow extends StatelessWidget {
-  const _MemberCheckRow({
-    required this.name,
-    required this.count,
-    required this.role,
-    required this.selected,
-    required this.dark,
-    required this.onTap,
-  });
-
-  final String name;
-  final int count;
-  final GroupRole role;
-  final bool selected;
-  final bool dark;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final tt = Theme.of(context).textTheme;
-    return BounceTap(
-      onTap: onTap,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(
-            horizontal: S.s16, vertical: S.s12),
-        child: Row(
-          children: [
-            // Avatar
-            Container(
-              width: 36,
-              height: 36,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: dark
-                    ? C.primaryMuted.withValues(alpha: 0.3)
-                    : C.primary.withValues(alpha: 0.1),
-              ),
-              child: Center(
-                child: Text(
-                  name[0].toUpperCase(),
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: dark ? C.primarySoft : C.primary,
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(width: S.s12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      if (role == GroupRole.leader)
-                        const Padding(
-                          padding: EdgeInsets.only(right: 4),
-                          child: Text('👑', style: TextStyle(fontSize: 12)),
-                        ),
-                      if (role == GroupRole.coLeader)
-                        const Padding(
-                          padding: EdgeInsets.only(right: 4),
-                          child: Text('⭐', style: TextStyle(fontSize: 12)),
-                        ),
-                      Text(
-                        name,
-                        style: tt.bodyMedium?.copyWith(
-                          fontWeight: FontWeight.w500,
-                          color: dark ? C.onDark1 : C.onLight1,
-                        ),
-                      ),
-                    ],
-                  ),
-                  Text(
-                    '$count selawat',
-                    style: tt.bodySmall?.copyWith(
-                      color: dark ? C.onDark3 : C.onLight3,
-                      fontSize: 12,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              width: 24,
-              height: 24,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(6),
-                color: selected
-                    ? C.error
-                    : (dark ? C.dark4 : C.light3),
-                border: Border.all(
-                  color: selected
-                      ? C.error
-                      : (dark ? C.onDark3 : C.onLight3)
-                          .withValues(alpha: 0.3),
-                  width: 1.5,
-                ),
-              ),
-              child: selected
-                  ? const Icon(Icons.check, size: 16, color: C.white)
-                  : null,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// ─────────────────────────────────────────────────────────
-//  Member row with radio (for transfer leadership)
-// ─────────────────────────────────────────────────────────
-
-class _MemberRadioRow extends StatelessWidget {
-  const _MemberRadioRow({
-    required this.name,
-    required this.count,
-    required this.selected,
-    required this.dark,
-    required this.onTap,
-  });
-
-  final String name;
-  final int count;
-  final bool selected;
-  final bool dark;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final tt = Theme.of(context).textTheme;
-    return BounceTap(
-      onTap: onTap,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(
-            horizontal: S.s16, vertical: S.s12),
-        child: Row(
-          children: [
-            // Avatar
-            Container(
-              width: 36,
-              height: 36,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: dark
-                    ? C.primaryMuted.withValues(alpha: 0.3)
-                    : C.primary.withValues(alpha: 0.1),
-              ),
-              child: Center(
-                child: Text(
-                  name[0].toUpperCase(),
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: dark ? C.primarySoft : C.primary,
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(width: S.s12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    name,
-                    style: tt.bodyMedium?.copyWith(
-                      fontWeight: FontWeight.w500,
-                      color: dark ? C.onDark1 : C.onLight1,
-                    ),
-                  ),
-                  Text(
-                    '$count selawat',
-                    style: tt.bodySmall?.copyWith(
-                      color: dark ? C.onDark3 : C.onLight3,
-                      fontSize: 12,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              width: 24,
-              height: 24,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: selected
-                    ? (dark ? C.primarySoft : C.primary)
-                    : Colors.transparent,
-                border: Border.all(
-                  color: selected
-                      ? (dark ? C.primarySoft : C.primary)
-                      : (dark ? C.onDark3 : C.onLight3)
-                          .withValues(alpha: 0.3),
-                  width: 2,
-                ),
-              ),
-              child: selected
-                  ? const Center(
-                      child: Icon(Icons.check, size: 14, color: C.white))
-                  : null,
-            ),
-          ],
-        ),
       ),
     );
   }

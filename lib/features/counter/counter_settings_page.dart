@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:selawathub/core/constants.dart';
 import 'package:selawathub/core/theme/colors.dart';
 import 'package:selawathub/core/widgets/action_buttons.dart';
+import 'package:selawathub/core/widgets/app_bottom_sheet.dart';
 import 'package:selawathub/core/widgets/bead_circle.dart';
 import 'package:selawathub/core/widgets/frosted_bar.dart';
 import 'package:selawathub/features/counter/models/dhikr.dart';
@@ -69,34 +70,18 @@ class _CounterSettingsPageState extends State<CounterSettingsPage> {
     final controller = TextEditingController(text: '${_targetFor(d)}');
     final dark = Theme.of(context).brightness == Brightness.dark;
 
-    showModalBottomSheet(
+    showAppFormSheet(
       context: context,
-      isScrollControlled: true,
-      backgroundColor: dark ? C.dark2 : C.light1,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
       builder: (ctx) => SafeArea(
         child: Padding(
           padding: EdgeInsets.fromLTRB(
-            S.page, S.s16, S.page,
+            S.page, S.s8, S.page,
             MediaQuery.of(ctx).viewInsets.bottom + S.page,
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Center(
-                child: Container(
-                  width: 36,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: dark ? C.dark4 : C.lightDivider,
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-              ),
-              const SizedBox(height: S.s16),
               Text(
                 d.name,
                 style: TextStyle(

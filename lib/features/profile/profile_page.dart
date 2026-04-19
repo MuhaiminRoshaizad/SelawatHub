@@ -1,17 +1,25 @@
-import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:selawathub/core/animations/bounce_tap.dart';
 import 'package:selawathub/core/animations/fade_in.dart';
 import 'package:selawathub/core/constants.dart';
+import 'package:selawathub/core/services/auth_service.dart';
+import 'package:selawathub/core/services/profile_service.dart';
+import 'package:selawathub/core/services/supabase_service.dart';
 import 'package:selawathub/core/theme/colors.dart';
 import 'package:selawathub/core/theme/theme.dart';
 import 'package:selawathub/core/widgets/action_buttons.dart';
+import 'package:selawathub/core/widgets/app_bottom_sheet.dart';
 import 'package:selawathub/core/widgets/app_snackbar.dart';
 import 'package:selawathub/features/auth/welcome_page.dart';
 import 'package:selawathub/features/profile/about_page.dart';
 import 'package:selawathub/features/profile/edit_profile_page.dart';
 import 'package:selawathub/features/profile/help_faq_page.dart';
+import 'package:selawathub/features/profile/widgets/profile_banner.dart';
+import 'package:selawathub/features/profile/widgets/profile_rows.dart';
+import 'package:selawathub/features/profile/widgets/profile_stats_row.dart';
+import 'package:skeletonizer/skeletonizer.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key, this.isGuest = false});
@@ -22,11 +30,49 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  String _name = 'Amin Muhaimin';
-  String _bio = 'Striving for consistency ✨';
-  String _email = 'amin@example.com';
+  String _name = '';
+  String _bio = '';
+  String _email = '';
+  String? _avatarUrl;
+  bool _loading = true;
+  int _totalDhikr = 0;
+  int _streak = 0;
+  int _daysActive = 0;
   late final bool _isGuest = widget.isGuest;
   String _language = 'English';
+
+  static final _numFmt = NumberFormat.decimalPattern();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProfile();
+  }
+
+  Future<void> _loadProfile() async {
+    if (_isGuest) {
+      setState(() => _loading = false);
+      return;
+    }
+    try {
+      final profile = await ProfileService.getProfile();
+      final stats = await ProfileService.getProfileStats();
+      if (!mounted) return;
+      setState(() {
+        _name = profile?['name'] as String? ?? '';
+        _bio = profile?['bio'] as String? ?? '';
+        _avatarUrl = profile?['avatar_url'] as String?;
+        _email = SupabaseService.currentUser?.email ?? '';
+        _totalDhikr = (stats['total_dhikr'] as num?)?.toInt() ?? 0;
+        _streak = (stats['streak'] as num?)?.toInt() ?? 0;
+        _daysActive = (stats['days_active'] as num?)?.toInt() ?? 0;
+        _loading = false;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _loading = false);
+    }
+  }
 
   String get _initials {
     final parts = _name.trim().split(RegExp(r'\s+'));
@@ -35,13 +81,21 @@ class _ProfilePageState extends State<ProfilePage> {
     return '${parts.first[0]}${parts.last[0]}'.toUpperCase();
   }
 
+  String get _memberSince {
+    final created = SupabaseService.currentUser?.createdAt;
+    if (created == null) return '';
+    final dt = DateTime.tryParse(created);
+    if (dt == null) return created;
+    return DateFormat.yMMMM().format(dt);
+  }
+
   Future<void> _openEditProfile() async {
     final result = await Navigator.of(context).push<Map<String, String>>(
       MaterialPageRoute(
         builder: (_) => EditProfilePage(
           name: _name,
           bio: _bio,
-          email: _email,
+          avatarUrl: _avatarUrl,
         ),
       ),
     );
@@ -49,7 +103,9 @@ class _ProfilePageState extends State<ProfilePage> {
       setState(() {
         _name = result['name'] ?? _name;
         _bio = result['bio'] ?? _bio;
-        _email = result['email'] ?? _email;
+        if (result.containsKey('avatar_url')) {
+          _avatarUrl = result['avatar_url'];
+        }
       });
     }
   }
@@ -62,150 +118,28 @@ class _ProfilePageState extends State<ProfilePage> {
     final topPad = MediaQuery.of(context).padding.top;
     final accent = dark ? C.primarySoft : C.primary;
 
-    // Banner height includes safe area + space for content + avatar overlap
-    const bannerBody = 160.0;
-    const avatarSize = 96.0;
-    const avatarOverlap = avatarSize / 2;
-    final bannerH = topPad + bannerBody;
-
-    return ListView(
-      padding: EdgeInsets.zero,
-      children: [
+    return Skeletonizer(
+      enabled: _loading,
+      child: RefreshIndicator(
+        color: accent,
+        onRefresh: () async {
+          await _loadProfile();
+        },
+        child: ListView(
+        physics: const AlwaysScrollableScrollPhysics(),
+        padding: EdgeInsets.zero,
+        children: [
         // ── Banner + Avatar hero ──
         FadeIn(
-          child: SizedBox(
-            height: bannerH + avatarOverlap + 8,
-            child: Stack(
-              clipBehavior: Clip.none,
-              children: [
-                // Gradient banner with curved bottom
-                ClipPath(
-                  clipper: _CurvedBannerClipper(),
-                  child: Container(
-                    height: bannerH,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: dark
-                            ? [
-                                C.primaryMuted,
-                                const Color(0xFF1A3D28),
-                              ]
-                            : [
-                                C.primary,
-                                C.primarySoft,
-                              ],
-                      ),
-                    ),
-                    child: Stack(
-                      children: [
-                        // Geometric pattern overlay
-                        Positioned.fill(
-                          child: CustomPaint(
-                            painter: _IslamicPatternPainter(
-                              color: C.white.withValues(alpha: 0.06),
-                            ),
-                          ),
-                        ),
-                        // "Profile" title
-                        Positioned(
-                          top: topPad + 12,
-                          left: 0,
-                          right: 0,
-                          child: Center(
-                            child: Text(
-                              'Profile',
-                              style: tt.titleLarge?.copyWith(
-                                fontWeight: FontWeight.w600,
-                                color: C.white,
-                              ),
-                            ),
-                          ),
-                        ),
-                        // Edit pen in top-right
-                        Positioned(
-                          top: topPad + 8,
-                          right: S.s16,
-                          child: BounceTap(
-                            onTap: _openEditProfile,
-                            child: Container(
-                              width: 36,
-                              height: 36,
-                              decoration: BoxDecoration(
-                                color: C.white.withValues(alpha: 0.15),
-                                shape: BoxShape.circle,
-                              ),
-                              child: const Icon(
-                                CupertinoIcons.pencil,
-                                size: 18,
-                                color: C.white,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-
-                // Avatar overlapping the banner
-                Positioned(
-                  bottom: 8,
-                  left: 0,
-                  right: 0,
-                  child: Center(
-                    child: Container(
-                      width: avatarSize,
-                      height: avatarSize,
-                      decoration: BoxDecoration(
-                        color: dark ? C.dark1 : C.light1,
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: dark ? C.dark1 : C.light1,
-                          width: 4,
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: C.black.withValues(alpha: 0.15),
-                            blurRadius: 16,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: [
-                              accent.withValues(alpha: 0.15),
-                              C.goldGlow,
-                            ],
-                          ),
-                          shape: BoxShape.circle,
-                        ),
-                        child: Center(
-                          child: _isGuest
-                              ? const Text(
-                                  '👤',
-                                  style: TextStyle(fontSize: 30),
-                                )
-                              : Text(
-                                  _initials,
-                                  style: TextStyle(
-                                    fontSize: 30,
-                                    fontWeight: FontWeight.w700,
-                                    color: accent,
-                                  ),
-                                ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
+          child: ProfileBanner(
+            dark: dark,
+            tt: tt,
+            topPad: topPad,
+            isGuest: _isGuest,
+            avatarUrl: _avatarUrl,
+            initials: _initials,
+            accent: accent,
+            onEditTap: _openEditProfile,
           ),
         ),
 
@@ -218,7 +152,7 @@ class _ProfilePageState extends State<ProfilePage> {
               children: [
                 const SizedBox(height: S.s4),
                 Text(
-                  _isGuest ? 'Guest' : _name,
+                  _isGuest ? 'Guest' : (_name.isEmpty ? 'Placeholder Name' : _name),
                   style: tt.headlineMedium?.copyWith(
                     fontWeight: FontWeight.w700,
                   ),
@@ -227,7 +161,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 if (!_isGuest) ...[
                   const SizedBox(height: S.s4),
                   Text(
-                    _bio,
+                    _bio.isEmpty ? 'A short bio goes here' : _bio,
                     style: tt.bodyMedium?.copyWith(
                       color: dark ? C.onDark2 : C.onLight2,
                     ),
@@ -246,46 +180,12 @@ class _ProfilePageState extends State<ProfilePage> {
           delay: const Duration(milliseconds: 140),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: S.page),
-            child: Container(
-              padding: const EdgeInsets.symmetric(vertical: S.s20),
-              decoration: BoxDecoration(
-                color: dark ? C.dark3 : C.light2,
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(
-                  color: dark ? C.darkDivider : C.lightDivider,
-                  width: 0.5,
-                ),
-              ),
-              child: IntrinsicHeight(
-                child: Row(
-                  children: [
-                    _StatItem(
-                      value: '28,450',
-                      label: 'Total Dhikr',
-                      icon: CupertinoIcons.heart_fill,
-                      iconColor: accent,
-                    ),
-                    VerticalDivider(
-                        width: 1,
-                        color: dark ? C.darkDivider : C.lightDivider),
-                    _StatItem(
-                      value: '19',
-                      label: 'Day Streak',
-                      icon: CupertinoIcons.flame_fill,
-                      iconColor: C.gold,
-                    ),
-                    VerticalDivider(
-                        width: 1,
-                        color: dark ? C.darkDivider : C.lightDivider),
-                    _StatItem(
-                      value: '45',
-                      label: 'Days Active',
-                      icon: CupertinoIcons.calendar,
-                      iconColor: accent,
-                    ),
-                  ],
-                ),
-              ),
+            child: ProfileStatsRow(
+              dark: dark,
+              accent: accent,
+              totalDhikr: _numFmt.format(_totalDhikr),
+              streak: _numFmt.format(_streak),
+              daysActive: _numFmt.format(_daysActive),
             ),
           ),
         ),
@@ -309,17 +209,17 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
               child: Column(
                 children: [
-                  _InfoRow(
+                  InfoRow(
                     icon: CupertinoIcons.mail,
                     label: 'Email',
                     value: _email,
                     dark: dark,
                   ),
                   _divider(dark),
-                  _InfoRow(
+                  InfoRow(
                     icon: CupertinoIcons.calendar,
                     label: 'Member Since',
-                    value: 'March 2026',
+                    value: _memberSince,
                     dark: dark,
                   ),
                 ],
@@ -331,49 +231,7 @@ class _ProfilePageState extends State<ProfilePage> {
         if (!_isGuest) ...[
           const SizedBox(height: S.s24),
 
-          // ── Group section ──
-          _sectionHeader('Group', 280, dark),
-          FadeIn(
-            delay: const Duration(milliseconds: 320),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: S.page),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: dark ? C.dark3 : C.light2,
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: dark ? C.darkDivider : C.lightDivider,
-                    width: 0.5,
-                  ),
-                ),
-                child: Column(
-                  children: [
-                    _InfoRow(
-                      icon: CupertinoIcons.person_3_fill,
-                      label: 'Group',
-                      value: 'SelawatHub Family',
-                      dark: dark,
-                    ),
-                    _divider(dark),
-                    _InfoRow(
-                      icon: CupertinoIcons.number,
-                      label: 'Code',
-                      value: 'SLWT-7861',
-                      dark: dark,
-                    ),
-                    _divider(dark),
-                    _InfoRow(
-                      icon: CupertinoIcons.star_fill,
-                      label: 'Role',
-                      value: 'Leader',
-                      dark: dark,
-                      valueColor: C.gold,
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
+          // ── Group section (will be wired separately) ──
         ],
 
         const SizedBox(height: S.s24),
@@ -397,7 +255,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 children: [
                   ValueListenableBuilder<ThemeMode>(
                     valueListenable: themeCtrl,
-                    builder: (context, mode, child) => _ToggleRow(
+                    builder: (context, mode, child) => ToggleRow(
                       icon: CupertinoIcons.moon_fill,
                       label: 'Dark Mode',
                       value: dark,
@@ -407,7 +265,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     ),
                   ),
                   _divider(dark),
-                  _ToggleRow(
+                  ToggleRow(
                     icon: CupertinoIcons.bell_fill,
                     label: 'Notifications',
                     value: true,
@@ -415,7 +273,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     onChanged: (_) {},
                   ),
                   _divider(dark),
-                  _MenuRow(
+                  MenuRow(
                     icon: CupertinoIcons.globe,
                     label: 'Language',
                     trailing: _language,
@@ -424,7 +282,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                   if (!_isGuest) ...[
                     _divider(dark),
-                    _MenuRow(
+                    MenuRow(
                       icon: CupertinoIcons.lock_fill,
                       label: 'Change Password',
                       dark: dark,
@@ -456,21 +314,21 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
               child: Column(
                 children: [
-                  _MenuRow(
+                  MenuRow(
                     icon: CupertinoIcons.question_circle,
                     label: 'Help & FAQ',
                     dark: dark,
                     onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const HelpFaqPage())),
                   ),
                   _divider(dark),
-                  _MenuRow(
+                  MenuRow(
                     icon: CupertinoIcons.info_circle,
                     label: 'About SelawatHub',
                     dark: dark,
                     onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AboutPage())),
                   ),
                   _divider(dark),
-                  _MenuRow(
+                  MenuRow(
                     icon: CupertinoIcons.share,
                     label: 'Share App',
                     dark: dark,
@@ -525,6 +383,15 @@ class _ProfilePageState extends State<ProfilePage> {
                     ),
                   )
                 : BounceTap(
+                    onTap: () async {
+                      await AuthService.signOut();
+                      if (!context.mounted) return;
+                      Navigator.of(context).pushAndRemoveUntil(
+                        MaterialPageRoute(
+                            builder: (_) => const WelcomePage()),
+                        (_) => false,
+                      );
+                    },
                     child: Container(
                       padding: const EdgeInsets.symmetric(vertical: S.s16),
                       decoration: BoxDecoration(
@@ -579,40 +446,28 @@ class _ProfilePageState extends State<ProfilePage> {
         SizedBox(
             height: MediaQuery.of(context).padding.bottom + 56 + S.s24),
       ],
+    ),
+    ),
     );
   }
 
   // ── Helpers ──
 
   void _showLanguagePicker(BuildContext context) {
-    final dark = Theme.of(context).brightness == Brightness.dark;
-    showModalBottomSheet(
+    showAppFormSheet(
       context: context,
-      backgroundColor: dark ? C.dark2 : C.light1,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
+      isScrollControlled: false,
       builder: (ctx) {
         return StatefulBuilder(
           builder: (ctx, setSheetState) {
+            final dark = Theme.of(ctx).brightness == Brightness.dark;
             final tt = Theme.of(ctx).textTheme;
             return Padding(
-              padding: const EdgeInsets.fromLTRB(S.page, S.s16, S.page, S.page),
+              padding: const EdgeInsets.fromLTRB(S.page, S.s8, S.page, S.page),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Center(
-                    child: Container(
-                      width: 36,
-                      height: 4,
-                      decoration: BoxDecoration(
-                        color: dark ? C.dark4 : C.lightDivider,
-                        borderRadius: BorderRadius.circular(2),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: S.s16),
                   Text('Language', style: tt.titleLarge?.copyWith(fontWeight: FontWeight.w600)),
                   const SizedBox(height: S.s24),
                   for (final lang in ['English', 'Bahasa Melayu'])
@@ -663,36 +518,19 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   void _showChangePassword(BuildContext context) {
-    final dark = Theme.of(context).brightness == Brightness.dark;
     final currentCtrl = TextEditingController();
     final newCtrl = TextEditingController();
     final confirmCtrl = TextEditingController();
-    showModalBottomSheet(
+    showAppFormSheet(
       context: context,
-      isScrollControlled: true,
-      backgroundColor: dark ? C.dark2 : C.light1,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
       builder: (ctx) {
         final tt = Theme.of(ctx).textTheme;
         return Padding(
-          padding: EdgeInsets.fromLTRB(S.page, S.s16, S.page, MediaQuery.of(ctx).viewInsets.bottom + S.page),
+          padding: EdgeInsets.fromLTRB(S.page, S.s8, S.page, MediaQuery.of(ctx).viewInsets.bottom + S.page),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Center(
-                child: Container(
-                  width: 36,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: dark ? C.dark4 : C.lightDivider,
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-              ),
-              const SizedBox(height: S.s16),
               Text('Change Password', style: tt.titleLarge?.copyWith(fontWeight: FontWeight.w600)),
               const SizedBox(height: S.s24),
               TextField(
@@ -757,290 +595,4 @@ class _ProfilePageState extends State<ProfilePage> {
         indent: 52,
         color: dark ? C.darkDivider : C.lightDivider,
       );
-}
-
-// ─────────────────────────────────────────────────────────
-//  Curved banner clipper
-// ─────────────────────────────────────────────────────────
-
-class _CurvedBannerClipper extends CustomClipper<Path> {
-  @override
-  Path getClip(Size size) {
-    final path = Path()
-      ..lineTo(0, size.height - 40)
-      ..quadraticBezierTo(
-        size.width / 2, size.height + 20,
-        size.width, size.height - 40,
-      )
-      ..lineTo(size.width, 0)
-      ..close();
-    return path;
-  }
-
-  @override
-  bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
-}
-
-// ─────────────────────────────────────────────────────────
-//  Islamic geometric pattern painter (subtle overlay)
-// ─────────────────────────────────────────────────────────
-
-class _IslamicPatternPainter extends CustomPainter {
-  _IslamicPatternPainter({required this.color});
-  final Color color;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = color
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 0.8;
-
-    const spacing = 40.0;
-    const radius = 16.0;
-
-    for (double y = -spacing; y < size.height + spacing; y += spacing) {
-      for (double x = -spacing; x < size.width + spacing; x += spacing) {
-        // Draw small 8-pointed star shapes
-        _drawStar(canvas, Offset(x, y), radius, paint);
-      }
-    }
-  }
-
-  void _drawStar(Canvas canvas, Offset center, double r, Paint paint) {
-    final path = Path();
-    const points = 8;
-    final innerR = r * 0.45;
-    for (int i = 0; i < points * 2; i++) {
-      final angle = (i * pi / points) - pi / 2;
-      final rad = i.isEven ? r : innerR;
-      final x = center.dx + rad * cos(angle);
-      final y = center.dy + rad * sin(angle);
-      if (i == 0) {
-        path.moveTo(x, y);
-      } else {
-        path.lineTo(x, y);
-      }
-    }
-    path.close();
-    canvas.drawPath(path, paint);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}
-
-// ─────────────────────────────────────────────────────────
-//  Stat item with icon
-// ─────────────────────────────────────────────────────────
-
-class _StatItem extends StatelessWidget {
-  const _StatItem({
-    required this.value,
-    required this.label,
-    required this.icon,
-    required this.iconColor,
-  });
-  final String value;
-  final String label;
-  final IconData icon;
-  final Color iconColor;
-
-  @override
-  Widget build(BuildContext context) {
-    final tt = Theme.of(context).textTheme;
-    return Expanded(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 16, color: iconColor),
-          const SizedBox(height: S.s6),
-          Text(
-            value,
-            style: tt.titleMedium?.copyWith(fontWeight: FontWeight.w700),
-          ),
-          const SizedBox(height: S.s2),
-          Text(label, style: tt.bodySmall),
-        ],
-      ),
-    );
-  }
-}
-
-// ─────────────────────────────────────────────────────────
-//  Info row (label + value)
-// ─────────────────────────────────────────────────────────
-
-class _InfoRow extends StatelessWidget {
-  const _InfoRow({
-    required this.icon,
-    required this.label,
-    required this.value,
-    required this.dark,
-    this.valueColor,
-  });
-
-  final IconData icon;
-  final String label;
-  final String value;
-  final bool dark;
-  final Color? valueColor;
-
-  @override
-  Widget build(BuildContext context) {
-    final tt = Theme.of(context).textTheme;
-    final accent = dark ? C.primarySoft : C.primary;
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: S.s20, vertical: S.s16),
-      child: Row(
-        children: [
-          Container(
-            width: 32,
-            height: 32,
-            decoration: BoxDecoration(
-              color: accent.withValues(alpha: 0.08),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Center(
-              child: Icon(icon, size: 16, color: accent),
-            ),
-          ),
-          const SizedBox(width: S.s12),
-          Expanded(
-            child: Text(
-              label,
-              style: tt.bodyMedium?.copyWith(
-                color: dark ? C.onDark2 : C.onLight2,
-              ),
-            ),
-          ),
-          Text(
-            value,
-            style: tt.titleSmall?.copyWith(
-              fontWeight: FontWeight.w600,
-              color: valueColor ?? (dark ? C.onDark1 : C.onLight1),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// ─────────────────────────────────────────────────────────
-//  Menu row (tappable with chevron)
-// ─────────────────────────────────────────────────────────
-
-class _MenuRow extends StatelessWidget {
-  const _MenuRow({
-    required this.icon,
-    required this.label,
-    required this.dark,
-    required this.onTap,
-    this.trailing,
-  });
-
-  final IconData icon;
-  final String label;
-  final bool dark;
-  final VoidCallback onTap;
-  final String? trailing;
-
-  @override
-  Widget build(BuildContext context) {
-    final tt = Theme.of(context).textTheme;
-    final accent = dark ? C.primarySoft : C.primary;
-    return BounceTap(
-      onTap: onTap,
-      child: Padding(
-        padding:
-            const EdgeInsets.symmetric(horizontal: S.s20, vertical: S.s16),
-        child: Row(
-          children: [
-            Container(
-              width: 32,
-              height: 32,
-              decoration: BoxDecoration(
-                color: accent.withValues(alpha: 0.08),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Center(
-                child: Icon(icon, size: 16, color: accent),
-              ),
-            ),
-            const SizedBox(width: S.s12),
-            Expanded(
-              child: Text(label, style: tt.titleSmall),
-            ),
-            if (trailing != null) ...[
-              Text(
-                trailing!,
-                style: tt.bodySmall?.copyWith(
-                  color: dark ? C.onDark3 : C.onLight3,
-                ),
-              ),
-              const SizedBox(width: S.s4),
-            ],
-            Icon(
-              CupertinoIcons.chevron_right,
-              size: 14,
-              color: dark ? C.onDark3 : C.onLight3,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// ─────────────────────────────────────────────────────────
-//  Toggle row (switch)
-// ─────────────────────────────────────────────────────────
-
-class _ToggleRow extends StatelessWidget {
-  const _ToggleRow({
-    required this.icon,
-    required this.label,
-    required this.value,
-    required this.dark,
-    required this.onChanged,
-  });
-
-  final IconData icon;
-  final String label;
-  final bool value;
-  final bool dark;
-  final ValueChanged<bool> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    final tt = Theme.of(context).textTheme;
-    final accent = dark ? C.primarySoft : C.primary;
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: S.s20, vertical: S.s8),
-      child: Row(
-        children: [
-          Container(
-            width: 32,
-            height: 32,
-            decoration: BoxDecoration(
-              color: accent.withValues(alpha: 0.08),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Center(
-              child: Icon(icon, size: 16, color: accent),
-            ),
-          ),
-          const SizedBox(width: S.s12),
-          Expanded(child: Text(label, style: tt.titleSmall)),
-          Switch.adaptive(
-            value: value,
-            onChanged: onChanged,
-            activeTrackColor: accent.withValues(alpha: 0.4),
-            activeThumbColor: accent,
-          ),
-        ],
-      ),
-    );
-  }
 }
