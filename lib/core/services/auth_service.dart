@@ -1,7 +1,13 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:selawathub/core/services/settings_service.dart';
 import 'package:selawathub/core/services/supabase_service.dart';
 
 /// Handles authentication operations via Supabase Auth.
+///
+/// Navigation on sign-in / sign-out is handled imperatively at the callsite
+/// (see `login_page.dart` and `profile_page.dart`) — this service only owns
+/// auth state and local cache cleanup. That keeps us immune to the gotrue
+/// 2.20+ bug where `signedOut` is not emitted on `onAuthStateChange`.
 class AuthService {
   AuthService._();
 
@@ -27,15 +33,13 @@ class AuthService {
     required String email,
     required String password,
   }) async {
-    return _auth.signInWithPassword(
-      email: email,
-      password: password,
-    );
+    return _auth.signInWithPassword(email: email, password: password);
   }
 
-  /// Sign out the current user.
+  /// Sign out the current user and clear any user-scoped local cache.
   static Future<void> signOut() async {
     await _auth.signOut();
+    SettingsService.clearCachedProfile();
   }
 
   /// Send a password reset email.
@@ -62,6 +66,7 @@ class AuthService {
   /// Get the current user's email.
   static String? get currentEmail => _auth.currentUser?.email;
 
-  /// Listen to auth state changes.
+  /// Raw Supabase auth state stream. Used by `app.dart` to intercept
+  /// `passwordRecovery` deep-link events only.
   static Stream<AuthState> get onAuthStateChange => _auth.onAuthStateChange;
 }

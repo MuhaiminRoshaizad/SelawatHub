@@ -182,12 +182,29 @@ User taps counter
 ```
 App launch
   → SupabaseService.init()
-  → Check SupabaseService.isAuthenticated
+  → Check SupabaseService.isAuthenticated (one-shot at boot)
   → Authenticated: AppShell (5 tabs)
   → Not authenticated: OnboardingPage
-    → Sign In/Up: LoginPage → AuthService.signIn/signUp → AppShell
+    → Sign In/Up: LoginPage → AuthService.signIn/signUp
+      → Navigator.pushAndRemoveUntil(AppShell)
     → Guest: AppShell(isGuest: true)
+
+Sign out (from ProfilePage)
+  → showConfirmDialog → AuthService.signOut()
+  → SettingsService.clearCachedProfile()
+  → Scheduled on next frame (post-frame callback) so the confirm
+    dialog pops itself cleanly first:
+    SelawatHubApp.navKey.currentState.pushAndRemoveUntil(WelcomePage)
 ```
+
+**Navigation pattern:** sign-in and sign-out both navigate imperatively
+from the callsite instead of reacting to `onAuthStateChange`. This
+mirrors the canonical Flutter + Supabase pattern, survives hot-reload,
+and sidesteps the gotrue 2.20+ regression where `signOut()` with local
+scope no longer emits `AuthChangeEvent.signedOut`
+(see https://github.com/supabase/gotrue-js/issues/648). The only auth
+event the app still listens for is `passwordRecovery`, used to push
+`ResetPasswordPage` on email deep-link returns.
 
 ### Password Reset Flow
 ```

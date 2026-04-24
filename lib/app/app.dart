@@ -13,13 +13,16 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 class SelawatHubApp extends StatefulWidget {
   const SelawatHubApp({super.key});
 
+  // Global key so we can push screens imperatively (password-reset deep link,
+  // sign-out navigation) from anywhere in the app.
+  static final GlobalKey<NavigatorState> navKey = GlobalKey<NavigatorState>();
+
   @override
   State<SelawatHubApp> createState() => _SelawatHubAppState();
 }
 
 class _SelawatHubAppState extends State<SelawatHubApp> {
   late final ValueNotifier<ThemeMode> _themeMode;
-  final _navKey = GlobalKey<NavigatorState>();
   StreamSubscription<AuthState>? _authSub;
 
   static const _modeMap = [ThemeMode.system, ThemeMode.light, ThemeMode.dark];
@@ -31,19 +34,15 @@ class _SelawatHubAppState extends State<SelawatHubApp> {
     _themeMode = ValueNotifier<ThemeMode>(_modeMap[saved]);
     _themeMode.addListener(_persistTheme);
 
+    // Only one reason to listen to the supabase auth stream: password-reset
+    // email deep links. Sign-in / sign-out navigation is handled imperatively
+    // at the callsite (login_page.dart / profile_page.dart) — the imperative
+    // pattern is simpler, survives hot-reload, and isn't affected by the
+    // gotrue 2.20+ regression that drops signedOut events.
     _authSub = AuthService.onAuthStateChange.listen((state) {
       if (state.event == AuthChangeEvent.passwordRecovery) {
-        _navKey.currentState?.pushAndRemoveUntil(
+        SelawatHubApp.navKey.currentState?.push(
           MaterialPageRoute(builder: (_) => const ResetPasswordPage()),
-          (_) => false,
-        );
-      } else if (state.event == AuthChangeEvent.signedOut) {
-        // Wipe any cached personal data so the next user (or guest) doesn't
-        // briefly see the previous user's profile/stats on first load.
-        SettingsService.clearCachedProfile();
-        _navKey.currentState?.pushAndRemoveUntil(
-          MaterialPageRoute(builder: (_) => const WelcomePage()),
-          (_) => false,
         );
       }
     });
@@ -63,20 +62,29 @@ class _SelawatHubAppState extends State<SelawatHubApp> {
 
   @override
   Widget build(BuildContext context) {
-    final isLoggedIn = SupabaseService.isAuthenticated;
-
     return ThemeController(
       notifier: _themeMode,
       child: ValueListenableBuilder<ThemeMode>(
         valueListenable: _themeMode,
         builder: (context, mode, child) => MaterialApp(
-          navigatorKey: _navKey,
+          navigatorKey: SelawatHubApp.navKey,
           title: 'SelawatHub',
           debugShowCheckedModeBanner: false,
           theme: AppTheme.light(),
           darkTheme: AppTheme.dark(),
           themeMode: mode,
-          home: isLoggedIn ? const AppShell() : const OnboardingPage(),
+          themeAnimationDuration: const Duration(milliseconds: 400),
+          themeAnimationCurve: Curves.easeInOutCubic,
+          // Single decision at boot time: authed users go straight to the
+          // app, new/signed-out users see onboarding. Transitions between
+          // these two states are done imperatively via Navigator from the
+          // login/logout handlers.
+          home: SupabaseService.isAuthenticated
+              ? const AppShell()
+              : const OnboardingPage(),
+          routes: {
+            '/welcome': (_) => const WelcomePage(),
+          },
         ),
       ),
     );

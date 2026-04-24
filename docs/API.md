@@ -55,6 +55,8 @@ class AuthService {
 - `signUp` stores `name` in `raw_user_meta_data` which triggers profile creation
 - `verifyPassword` works by attempting `signInWithPassword` — throws `AuthException` if wrong
 - `sendPasswordReset` uses redirect URL: `io.supabase.selawathub://login-callback`
+- `signOut` clears the cached profile via `SettingsService.clearCachedProfile()` before returning. Callers navigate imperatively (e.g. `Navigator.pushAndRemoveUntil(WelcomePage)`) after the await resolves — the app does not rely on `AuthChangeEvent.signedOut` since gotrue 2.20+ no longer emits it for local-scope sign-outs.
+- `onAuthStateChange` is listened to in `app.dart` solely to intercept `AuthChangeEvent.passwordRecovery` for email deep-link password resets.
 
 ### CounterService
 
