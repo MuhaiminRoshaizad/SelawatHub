@@ -12,6 +12,7 @@ SelawatHub is a Flutter mobile application for Islamic devotional tracking (sela
 | **State Management** | Riverpod (flutter_riverpod) |
 | **Backend** | Supabase (Auth, PostgreSQL, Storage, Edge Functions) |
 | **Local Storage** | SharedPreferences |
+| **Image Caching** | cached_network_image |
 | **Animations** | Lottie, Custom AnimationControllers |
 | **External API** | Naikiyah Dua Data API (hadith/dua content) |
 
@@ -40,10 +41,11 @@ lib/
 │   ├── services/
 │   │   ├── auth_service.dart          # Auth operations (sign up/in/out, password)
 │   │   ├── counter_service.dart       # Dhikr count CRUD + aggregation
-│   │   ├── doa_api_service.dart       # External hadith/dua API client
+│   │   ├── doa_api_service.dart       # External hadith/dua API client (persistent cache)
 │   │   ├── group_service.dart         # Group CRUD + membership + stats
 │   │   ├── profile_service.dart       # Profile CRUD + avatar upload
-│   │   ├── settings_service.dart      # Local preferences persistence
+│   │   ├── settings_service.dart      # Local preferences + profile cache persistence
+│   │   ├── stats_cache.dart           # In-memory stats cache (invalidated on counter save)
 │   │   └── supabase_service.dart      # Supabase client singleton
 │   ├── theme/
 │   │   ├── colors.dart                # Color palette (C class)
@@ -161,8 +163,8 @@ All services are **static utility classes** (no instantiation needed):
 - **Supabase PostgreSQL** — Main persistence (counter_sessions, groups, group_members, profiles)
 - **Supabase Auth** — Email/password authentication with JWT tokens
 - **Supabase Storage** — Avatar image uploads (public `avatars` bucket)
-- **SharedPreferences** — Local settings, guest data, offline cache
-- **Naikiyah API** — Read-only external API for hadith/dua content (cached in memory)
+- **SharedPreferences** — Local settings, guest data, profile cache, doa/hadith content cache (24h TTL)
+- **Naikiyah API** — Read-only external API for hadith/dua content (persisted to SharedPreferences, stale-while-revalidate)
 
 ## Data Flow
 

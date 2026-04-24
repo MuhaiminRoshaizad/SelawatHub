@@ -106,6 +106,7 @@ flutter build ipa --dart-define=SUPABASE_URL=... --dart-define=SUPABASE_ANON_KEY
 |---------|---------|---------|
 | `lottie` | ^3.3.3 | Lottie animation playback |
 | `skeletonizer` | ^2.1.3 | Loading skeleton placeholders |
+| `cached_network_image` | ^3.4.1 | Persistent network image caching |
 | `cupertino_icons` | ^1.0.8 | iOS-style icons |
 
 ### Utilities

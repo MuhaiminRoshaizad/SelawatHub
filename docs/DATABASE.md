@@ -112,6 +112,17 @@ $$;
 
 ## RPC Functions
 
+### `get_group_members_with_period_counts`
+
+Returns group members with their dhikr count for an arbitrary date range, used for the Today / Week / Month leaderboard tabs. Requires `SECURITY DEFINER` because `counter_sessions` RLS blocks cross-user reads.
+
+```sql
+get_group_members_with_period_counts(p_group_id UUID, p_start_date DATE, p_end_date DATE)
+→ TABLE (user_id UUID, role TEXT, name TEXT, avatar_url TEXT, period_count BIGINT)
+```
+
+**Usage:** `GroupService.getGroupMembersForPeriod(groupId, start, end)`
+
 ### `get_group_members_with_counts`
 
 Returns group members with their today's dhikr count, used for the leaderboard.

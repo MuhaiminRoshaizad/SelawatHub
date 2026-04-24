@@ -74,6 +74,7 @@ class CounterService {
 
 **Notes:**
 - `upsertCount` uses `ON CONFLICT` for idempotent daily updates
+- `upsertCount` calls `StatsCache.invalidate()` so the stats page reflects latest data on next open
 - `getSessionsInRange` returns raw rows for heatmap/breakdown calculations
 - `getWeeklyBreakdown` returns last 7 days split by selawat/zikir
 
@@ -94,6 +95,7 @@ class GroupService {
   static Future<void> leaveGroup(String groupId)
   static Future<Map<String, dynamic>?> getMyGroup()
   static Future<List<Map<String, dynamic>>> getGroupMembers(String groupId)
+  static Future<List<Map<String, dynamic>>> getGroupMembersForPeriod(String groupId, DateTime start, DateTime end)
   static Future<void> updateGroup(String groupId, {String? name, String? description, int? dailyGoal})
   static Future<void> updateMemberRole(String groupId, String userId, String role)
   static Future<void> removeMember(String groupId, String userId)
@@ -105,6 +107,7 @@ class GroupService {
 **Notes:**
 - `createGroup` auto-generates `SLWT-XXXX` invite codes, retries on collision
 - `getGroupMembers` calls RPC `get_group_members_with_counts` with today's date
+- `getGroupMembersForPeriod` calls RPC `get_group_members_with_period_counts`; falls back to today on error
 - `getMyGroup` returns the first group the user belongs to (one group per user)
 
 ### ProfileService
@@ -159,14 +162,38 @@ class SettingsService {
   // Local counter data (offline backup)
   static int getLocalCount(String dhikrId)
   static void saveLocalCount(String dhikrId, int count)
+
+  // Profile cache (keyed by userId to prevent stale cross-user data)
+  static Map<String, dynamic>? getCachedProfile()
+  static Future<void> setCachedProfile(Map<String, dynamic> profile)
+  static Future<void> clearCachedProfile()       // Called on sign-out
 }
 ```
 
-### DoaApiService
+### StatsCache
+
+**File:** `lib/core/services/stats_cache.dart`
+
+In-memory stats cache. Prevents redundant Supabase calls when re-opening the Stats page within the same day.
+
+```dart
+class StatsCache {
+  static bool get hasData                        // True if cache has been populated
+  static bool get isFreshForToday               // True if cache date matches today's date
+  static void store(StatsData data)              // Populate cache with latest stats
+  static StatsData? get data                     // Retrieve cached data (null if empty)
+  static void invalidate()                       // Clear cache (called by upsertCount)
+}
+```
+
+**Notes:**
+- Deliberately **not** persisted to disk — source of truth is Supabase `counter_sessions`
+- Cache is invalidated on every counter save via `CounterService.upsertCount`
+- `isFreshForToday` guards against serving yesterday's data after midnight
 
 **File:** `lib/core/services/doa_api_service.dart`
 
-External API client for Islamic content. Singleton with in-memory caching.
+External API client for Islamic content. Persistent cache with stale-while-revalidate strategy.
 
 ```dart
 class DoaApiService {
@@ -188,7 +215,12 @@ class DoaApiService {
 | `/adkar/daily` | `DailyAdkar` | Daily morning/evening adkar |
 | `/adkar/post-salaah` | `PostSalaahZikr` | Post-prayer zikr |
 
-**Caching:** Results are cached in instance fields after first fetch. Cache lives for the app session lifetime.
+**Caching:** 3-layer stale-while-revalidate:
+1. In-memory (fastest, lives until app restart)
+2. SharedPreferences JSON blob (24h TTL, survives restarts)
+3. Network (fetched when cache is absent or stale)
+
+On first-ever call, awaits network response so callers never get an empty list. Concurrent fetches for the same endpoint are deduplicated. Cache keys prefixed `doa_cache_` / `doa_cache_ts_`.
 
 ---
 

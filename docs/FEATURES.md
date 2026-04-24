@@ -92,7 +92,7 @@ Community feature allowing users to track dhikr together.
 - Transfer leadership to another member
 
 ### Group Statistics
-- **Leaderboard** — Members sorted by today's count (via RPC function)
+- **Leaderboard** — Members sorted by count with Today / Week / Month period tabs (all prefetched in parallel on load — tab switch is instant)
 - **Period totals** — Weekly and monthly aggregate counts
 - **Yearly chart** — 12-month bar chart of group activity
 
@@ -167,7 +167,7 @@ Curated Islamic content hub sourced from the Naikiyah Dua Data API.
 
 ### Data Handling
 - All 4 content types fetched in parallel on page load
-- In-memory cache (singleton) — fetched once per app session
+- Persistent cache (SharedPreferences, 24h TTL) — survives app restarts; stale-while-revalidate so UI never blocks on network
 - Loading state: Skeletonizer placeholders
 - Error state: Retry UI with error message
 
