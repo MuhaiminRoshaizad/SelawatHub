@@ -15,6 +15,7 @@ import 'package:selawathub/core/theme/colors.dart';
 import 'package:selawathub/core/theme/theme.dart';
 import 'package:selawathub/core/widgets/action_buttons.dart';
 import 'package:selawathub/core/widgets/app_bottom_sheet.dart';
+import 'package:selawathub/core/widgets/app_refresh_indicator.dart';
 import 'package:selawathub/core/widgets/app_snackbar.dart';
 import 'package:selawathub/core/widgets/confirmation_dialog.dart';
 import 'package:selawathub/features/auth/welcome_page.dart';
@@ -193,8 +194,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
     return Skeletonizer(
       enabled: _loading,
-      child: RefreshIndicator(
-        color: accent,
+      child: AppRefreshIndicator(
         onRefresh: () async {
           await _loadProfile();
         },

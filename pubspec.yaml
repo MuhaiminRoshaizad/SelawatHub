@@ -45,6 +45,7 @@ dependencies:
   image_picker: ^1.2.1
   share_plus: ^13.0.0
   cached_network_image: ^3.4.1
+  custom_refresh_indicator: ^4.0.1
 
 dev_dependencies:
   flutter_test:

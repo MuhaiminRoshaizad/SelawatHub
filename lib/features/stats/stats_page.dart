@@ -11,6 +11,7 @@ import 'package:selawathub/core/services/supabase_service.dart';
 import 'package:selawathub/features/counter/models/dhikr.dart';
 import 'package:selawathub/core/theme/colors.dart';
 import 'package:selawathub/core/widgets/app_bottom_sheet.dart';
+import 'package:selawathub/core/widgets/app_refresh_indicator.dart';
 import 'package:selawathub/core/widgets/app_snackbar.dart';
 import 'package:selawathub/core/widgets/frosted_bar.dart';
 import 'package:selawathub/features/stats/models/day_data.dart';
@@ -346,8 +347,8 @@ class _StatsPageState extends State<StatsPage> {
         if (_hasData || _loading)
         Skeletonizer(
           enabled: _loading,
-          child: RefreshIndicator(
-            color: dark ? C.primarySoft : C.primary,
+          child: AppRefreshIndicator(
+            topOffset: MediaQuery.of(context).padding.top + 60,
             onRefresh: () async {
               await _loadStats();
             },
@@ -513,8 +514,7 @@ class _StatsPageState extends State<StatsPage> {
       )
         else
           SafeArea(
-            child: RefreshIndicator(
-              color: dark ? C.primarySoft : C.primary,
+            child: AppRefreshIndicator(
               onRefresh: () async {
                 await _loadStats();
               },

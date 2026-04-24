@@ -9,6 +9,7 @@ import 'package:selawathub/core/services/group_service.dart';
 import 'package:selawathub/core/services/supabase_service.dart';
 import 'package:selawathub/core/theme/colors.dart';
 import 'package:selawathub/core/widgets/app_bottom_sheet.dart';
+import 'package:selawathub/core/widgets/app_refresh_indicator.dart';
 import 'package:selawathub/core/widgets/app_snackbar.dart';
 import 'package:selawathub/core/widgets/frosted_bar.dart';
 import 'package:selawathub/features/group/group_settings_page.dart';
@@ -360,8 +361,8 @@ class _GroupViewState extends State<_GroupView> {
 
     return Stack(
       children: [
-        RefreshIndicator(
-          color: dark ? C.primarySoft : C.primary,
+        AppRefreshIndicator(
+          topOffset: MediaQuery.of(context).padding.top + 60,
           onRefresh: () async {
             await _loadMembers();
           },
