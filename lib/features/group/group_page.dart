@@ -125,12 +125,29 @@ class _GroupView extends StatefulWidget {
 }
 
 class _GroupViewState extends State<_GroupView> {
-  List<Map<String, dynamic>> _members = [];
+  // Per-period member lists, populated once on load and swapped on tab tap.
+  // Null means "not yet loaded" — only the current tab's list shows a
+  // skeleton during the initial fetch; switching tabs is instant afterwards.
+  List<Map<String, dynamic>>? _todayMembers;
+  List<Map<String, dynamic>>? _weekMembers;
+  List<Map<String, dynamic>>? _monthMembers;
+
   bool _loading = true;
   int _weekTotal = 0;
   int _monthTotal = 0;
   static const _periods = ['Today', 'This Week', 'This Month'];
   int _periodIdx = 0;
+
+  List<Map<String, dynamic>> get _members {
+    switch (_periodIdx) {
+      case 1:
+        return _weekMembers ?? _todayMembers ?? const [];
+      case 2:
+        return _monthMembers ?? _todayMembers ?? const [];
+      default:
+        return _todayMembers ?? const [];
+    }
+  }
 
   @override
   void initState() {
@@ -140,17 +157,31 @@ class _GroupViewState extends State<_GroupView> {
 
   Future<void> _loadMembers() async {
     try {
-      final members = await GroupService.getGroupMembers(widget.group['id']);
-      // Also load week/month totals
-      final periodTotals = await GroupService.getGroupPeriodTotals(widget.group['id'] as String);
-      if (mounted) {
-        setState(() {
-          _members = members;
-          _weekTotal = periodTotals['week'] ?? 0;
-          _monthTotal = periodTotals['month'] ?? 0;
-          _loading = false;
-        });
-      }
+      final now = DateTime.now();
+      final today = DateTime(now.year, now.month, now.day);
+      final monday = today.subtract(Duration(days: today.weekday - 1));
+      final firstOfMonth = DateTime(now.year, now.month, 1);
+      final groupId = widget.group['id'] as String;
+
+      // Fire all four calls in parallel so the tab toggle is instant once
+      // the group page finishes loading.
+      final results = await Future.wait([
+        GroupService.getGroupMembers(groupId),
+        GroupService.getGroupMembersForPeriod(groupId, monday, today),
+        GroupService.getGroupMembersForPeriod(groupId, firstOfMonth, today),
+        GroupService.getGroupPeriodTotals(groupId),
+      ]);
+
+      if (!mounted) return;
+      setState(() {
+        _todayMembers = results[0] as List<Map<String, dynamic>>;
+        _weekMembers = results[1] as List<Map<String, dynamic>>;
+        _monthMembers = results[2] as List<Map<String, dynamic>>;
+        final periodTotals = results[3] as Map<String, int>;
+        _weekTotal = periodTotals['week'] ?? 0;
+        _monthTotal = periodTotals['month'] ?? 0;
+        _loading = false;
+      });
     } catch (_) {
       if (mounted) setState(() => _loading = false);
     }
@@ -504,7 +535,11 @@ class _GroupViewState extends State<_GroupView> {
                     children: List.generate(_periods.length, (i) {
                       final active = i == _periodIdx;
                       return GestureDetector(
-                        onTap: () => setState(() => _periodIdx = i),
+                        onTap: () {
+                          if (i == _periodIdx) return;
+                          // Tabs are cached — no reload, no skeleton.
+                          setState(() => _periodIdx = i);
+                        },
                         child: AnimatedContainer(
                           duration: const Duration(milliseconds: 200),
                           padding: const EdgeInsets.symmetric(

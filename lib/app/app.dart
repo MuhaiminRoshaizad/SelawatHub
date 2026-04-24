@@ -7,6 +7,7 @@ import 'package:selawathub/core/services/supabase_service.dart';
 import 'package:selawathub/core/theme/theme.dart';
 import 'package:selawathub/features/auth/onboarding_page.dart';
 import 'package:selawathub/features/auth/reset_password_page.dart';
+import 'package:selawathub/features/auth/welcome_page.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SelawatHubApp extends StatefulWidget {
@@ -34,6 +35,14 @@ class _SelawatHubAppState extends State<SelawatHubApp> {
       if (state.event == AuthChangeEvent.passwordRecovery) {
         _navKey.currentState?.pushAndRemoveUntil(
           MaterialPageRoute(builder: (_) => const ResetPasswordPage()),
+          (_) => false,
+        );
+      } else if (state.event == AuthChangeEvent.signedOut) {
+        // Wipe any cached personal data so the next user (or guest) doesn't
+        // briefly see the previous user's profile/stats on first load.
+        SettingsService.clearCachedProfile();
+        _navKey.currentState?.pushAndRemoveUntil(
+          MaterialPageRoute(builder: (_) => const WelcomePage()),
           (_) => false,
         );
       }

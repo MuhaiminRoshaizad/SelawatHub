@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:selawathub/core/animations/fade_in.dart';
 import 'package:selawathub/core/constants.dart';
@@ -67,7 +68,7 @@ class MemberTile extends StatelessWidget {
                 radius: 16,
                 backgroundColor: dark ? C.dark4 : C.light3,
                 backgroundImage: avatarUrl != null && avatarUrl!.isNotEmpty
-                    ? NetworkImage(avatarUrl!)
+                    ? CachedNetworkImageProvider(avatarUrl!)
                     : null,
                 child: avatarUrl != null && avatarUrl!.isNotEmpty
                     ? null

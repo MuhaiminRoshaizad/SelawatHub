@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -336,12 +337,12 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                           builder: (context, _) => Center(
                                             child: _avatarUrl != null && _avatarUrl!.isNotEmpty
                                                 ? ClipOval(
-                                                    child: Image.network(
-                                                      _avatarUrl!,
+                                                    child: CachedNetworkImage(
+                                                      imageUrl: _avatarUrl!,
                                                       width: 96,
                                                       height: 96,
                                                       fit: BoxFit.cover,
-                                                      errorBuilder: (c, e, s) => Text(
+                                                      errorWidget: (c, u, e) => Text(
                                                         _initials,
                                                         style: TextStyle(
                                                           fontSize: 30,

@@ -36,8 +36,10 @@ class SettingsService {
   static int get themeMode => _prefs?.getInt(_kThemeMode) ?? 0;
   static set themeMode(int v) => _prefs?.setInt(_kThemeMode, v);
 
-  /// Daily goal for stats progress bar (default 100)
-  static int get dailyGoal => _prefs?.getInt(_kDailyGoal) ?? 100;
+  /// Daily goal for stats progress bar (default 500).
+  /// Also used as the streak threshold: a day only counts toward the
+  /// current/best streak if the user hits this goal.
+  static int get dailyGoal => _prefs?.getInt(_kDailyGoal) ?? 500;
   static set dailyGoal(int v) => _prefs?.setInt(_kDailyGoal, v);
 
   /// Get custom target for a dhikr ID, or null if not set.
@@ -63,6 +65,77 @@ class SettingsService {
     for (final e in targets.entries) {
       setCustomTarget(e.key, e.value);
     }
+  }
+
+  // ── Local counter storage ──
+
+  // ── Cached profile (stale-while-revalidate) ──
+
+  static const _kCachedName = 'cached_profile_name';
+  static const _kCachedBio = 'cached_profile_bio';
+  static const _kCachedAvatarUrl = 'cached_profile_avatar_url';
+  static const _kCachedEmail = 'cached_profile_email';
+  static const _kCachedTotalDhikr = 'cached_profile_total_dhikr';
+  static const _kCachedStreak = 'cached_profile_streak';
+  static const _kCachedDaysActive = 'cached_profile_days_active';
+  static const _kCachedProfileUserId = 'cached_profile_user_id';
+
+  /// Returns cached profile for [userId] or null if none cached / different user.
+  /// Lets the profile page render real data on first build without waiting
+  /// for a network round-trip.
+  static Map<String, dynamic>? getCachedProfile(String? userId) {
+    if (_prefs == null || userId == null) return null;
+    if (_prefs!.getString(_kCachedProfileUserId) != userId) return null;
+    return {
+      'name': _prefs!.getString(_kCachedName) ?? '',
+      'bio': _prefs!.getString(_kCachedBio) ?? '',
+      'avatar_url': _prefs!.getString(_kCachedAvatarUrl),
+      'email': _prefs!.getString(_kCachedEmail) ?? '',
+      'total_dhikr': _prefs!.getInt(_kCachedTotalDhikr) ?? 0,
+      'streak': _prefs!.getInt(_kCachedStreak) ?? 0,
+      'days_active': _prefs!.getInt(_kCachedDaysActive) ?? 0,
+    };
+  }
+
+  static void setCachedProfile({
+    required String userId,
+    String? name,
+    String? bio,
+    String? avatarUrl,
+    String? email,
+    int? totalDhikr,
+    int? streak,
+    int? daysActive,
+  }) {
+    final p = _prefs;
+    if (p == null) return;
+    p.setString(_kCachedProfileUserId, userId);
+    if (name != null) p.setString(_kCachedName, name);
+    if (bio != null) p.setString(_kCachedBio, bio);
+    if (avatarUrl != null) {
+      p.setString(_kCachedAvatarUrl, avatarUrl);
+    } else {
+      p.remove(_kCachedAvatarUrl);
+    }
+    if (email != null) p.setString(_kCachedEmail, email);
+    if (totalDhikr != null) p.setInt(_kCachedTotalDhikr, totalDhikr);
+    if (streak != null) p.setInt(_kCachedStreak, streak);
+    if (daysActive != null) p.setInt(_kCachedDaysActive, daysActive);
+  }
+
+  /// Clears the cached profile — called on sign-out so the next user
+  /// doesn't briefly see the previous user's data.
+  static void clearCachedProfile() {
+    final p = _prefs;
+    if (p == null) return;
+    p.remove(_kCachedProfileUserId);
+    p.remove(_kCachedName);
+    p.remove(_kCachedBio);
+    p.remove(_kCachedAvatarUrl);
+    p.remove(_kCachedEmail);
+    p.remove(_kCachedTotalDhikr);
+    p.remove(_kCachedStreak);
+    p.remove(_kCachedDaysActive);
   }
 
   // ── Local counter storage ──

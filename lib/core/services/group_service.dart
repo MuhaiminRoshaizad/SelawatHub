@@ -141,6 +141,49 @@ class GroupService {
     }
   }
 
+  /// Get members with their aggregated counts for an arbitrary date range.
+  /// Used by the "Today / This Week / This Month" toggle so each period
+  /// shows the correct per-member contribution (not just today's).
+  ///
+  /// Backed by the `get_group_members_with_period_counts(group_id, start, end)`
+  /// Postgres RPC (see SQL migration). Inclusive on both bounds.
+  static Future<List<Map<String, dynamic>>> getGroupMembersForPeriod(
+    String groupId,
+    DateTime startDate,
+    DateTime endDate,
+  ) async {
+    try {
+      final result = await _db.rpc(
+        'get_group_members_with_period_counts',
+        params: {
+          'p_group_id': groupId,
+          'p_start_date': _dateStr(startDate),
+          'p_end_date': _dateStr(endDate),
+        },
+      );
+      final members = (result as List).cast<Map<String, dynamic>>();
+      final uid = SupabaseService.userId;
+      final mapped = members.map((m) => {
+        'user_id': m['user_id'],
+        'role': m['role'],
+        'name': m['name'] ?? 'Unknown',
+        'avatar_url': m['avatar_url'],
+        // Reuses the existing 'today_count' key so MemberTile stays agnostic
+        // to which period it's rendering. The UI label above the list tells
+        // the user what the period is.
+        'today_count': (m['period_count'] as num?)?.toInt() ?? 0,
+        'is_me': m['user_id'] == uid,
+      }).toList()
+        ..sort((a, b) =>
+            (b['today_count'] as int).compareTo(a['today_count'] as int));
+      return mapped;
+    } catch (e) {
+      debugPrint('[GroupService] getGroupMembersForPeriod error: $e');
+      // Graceful fallback: return today's data so the list isn't empty.
+      return getGroupMembers(groupId);
+    }
+  }
+
   /// Update group settings (name, description, daily_goal). Leader only.
   static Future<void> updateGroup(String groupId, {String? name, String? description, int? dailyGoal}) async {
     final updates = <String, dynamic>{};

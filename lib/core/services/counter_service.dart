@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:selawathub/core/services/stats_cache.dart';
 import 'package:selawathub/core/services/supabase_service.dart';
 
 class CounterService {
@@ -12,6 +13,9 @@ class CounterService {
     required String category,
     required int count,
   }) async {
+    // Invalidate stats cache — counts changed so any derived view is stale.
+    // Profile stats scalars refresh naturally the next time ProfilePage opens.
+    StatsCache.invalidate();
     final uid = SupabaseService.userId;
     if (uid == null) return;
     final today = _todayStr();

@@ -132,7 +132,16 @@ class _CounterSettingsPageState extends State<CounterSettingsPage> {
     final dark = Theme.of(context).brightness == Brightness.dark;
     final tt = Theme.of(context).textTheme;
 
-    return Scaffold(
+    return PopScope(
+      canPop: false,
+      // Intercept both the app-bar back button path (via _pop) and the
+      // Android system back gesture, which would otherwise pop without
+      // returning the updated settings — causing the counter page to
+      // discard changes and feel "stuck" on the old color/style.
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) _pop();
+      },
+      child: Scaffold(
       backgroundColor: dark ? C.dark1 : C.light1,
       body: Stack(
         children: [
@@ -365,6 +374,7 @@ class _CounterSettingsPageState extends State<CounterSettingsPage> {
             ),
           ),
         ],
+      ),
       ),
     );
   }

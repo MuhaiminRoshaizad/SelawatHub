@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/cupertino.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:selawathub/core/animations/bounce_tap.dart';
 import 'package:selawathub/core/constants.dart';
@@ -163,8 +164,8 @@ class ProfileBanner extends StatelessWidget {
                           )
                         : avatarUrl != null && avatarUrl!.isNotEmpty
                             ? ClipOval(
-                                child: Image.network(
-                                  avatarUrl!,
+                                child: CachedNetworkImage(
+                                  imageUrl: avatarUrl!,
                                   width: avatarSize - 8,
                                   height: avatarSize - 8,
                                   fit: BoxFit.cover,

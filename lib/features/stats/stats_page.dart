@@ -6,6 +6,7 @@ import 'package:selawathub/core/animations/fade_in.dart';
 import 'package:selawathub/core/constants.dart';
 import 'package:selawathub/core/services/counter_service.dart';
 import 'package:selawathub/core/services/settings_service.dart';
+import 'package:selawathub/core/services/stats_cache.dart';
 import 'package:selawathub/core/services/supabase_service.dart';
 import 'package:selawathub/features/counter/models/dhikr.dart';
 import 'package:selawathub/core/theme/colors.dart';
@@ -48,7 +49,22 @@ class _StatsPageState extends State<StatsPage> {
   @override
   void initState() {
     super.initState();
+    _hydrateFromCache();
     _loadStats();
+  }
+
+  /// Populate state from in-memory cache so the first frame shows real
+  /// data on repeat visits (tab switches, nav pop). The network call in
+  /// [_loadStats] still runs and overrides with fresh numbers.
+  void _hydrateFromCache() {
+    if (!StatsCache.hasData || !StatsCache.isFreshForToday) return;
+    final heatmap = StatsCache.heatmap<DayData>();
+    if (heatmap.isEmpty) return;
+    _heatmapData = heatmap;
+    _weeklyData = StatsCache.weeklyData<WeekData>();
+    _todayTotal = StatsCache.totalToday;
+    _hasData = heatmap.any((d) => d.total > 0);
+    _loading = false;
   }
 
   Future<void> _loadStats() async {
@@ -123,22 +139,39 @@ class _StatsPageState extends State<StatsPage> {
         .toList()
       ..sort((a, b) => b.$3.compareTo(a.$3));
 
-    // Streaks
+    // ── Streaks ──
+    // Streak is goal-based: a day only counts if the user hit their
+    // daily goal. Today is given a grace period — if today's total hasn't
+    // reached the goal yet, we don't break the streak (we simply start
+    // counting from yesterday). `daysActive` tracks any activity and
+    // remains a pure engagement metric.
+    final goal = SettingsService.dailyGoal;
+    final today = DateTime(now.year, now.month, now.day);
+
     int current = 0, best = 0, daysActive = 0;
-    // Walk from most recent day backwards for current streak
-    for (int i = heatmap.length - 1; i >= 0; i--) {
-      if (heatmap[i].total > 0) {
-        current++;
-      } else {
-        break;
-      }
+
+    // Current streak: walk from most recent day backwards.
+    int i = heatmap.length - 1;
+    if (i >= 0) {
+      final lastDate = start.add(Duration(days: i));
+      final isToday = lastDate.year == today.year &&
+          lastDate.month == today.month &&
+          lastDate.day == today.day;
+      // If today exists in the range but the goal hasn't been met yet,
+      // skip it so it doesn't look like the streak is already broken.
+      if (isToday && heatmap[i].total < goal) i--;
     }
-    // Walk all days for best streak and days active
+    while (i >= 0 && heatmap[i].total >= goal) {
+      current++;
+      i--;
+    }
+
+    // Best streak + days active over the whole window.
     int run = 0;
     for (final d in heatmap) {
-      if (d.total > 0) {
+      if (d.total > 0) daysActive++;
+      if (d.total >= goal) {
         run++;
-        daysActive++;
         if (run > best) best = run;
       } else {
         run = 0;
@@ -178,6 +211,14 @@ class _StatsPageState extends State<StatsPage> {
       _hasData = heatmap.any((d) => d.total > 0);
       _loading = false;
     });
+
+    // Seed the cache so the next tab switch renders instantly.
+    StatsCache.store(
+      heatmap: heatmap,
+      weeklyData: weeklyData,
+      breakdown: const [],
+      totalToday: heatmap.isNotEmpty ? heatmap.last.total : 0,
+    );
   }
 
   void _onHeatmapDaySelected(int? idx) {

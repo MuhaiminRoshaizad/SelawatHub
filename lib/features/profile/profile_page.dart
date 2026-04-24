@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -6,6 +7,7 @@ import 'package:selawathub/core/animations/fade_in.dart';
 import 'package:selawathub/core/constants.dart';
 import 'package:selawathub/core/services/auth_service.dart';
 import 'package:selawathub/core/services/profile_service.dart';
+import 'package:selawathub/core/services/settings_service.dart';
 import 'package:selawathub/core/services/supabase_service.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:selawathub/core/theme/colors.dart';
@@ -49,28 +51,75 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   void initState() {
     super.initState();
+    _hydrateFromCache();
     _loadProfile();
+  }
+
+  /// Synchronously populate state from cached profile so the first frame
+  /// shows real data on app restart / tab switch — no skeleton flicker.
+  /// The network refresh in [_loadProfile] still runs to pick up any
+  /// server-side changes.
+  void _hydrateFromCache() {
+    if (_isGuest) {
+      _loading = false;
+      return;
+    }
+    final uid = SupabaseService.userId;
+    final cached = SettingsService.getCachedProfile(uid);
+    if (cached == null) return;
+    _name = cached['name'] as String? ?? '';
+    _bio = cached['bio'] as String? ?? '';
+    _avatarUrl = cached['avatar_url'] as String?;
+    _email =
+        (cached['email'] as String?)?.isNotEmpty == true
+            ? cached['email'] as String
+            : (SupabaseService.currentUser?.email ?? '');
+    _totalDhikr = (cached['total_dhikr'] as int?) ?? 0;
+    _streak = (cached['streak'] as int?) ?? 0;
+    _daysActive = (cached['days_active'] as int?) ?? 0;
+    _loading = false;
   }
 
   Future<void> _loadProfile() async {
     if (_isGuest) {
-      setState(() => _loading = false);
+      if (mounted && _loading) setState(() => _loading = false);
       return;
     }
     try {
       final profile = await ProfileService.getProfile();
       final stats = await ProfileService.getProfileStats();
       if (!mounted) return;
+      final name = profile?['name'] as String? ?? '';
+      final bio = profile?['bio'] as String? ?? '';
+      final avatarUrl = profile?['avatar_url'] as String?;
+      final email = SupabaseService.currentUser?.email ?? '';
+      final totalDhikr = (stats['total_dhikr'] as num?)?.toInt() ?? 0;
+      final streak = (stats['streak'] as num?)?.toInt() ?? 0;
+      final daysActive = (stats['days_active'] as num?)?.toInt() ?? 0;
       setState(() {
-        _name = profile?['name'] as String? ?? '';
-        _bio = profile?['bio'] as String? ?? '';
-        _avatarUrl = profile?['avatar_url'] as String?;
-        _email = SupabaseService.currentUser?.email ?? '';
-        _totalDhikr = (stats['total_dhikr'] as num?)?.toInt() ?? 0;
-        _streak = (stats['streak'] as num?)?.toInt() ?? 0;
-        _daysActive = (stats['days_active'] as num?)?.toInt() ?? 0;
+        _name = name;
+        _bio = bio;
+        _avatarUrl = avatarUrl;
+        _email = email;
+        _totalDhikr = totalDhikr;
+        _streak = streak;
+        _daysActive = daysActive;
         _loading = false;
       });
+      // Persist so next app launch renders instantly.
+      final uid = SupabaseService.userId;
+      if (uid != null) {
+        SettingsService.setCachedProfile(
+          userId: uid,
+          name: name,
+          bio: bio,
+          avatarUrl: avatarUrl,
+          email: email,
+          totalDhikr: totalDhikr,
+          streak: streak,
+          daysActive: daysActive,
+        );
+      }
     } catch (_) {
       if (!mounted) return;
       setState(() => _loading = false);
@@ -123,8 +172,8 @@ class _ProfilePageState extends State<ProfilePage> {
           insetPadding: const EdgeInsets.all(S.s24),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(16),
-            child: Image.network(
-              url,
+            child: CachedNetworkImage(
+              imageUrl: url,
               fit: BoxFit.contain,
             ),
           ),
@@ -396,13 +445,10 @@ class _ProfilePageState extends State<ProfilePage> {
                         actionLabel: 'Sign Out',
                         errorMessage: 'Failed to sign out',
                         onConfirm: () async {
+                          // Navigation to WelcomePage handled globally by
+                          // app.dart via the signedOut auth event — avoids
+                          // a race between dialog dismissal and route removal.
                           await AuthService.signOut();
-                          if (!context.mounted) return;
-                          Navigator.of(context).pushAndRemoveUntil(
-                            MaterialPageRoute(
-                                builder: (_) => const WelcomePage()),
-                            (_) => false,
-                          );
                         },
                       );
                     },

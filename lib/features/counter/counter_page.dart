@@ -48,23 +48,29 @@ class _CounterPageState extends State<CounterPage>
   @override
   void initState() {
     super.initState();
+    // Read all UI settings synchronously BEFORE the first build so we never
+    // flash the default style/color to the user. SharedPreferences is already
+    // primed in main.dart, so these getters are non-blocking.
+    _hapticEnabled = SettingsService.hapticEnabled;
+    _hapticIntensity = SettingsService.hapticIntensity;
+    _counterStyle = SettingsService.counterStyle;
+    _colorThemeIndex = SettingsService.colorThemeIndex;
+    _customTargets = SettingsService.getAllCustomTargets(
+      Dhikr.all.map((d) => d.id).toList(),
+    );
+
     _pulse = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 200),
     );
-    _loadState();
+
+    _loadCounts();
   }
 
-  Future<void> _loadState() async {
-    final haptic = SettingsService.hapticEnabled;
-    final intensity = SettingsService.hapticIntensity;
-    final style = SettingsService.counterStyle;
-    final colorIdx = SettingsService.colorThemeIndex;
-    final targets = SettingsService.getAllCustomTargets(
-      Dhikr.all.map((d) => d.id).toList(),
-    );
-
-    Map<String, int> todayCounts = {};
+  /// Loads today's per-dhikr counts. Kept separate from the sync settings
+  /// read above because Supabase IO is genuinely async.
+  Future<void> _loadCounts() async {
+    Map<String, int> todayCounts;
     if (SupabaseService.isAuthenticated) {
       todayCounts = await CounterService.getTodayCounts();
     } else {
@@ -75,11 +81,6 @@ class _CounterPageState extends State<CounterPage>
 
     if (!mounted) return;
     setState(() {
-      _hapticEnabled = haptic;
-      _hapticIntensity = intensity;
-      _counterStyle = style;
-      _colorThemeIndex = colorIdx;
-      _customTargets = targets;
       _todayCounts = todayCounts;
       _total = _todayCounts[_dhikr.id] ?? 0;
     });
@@ -115,14 +116,33 @@ class _CounterPageState extends State<CounterPage>
 
   int get _target => _customTargets[_dhikr.id] ?? _dhikr.defaultTarget;
 
-  void _tap() {
-    if (_hapticEnabled) {
-      switch (_hapticIntensity) {
-        case 0: HapticFeedback.lightImpact();
-        case 1: HapticFeedback.mediumImpact();
-        default: HapticFeedback.heavyImpact();
+  /// Safely triggers haptic feedback. Wraps `HapticFeedback` calls in a
+  /// try/catch so that platforms that disallow haptics (web, desktop, or
+  /// certain Android configurations) don't crash the tap handler.
+  ///
+  /// intensity: 0 = light, 1 = medium, 2+ = heavy.
+  void _triggerHaptic(int intensity) {
+    if (!_hapticEnabled) return;
+    try {
+      switch (intensity) {
+        case 0:
+          HapticFeedback.lightImpact();
+        case 1:
+          HapticFeedback.mediumImpact();
+        default:
+          HapticFeedback.heavyImpact();
       }
+    } catch (_) {
+      // Silently ignore — the OS-level vibration toggle and platform support
+      // decide whether anything actually fires.
     }
+  }
+
+  void _tap() {
+    // Haptic is best-effort. On Android the OS silently no-ops if the user
+    // has disabled vibration system-wide (e.g. Pixel vibration toggle), so
+    // we just guard against unexpected platform exceptions.
+    _triggerHaptic(_hapticIntensity);
     _pulse.forward(from: 0);
     setState(() {
       _count++;
@@ -130,7 +150,7 @@ class _CounterPageState extends State<CounterPage>
       if (_count >= _target) {
         _count = 0;
         _round++;
-        if (_hapticEnabled) HapticFeedback.heavyImpact();
+        _triggerHaptic(2); // heavy on round completion
       }
     });
     _todayCounts[_dhikr.id] = _total;
