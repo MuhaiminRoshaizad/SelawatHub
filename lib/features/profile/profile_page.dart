@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:selawathub/app/app.dart';
 import 'package:selawathub/core/animations/bounce_tap.dart';
 import 'package:selawathub/core/animations/fade_in.dart';
 import 'package:selawathub/core/constants.dart';
@@ -20,7 +21,7 @@ import 'package:selawathub/features/auth/welcome_page.dart';
 import 'package:selawathub/features/profile/about_page.dart';
 import 'package:selawathub/features/profile/edit_profile_page.dart';
 import 'package:selawathub/features/profile/help_faq_page.dart';
-import 'package:selawathub/features/profile/widgets/profile_banner.dart';
+import 'package:selawathub/features/profile/widgets/profile_header.dart';
 import 'package:selawathub/features/profile/widgets/profile_rows.dart';
 import 'package:selawathub/features/profile/widgets/profile_stats_row.dart';
 import 'package:skeletonizer/skeletonizer.dart';
@@ -201,11 +202,10 @@ class _ProfilePageState extends State<ProfilePage> {
         physics: const AlwaysScrollableScrollPhysics(),
         padding: EdgeInsets.zero,
         children: [
-        // ── Banner + Avatar hero ──
+        // ── Clean minimal header (avatar + edit badge) ──
         FadeIn(
-          child: ProfileBanner(
+          child: ProfileHeader(
             dark: dark,
-            tt: tt,
             topPad: topPad,
             isGuest: _isGuest,
             avatarUrl: _avatarUrl,
@@ -225,7 +225,7 @@ class _ProfilePageState extends State<ProfilePage> {
             padding: const EdgeInsets.symmetric(horizontal: S.page),
             child: Column(
               children: [
-                const SizedBox(height: S.s4),
+                const SizedBox(height: S.s16),
                 Text(
                   _isGuest ? 'Guest' : (_name.isEmpty ? (SupabaseService.currentUser?.userMetadata?['name'] as String? ?? 'Set your name') : _name),
                   style: tt.headlineMedium?.copyWith(
@@ -236,7 +236,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 if (!_isGuest) ...[
                   const SizedBox(height: S.s4),
                   Text(
-                    _bio.isEmpty ? 'Tap ✏️ to add a bio' : _bio,
+                    _bio.isEmpty ? 'Tap the pencil to add a bio' : _bio,
                     style: tt.bodyMedium?.copyWith(
                       color: dark ? C.onDark2 : C.onLight2,
                     ),
@@ -329,9 +329,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 children: [
                   ValueListenableBuilder<ThemeMode>(
                     valueListenable: themeCtrl,
-                    builder: (context, mode, child) => ToggleRow(
-                      icon: CupertinoIcons.moon_fill,
-                      label: 'Dark Mode',
+                    builder: (context, mode, child) => DarkModeRow(
                       value: dark,
                       onChanged: (v) => themeCtrl.value =
                           v ? ThemeMode.dark : ThemeMode.light,
@@ -445,10 +443,20 @@ class _ProfilePageState extends State<ProfilePage> {
                         actionLabel: 'Sign Out',
                         errorMessage: 'Failed to sign out',
                         onConfirm: () async {
-                          // Navigation to WelcomePage handled globally by
-                          // app.dart via the signedOut auth event — avoids
-                          // a race between dialog dismissal and route removal.
                           await AuthService.signOut();
+                          // Let showConfirmDialog auto-pop the dialog first,
+                          // then navigate on the next frame via the root
+                          // navigator. Navigating synchronously here races
+                          // with the helper's post-await Navigator.pop and
+                          // ends up popping our new WelcomePage.
+                          WidgetsBinding.instance.addPostFrameCallback((_) {
+                            SelawatHubApp.navKey.currentState?.pushAndRemoveUntil(
+                              MaterialPageRoute(
+                                builder: (_) => const WelcomePage(),
+                              ),
+                              (_) => false,
+                            );
+                          });
                         },
                       );
                     },

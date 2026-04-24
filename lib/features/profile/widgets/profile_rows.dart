@@ -225,3 +225,81 @@ class ToggleRow extends StatelessWidget {
     );
   }
 }
+
+// ─────────────────────────────────────────────────────────
+//  Dark mode row — animated sun/moon leading icon
+// ─────────────────────────────────────────────────────────
+
+class DarkModeRow extends StatelessWidget {
+  const DarkModeRow({
+    super.key,
+    required this.value,
+    required this.onChanged,
+  });
+
+  final bool value;
+  final ValueChanged<bool> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    final tt = Theme.of(context).textTheme;
+    final accent = dark ? C.primarySoft : C.primary;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: S.s20, vertical: S.s8),
+      child: Row(
+        children: [
+          // Animated sun/moon tile — gradient background swaps with state
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 400),
+            curve: Curves.easeInOutCubic,
+            width: 32,
+            height: 32,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: value
+                    ? const [Color(0xFF283046), Color(0xFF1A1F35)]
+                    : const [Color(0xFFFFB547), Color(0xFFFF8A3D)],
+              ),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Center(
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 300),
+                transitionBuilder: (child, anim) => FadeTransition(
+                  opacity: anim,
+                  child: ScaleTransition(
+                    scale: Tween<double>(begin: 0.6, end: 1).animate(anim),
+                    child: RotationTransition(
+                      turns: Tween<double>(begin: -0.25, end: 0).animate(anim),
+                      child: child,
+                    ),
+                  ),
+                ),
+                child: Icon(
+                  value
+                      ? CupertinoIcons.moon_stars_fill
+                      : CupertinoIcons.sun_max_fill,
+                  key: ValueKey(value),
+                  size: 18,
+                  color: C.white,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: S.s12),
+          Expanded(child: Text('Dark Mode', style: tt.titleSmall)),
+          Switch.adaptive(
+            value: value,
+            onChanged: onChanged,
+            activeTrackColor: accent.withValues(alpha: 0.4),
+            activeThumbColor: accent,
+          ),
+        ],
+      ),
+    );
+  }
+}
