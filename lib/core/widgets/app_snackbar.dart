@@ -50,6 +50,9 @@ class _OverlayToastState extends State<_OverlayToast>
   late final AnimationController _ctrl;
   late final Animation<Offset> _slide;
   late final Animation<double> _fade;
+  // Tracks the user's vertical drag (negative = upward). Reset to 0 on
+  // release if the user didn't drag far/fast enough to dismiss.
+  double _dragDy = 0;
 
   @override
   void initState() {
@@ -78,6 +81,24 @@ class _OverlayToastState extends State<_OverlayToast>
     });
   }
 
+  void _onDragUpdate(DragUpdateDetails d) {
+    // Only track upward drag; clamp downward at 0 so the toast doesn't
+    // pull below its resting position.
+    setState(() {
+      _dragDy = (_dragDy + d.delta.dy).clamp(-200.0, 0.0);
+    });
+  }
+
+  void _onDragEnd(DragEndDetails d) {
+    final velocity = d.primaryVelocity ?? 0;
+    // Dismiss if dragged far enough OR flicked up fast enough.
+    if (_dragDy < -24 || velocity < -300) {
+      _dismiss();
+    } else {
+      setState(() => _dragDy = 0);
+    }
+  }
+
   @override
   void dispose() {
     _ctrl.dispose();
@@ -100,68 +121,76 @@ class _OverlayToastState extends State<_OverlayToast>
         position: _slide,
         child: FadeTransition(
           opacity: _fade,
-          child: Material(
-            color: Colors.transparent,
-            child: Container(
-              padding: EdgeInsets.only(
-                left: 16,
-                right: hasAction ? 6 : 16,
-                top: 14,
-                bottom: 14,
-              ),
-              decoration: BoxDecoration(
-                color: bg,
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.15),
-                    blurRadius: 12,
-                    offset: const Offset(0, 4),
+          child: Transform.translate(
+            offset: Offset(0, _dragDy),
+            child: Material(
+              color: Colors.transparent,
+              child: GestureDetector(
+                onVerticalDragUpdate: _onDragUpdate,
+                onVerticalDragEnd: _onDragEnd,
+                behavior: HitTestBehavior.opaque,
+                child: Container(
+                  padding: EdgeInsets.only(
+                    left: 16,
+                    right: hasAction ? 6 : 16,
+                    top: 14,
+                    bottom: 14,
                   ),
-                ],
-              ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: _dismiss,
-                      behavior: HitTestBehavior.opaque,
-                      child: Text(
-                        widget.message,
-                        style: const TextStyle(
-                          color: C.white,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                        ),
+                  decoration: BoxDecoration(
+                    color: bg,
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.15),
+                        blurRadius: 12,
+                        offset: const Offset(0, 4),
                       ),
-                    ),
+                    ],
                   ),
-                  if (hasAction) ...[
-                    const SizedBox(width: 8),
-                    InkWell(
-                      onTap: () {
-                        widget.onAction!();
-                        _dismiss();
-                      },
-                      borderRadius: BorderRadius.circular(8),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 6,
-                        ),
-                        child: Text(
-                          widget.actionLabel!.toUpperCase(),
-                          style: const TextStyle(
-                            color: C.white,
-                            fontSize: 13,
-                            fontWeight: FontWeight.w700,
-                            letterSpacing: 0.5,
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: _dismiss,
+                          behavior: HitTestBehavior.opaque,
+                          child: Text(
+                            widget.message,
+                            style: const TextStyle(
+                              color: C.white,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
-                ],
+                      if (hasAction) ...[
+                        const SizedBox(width: 8),
+                        InkWell(
+                          onTap: () {
+                            widget.onAction!();
+                            _dismiss();
+                          },
+                          borderRadius: BorderRadius.circular(8),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 6,
+                            ),
+                            child: Text(
+                              widget.actionLabel!.toUpperCase(),
+                              style: const TextStyle(
+                                color: C.white,
+                                fontSize: 13,
+                                fontWeight: FontWeight.w700,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
               ),
             ),
           ),
