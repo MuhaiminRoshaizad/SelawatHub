@@ -279,7 +279,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                         setState(() => _dailyGoal = val);
                         if (ctx.mounted) {
                           Navigator.of(ctx).pop();
-                          showAppSnackBar(ctx, 'Daily goal updated');
+                          showAppSnackBar(ctx, 'Group daily goal set to $val');
                         }
                       } catch (_) {
                         setSheetState(() => saving = false);

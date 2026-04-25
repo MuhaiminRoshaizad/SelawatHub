@@ -6,6 +6,7 @@ import 'package:selawathub/core/constants.dart';
 import 'package:selawathub/core/services/custom_dhikr_service.dart';
 import 'package:selawathub/core/services/supabase_service.dart';
 import 'package:selawathub/core/theme/colors.dart';
+import 'package:selawathub/core/widgets/app_snackbar.dart';
 import 'package:selawathub/features/counter/models/dhikr.dart';
 
 /// Result returned by the manual-add sheet.
@@ -17,13 +18,17 @@ typedef ManualCountResult = ({Dhikr dhikr, int amount});
 class ManualCountSheet {
   static Future<ManualCountResult?> show(
     BuildContext context,
-    Dhikr initial,
-  ) {
+    Dhikr initial, {
+    VoidCallback? onOpenTodayLog,
+  }) {
     return showModalBottomSheet<ManualCountResult>(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (ctx) => _ManualCountBody(initial: initial),
+      builder: (ctx) => _ManualCountBody(
+        initial: initial,
+        onOpenTodayLog: onOpenTodayLog,
+      ),
     );
   }
 }
@@ -31,8 +36,9 @@ class ManualCountSheet {
 enum _View { amount, pick, addNew }
 
 class _ManualCountBody extends StatefulWidget {
-  const _ManualCountBody({required this.initial});
+  const _ManualCountBody({required this.initial, this.onOpenTodayLog});
   final Dhikr initial;
+  final VoidCallback? onOpenTodayLog;
 
   @override
   State<_ManualCountBody> createState() => _ManualCountBodyState();
@@ -41,6 +47,7 @@ class _ManualCountBody extends StatefulWidget {
 class _ManualCountBodyState extends State<_ManualCountBody> {
   late Dhikr _dhikr = widget.initial;
   _View _view = _View.amount;
+  bool _subtract = false;
 
   // Amount view state
   final _amountCtrl = TextEditingController();
@@ -87,7 +94,8 @@ class _ManualCountBodyState extends State<_ManualCountBody> {
   void _submit() {
     final amount = _parsed;
     if (amount <= 0) return;
-    Navigator.pop(context, (dhikr: _dhikr, amount: amount));
+    final signed = _subtract ? -amount : amount;
+    Navigator.pop(context, (dhikr: _dhikr, amount: signed));
   }
 
   Future<void> _openPicker() async {
@@ -127,8 +135,20 @@ class _ManualCountBodyState extends State<_ManualCountBody> {
     );
     if (!mounted) return;
     setState(() => _saving = false);
-    if (created == null) return;
+    if (created == null) {
+      showAppSnackBar(
+        context,
+        "Couldn't save custom ${_newCategory.name}. Try again.",
+        backgroundColor: C.error,
+      );
+      return;
+    }
     _customs = await CustomDhikrService.list();
+    if (!mounted) return;
+    showAppSnackBar(
+      context,
+      'Added "${created.name}" to your ${_newCategory.name} list',
+    );
     _pickDhikr(created);
   }
 
@@ -177,6 +197,7 @@ class _ManualCountBodyState extends State<_ManualCountBody> {
     final tt = Theme.of(context).textTheme;
     final accent = dark ? C.primarySoft : C.primary;
     final canSubmit = _parsed > 0;
+    final titleText = _subtract ? 'Subtract manually' : 'Add manually';
 
     return Column(
       key: const ValueKey('amount'),
@@ -185,12 +206,16 @@ class _ManualCountBodyState extends State<_ManualCountBody> {
         _dragHandle(dark),
         const SizedBox(height: S.s20),
         Text(
-          'Add manually',
+          titleText,
           style: tt.titleMedium?.copyWith(
             fontWeight: FontWeight.w700,
             color: dark ? C.onDark1 : C.onLight1,
           ),
         ),
+        const SizedBox(height: S.s12),
+
+        // Mode toggle: Add / Subtract
+        _modeToggle(dark, accent),
         const SizedBox(height: S.s12),
 
         // Dhikr pill (tappable → picker)
@@ -330,7 +355,9 @@ class _ManualCountBodyState extends State<_ManualCountBody> {
             width: double.infinity,
             padding: const EdgeInsets.symmetric(vertical: S.s16),
             decoration: BoxDecoration(
-              color: canSubmit ? accent : accent.withValues(alpha: 0.3),
+              color: canSubmit
+                  ? (_subtract ? C.error : accent)
+                  : (_subtract ? C.error : accent).withValues(alpha: 0.3),
               borderRadius: BorderRadius.circular(16),
             ),
             alignment: Alignment.center,
@@ -338,13 +365,19 @@ class _ManualCountBodyState extends State<_ManualCountBody> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(
-                  CupertinoIcons.check_mark,
+                  _subtract
+                      ? CupertinoIcons.minus
+                      : CupertinoIcons.check_mark,
                   size: 16,
                   color: dark ? C.onDark1 : Colors.white,
                 ),
                 const SizedBox(width: S.s8),
                 Text(
-                  canSubmit ? 'Add $_parsed' : 'Enter an amount',
+                  canSubmit
+                      ? (_subtract
+                          ? 'Subtract $_parsed'
+                          : 'Add $_parsed')
+                      : 'Enter an amount',
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
@@ -355,6 +388,40 @@ class _ManualCountBodyState extends State<_ManualCountBody> {
             ),
           ),
         ),
+
+        if (widget.onOpenTodayLog != null) ...[
+          const SizedBox(height: S.s12),
+          BounceTap(
+            onTap: () {
+              Navigator.pop(context);
+              widget.onOpenTodayLog!();
+            },
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: S.s4),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    CupertinoIcons.list_bullet,
+                    size: 12,
+                    color: dark ? C.onDark3 : C.onLight3,
+                  ),
+                  const SizedBox(width: S.s6),
+                  Text(
+                    "Edit today's log",
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: dark ? C.onDark3 : C.onLight3,
+                      decoration: TextDecoration.underline,
+                      decorationColor: dark ? C.onDark3 : C.onLight3,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ],
     );
   }
@@ -702,4 +769,63 @@ class _ManualCountBodyState extends State<_ManualCountBody> {
           borderRadius: BorderRadius.circular(2),
         ),
       );
+
+  Widget _modeToggle(bool dark, Color accent) {
+    Widget seg(String label, IconData icon, bool selected, VoidCallback onTap,
+        Color activeColor) {
+      return Expanded(
+        child: BounceTap(
+          onTap: onTap,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 180),
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            decoration: BoxDecoration(
+              color: selected ? activeColor : C.transparent,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            alignment: Alignment.center,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  icon,
+                  size: 13,
+                  color: selected
+                      ? Colors.white
+                      : (dark ? C.onDark3 : C.onLight3),
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: selected
+                        ? Colors.white
+                        : (dark ? C.onDark3 : C.onLight3),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
+    return Container(
+      padding: const EdgeInsets.all(3),
+      decoration: BoxDecoration(
+        color: dark ? C.dark3 : C.light3,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Row(
+        children: [
+          seg('Add', CupertinoIcons.plus, !_subtract,
+              () => setState(() => _subtract = false), accent),
+          seg('Subtract', CupertinoIcons.minus, _subtract,
+              () => setState(() => _subtract = true), C.error),
+        ],
+      ),
+    );
+  }
 }

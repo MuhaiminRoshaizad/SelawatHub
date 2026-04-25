@@ -114,7 +114,7 @@ class _CounterSettingsPageState extends State<CounterSettingsPage> {
                   if (val != null && val > 0) {
                     setState(() => _customTargets[d.id] = val);
                     Navigator.pop(ctx);
-                    showAppSnackBar(context, 'Target updated to $val');
+                    showAppSnackBar(context, '${d.name} target set to $val');
                   } else {
                     showAppSnackBar(ctx, 'Enter a number greater than 0', backgroundColor: C.error);
                   }

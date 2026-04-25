@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:selawathub/core/animations/fade_in.dart';
 import 'package:selawathub/core/constants.dart';
 import 'package:selawathub/core/services/counter_service.dart';
+import 'package:selawathub/core/services/custom_dhikr_service.dart';
 import 'package:selawathub/core/services/settings_service.dart';
 import 'package:selawathub/core/services/supabase_service.dart';
 import 'package:selawathub/core/theme/colors.dart';
@@ -17,6 +18,7 @@ import 'package:selawathub/features/counter/widgets/dhikr_selector_sheet.dart';
 import 'package:selawathub/features/counter/widgets/digital_counter.dart';
 import 'package:selawathub/features/counter/widgets/manual_count_sheet.dart';
 import 'package:selawathub/features/counter/widgets/minimal_counter.dart';
+import 'package:selawathub/features/counter/widgets/today_log_sheet.dart';
 
 class CounterPage extends StatefulWidget {
   const CounterPage({super.key});
@@ -209,27 +211,49 @@ class _CounterPageState extends State<CounterPage>
   }
 
   Future<void> _openManualAdd() async {
-    final result = await ManualCountSheet.show(context, _dhikr);
-    if (result == null || result.amount <= 0) return;
-    final picked = result.dhikr;
-    final amount = result.amount;
+    final result = await ManualCountSheet.show(
+      context,
+      _dhikr,
+      onOpenTodayLog: _openTodayLog,
+    );
+    if (result == null || result.amount == 0) return;
+    await _applyManualAdjust(result.dhikr, result.amount, allowUndo: true);
+  }
+
+  /// Applies a signed manual adjustment (positive = add, negative = subtract)
+  /// against [picked] and persists it. When [allowUndo] is true, the success
+  /// toast offers an Undo action that reverses the change by calling this
+  /// method again with the inverted delta.
+  Future<void> _applyManualAdjust(
+    Dhikr picked,
+    int delta, {
+    bool allowUndo = false,
+  }) async {
+    if (delta == 0) return;
     final isCurrent = picked.id == _dhikr.id;
 
-    // Cancel the auto-save timer so it doesn't race with our RPC.
     _saveTimer?.cancel();
 
-    // Optimistic local update. If user added to a different dhikr (e.g. a
-    // custom amalan) we only update the per-dhikr map; _total stays on
-    // whatever the user has currently selected on the counter.
     final prevTotalForPicked = _todayCounts[picked.id] ?? 0;
-    final newTotalForPicked = prevTotalForPicked + amount;
+    // Clamp at 0 — we don't allow negative daily totals.
+    final newTotalForPicked = (prevTotalForPicked + delta).clamp(0, 1 << 31);
+    final effectiveDelta = newTotalForPicked - prevTotalForPicked;
+    if (effectiveDelta == 0) {
+      if (mounted) {
+        showAppSnackBar(
+          context,
+          "Can't subtract below 0",
+          backgroundColor: C.error,
+        );
+      }
+      return;
+    }
+
     setState(() {
       _todayCounts[picked.id] = newTotalForPicked;
       if (isCurrent) _total = newTotalForPicked;
     });
 
-    // Persist locally for the guest/offline path (current dhikr only —
-    // guests can't pick custom dhikr, so picked is always built-in here).
     final now = DateTime.now();
     final today =
         '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
@@ -241,20 +265,23 @@ class _CounterPageState extends State<CounterPage>
     );
 
     if (!SupabaseService.isAuthenticated) {
-      if (mounted) _showManualAddToast(picked, amount, newTotalForPicked);
+      if (mounted) {
+        _showManualAdjustToast(
+          picked,
+          effectiveDelta,
+          newTotalForPicked,
+          allowUndo: allowUndo,
+        );
+      }
       return;
     }
 
     try {
-      // If we're adding to the currently-selected dhikr, flush any
-      // un-saved taps first (as an overwrite) so the RPC additive layer
-      // on top is correct relative to server state. For a different
-      // dhikr we don't touch pending taps on the current one.
-      if (isCurrent && _tapsSinceLastSave > 0) {
+      if (isCurrent && _tapsSinceLastSave > 0 && effectiveDelta > 0) {
         await CounterService.upsertCount(
           dhikrId: _dhikr.id,
           category: _dhikr.category.name,
-          count: _total - amount,
+          count: _total - effectiveDelta,
         );
         _tapsSinceLastSave = 0;
       }
@@ -262,9 +289,16 @@ class _CounterPageState extends State<CounterPage>
       await CounterService.addManualCount(
         dhikrId: picked.id,
         category: picked.category.name,
-        amount: amount,
+        amount: effectiveDelta,
       );
-      if (mounted) _showManualAddToast(picked, amount, newTotalForPicked);
+      if (mounted) {
+        _showManualAdjustToast(
+          picked,
+          effectiveDelta,
+          newTotalForPicked,
+          allowUndo: allowUndo,
+        );
+      }
     } catch (_) {
       setState(() {
         _todayCounts[picked.id] = prevTotalForPicked;
@@ -273,18 +307,137 @@ class _CounterPageState extends State<CounterPage>
       if (mounted) {
         showAppSnackBar(
           context,
-          'Failed to add. Please try again.',
+          'Failed to save. Please try again.',
           backgroundColor: C.error,
         );
       }
     }
   }
 
-  void _showManualAddToast(Dhikr dhikr, int amount, int newTotal) {
+  void _showManualAdjustToast(
+    Dhikr dhikr,
+    int delta,
+    int newTotal, {
+    required bool allowUndo,
+  }) {
+    final verb = delta >= 0 ? 'Added' : 'Removed';
+    final mag = delta.abs();
     showAppSnackBar(
       context,
-      'Added $amount to ${dhikr.name} · Today: $newTotal',
+      '$verb $mag · ${dhikr.name} · Today: $newTotal',
+      actionLabel: allowUndo ? 'Undo' : null,
+      onAction: allowUndo
+          ? () => _applyManualAdjust(dhikr, -delta, allowUndo: false)
+          : null,
     );
+  }
+
+  /// Opens the counter's overflow action menu — the single ⋮ entry point
+  /// in the header. Surfaces the three discrete actions (manual add,
+  /// today's log, counter settings) as discoverable list rows so users
+  /// don't have to remember icon meanings.
+  Future<void> _openCounterMenu() async {
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    HapticFeedback.lightImpact();
+    final choice = await showModalBottomSheet<String>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (sheetCtx) => _CounterMenuSheet(dark: dark),
+    );
+    if (!mounted || choice == null) return;
+    switch (choice) {
+      case 'manual':
+        await _openManualAdd();
+      case 'today':
+        await _openTodayLog();
+      case 'settings':
+        _openSettings();
+    }
+  }
+
+  /// Opens the "Today's log" sheet — lets the user view all of today's
+  /// per-dhikr totals and edit any one to an exact number. Used as the
+  /// direct-correction path for mistakes the user notices later.
+  Future<void> _openTodayLog() async {
+    final customs = SupabaseService.isAuthenticated
+        ? await CustomDhikrService.list()
+        : const <Dhikr>[];
+    if (!mounted) return;
+    HapticFeedback.lightImpact();
+    await TodayLogSheet.show(
+      context,
+      counts: _todayCounts,
+      customs: customs,
+      onEdit: (dhikr, newCount) => _setExactCount(dhikr, newCount),
+    );
+  }
+
+  /// Overwrite today's count for [dhikr] to exactly [newCount]. Returns
+  /// true on success. Keeps the local UI in sync (including the active
+  /// counter's `_total` if it matches).
+  Future<bool> _setExactCount(Dhikr dhikr, int newCount) async {
+    if (newCount < 0) return false;
+    final isCurrent = dhikr.id == _dhikr.id;
+
+    _saveTimer?.cancel();
+    final prev = _todayCounts[dhikr.id] ?? 0;
+
+    setState(() {
+      _todayCounts[dhikr.id] = newCount;
+      if (isCurrent) {
+        _total = newCount;
+        _tapsSinceLastSave = 0;
+      }
+    });
+
+    final now = DateTime.now();
+    final today =
+        '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
+    SettingsService.saveLocalCount(
+      dhikr.id,
+      dhikr.category.name,
+      newCount,
+      today,
+    );
+
+    if (!SupabaseService.isAuthenticated) {
+      if (mounted) {
+        showAppSnackBar(
+          context,
+          'Updated · ${dhikr.name} · $prev → $newCount',
+        );
+      }
+      return true;
+    }
+
+    try {
+      await CounterService.upsertCount(
+        dhikrId: dhikr.id,
+        category: dhikr.category.name,
+        count: newCount,
+      );
+      if (mounted) {
+        showAppSnackBar(
+          context,
+          'Updated · ${dhikr.name} · $prev → $newCount',
+        );
+      }
+      return true;
+    } catch (_) {
+      setState(() {
+        _todayCounts[dhikr.id] = prev;
+        if (isCurrent) _total = prev;
+      });
+      if (mounted) {
+        showAppSnackBar(
+          context,
+          'Failed to update. Please try again.',
+          backgroundColor: C.error,
+        );
+      }
+      return false;
+    }
   }
 
   void _reset() async {
@@ -315,7 +468,7 @@ class _CounterPageState extends State<CounterPage>
       _todayCounts[_dhikr.id] = 0;
       _saveTimer?.cancel();
       _persistCount();
-      if (mounted) showAppSnackBar(context, 'Counter reset');
+      if (mounted) showAppSnackBar(context, 'Counter reset · ${_dhikr.name}');
     }
   }
 
@@ -328,73 +481,77 @@ class _CounterPageState extends State<CounterPage>
       bottom: false,
       child: Column(
         children: [
-          // ── Compact dhikr selector ──
+          // ── Header: centered dhikr title + single overflow menu ──
+          // Title is absolutely centered via Stack; the overflow menu sits
+          // alone on the right edge. Tapping it opens an action sheet
+          // with manual-add, today's log, and settings — keeps the header
+          // clean and lets the title get full width.
           FadeIn(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(S.page, S.s12, S.page, 0),
-              child: Row(
-                children: [
-                  GestureDetector(
-                    onTap: _openManualAdd,
-                    child: Container(
-                      width: 36,
-                      height: 36,
-                      decoration: BoxDecoration(
-                        color: dark ? C.dark3 : C.light3,
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        CupertinoIcons.add,
-                        size: 16,
-                        color: dark ? C.onDark2 : C.onLight2,
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: _openSelector,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Flexible(
-                            child: Text(
-                              _dhikr.name,
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: dark ? C.onDark1 : C.onLight1,
+              child: SizedBox(
+                height: 36,
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    // Centered title — small horizontal padding leaves
+                    // room for the menu button so long names ellipsize
+                    // without overlapping.
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 56),
+                      child: GestureDetector(
+                        onTap: _openSelector,
+                        behavior: HitTestBehavior.opaque,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Flexible(
+                              child: Text(
+                                _dhikr.name,
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: dark ? C.onDark1 : C.onLight1,
+                                ),
+                                overflow: TextOverflow.ellipsis,
                               ),
-                              overflow: TextOverflow.ellipsis,
                             ),
-                          ),
-                          const SizedBox(width: S.s8),
-                          Icon(
-                            CupertinoIcons.chevron_down,
-                            size: 14,
-                            color: dark ? C.onDark3 : C.onLight3,
-                          ),
-                        ],
+                            const SizedBox(width: S.s8),
+                            Icon(
+                              CupertinoIcons.chevron_down,
+                              size: 14,
+                              color: dark ? C.onDark3 : C.onLight3,
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                  GestureDetector(
-                    onTap: _openSettings,
-                    child: Container(
-                      width: 36,
-                      height: 36,
-                      decoration: BoxDecoration(
-                        color: dark ? C.dark3 : C.light3,
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        CupertinoIcons.gear,
-                        size: 16,
-                        color: dark ? C.onDark2 : C.onLight2,
+                    Positioned(
+                      right: 0,
+                      top: 0,
+                      bottom: 0,
+                      child: GestureDetector(
+                        onTap: _openCounterMenu,
+                        onLongPress: _openTodayLog,
+                        child: Container(
+                          width: 36,
+                          height: 36,
+                          decoration: BoxDecoration(
+                            color: dark ? C.dark3 : C.light3,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            CupertinoIcons.ellipsis,
+                            size: 16,
+                            color: dark ? C.onDark2 : C.onLight2,
+                          ),
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
@@ -659,6 +816,143 @@ class _CounterPageState extends State<CounterPage>
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+
+/// Action menu shown when the user taps the counter header's ⋮ button.
+/// Lists the three discrete page-level actions (manual add, today's log,
+/// counter settings) as labeled rows so each is self-documenting; the
+/// sheet pops with a string identifier so the parent picks the right
+/// flow without needing direct callbacks.
+class _CounterMenuSheet extends StatelessWidget {
+  const _CounterMenuSheet({required this.dark});
+  final bool dark;
+
+  @override
+  Widget build(BuildContext context) {
+    final bottomInset = MediaQuery.of(context).padding.bottom;
+    return Container(
+      decoration: BoxDecoration(
+        color: dark ? C.dark2 : C.light2,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      padding: EdgeInsets.fromLTRB(0, S.s12, 0, bottomInset + S.s12),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Drag handle
+          Center(
+            child: Container(
+              width: 36,
+              height: 4,
+              decoration: BoxDecoration(
+                color: dark ? C.dark4 : C.lightDivider,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+          ),
+          const SizedBox(height: S.s16),
+
+          _CounterMenuRow(
+            icon: CupertinoIcons.add_circled,
+            title: 'Add manual count',
+            subtitle: 'Log counts from a physical tasbih',
+            dark: dark,
+            onTap: () => Navigator.pop(context, 'manual'),
+          ),
+          _CounterMenuRow(
+            icon: CupertinoIcons.list_bullet,
+            title: "Edit today's log",
+            subtitle: 'Fix a wrong number from earlier today',
+            dark: dark,
+            onTap: () => Navigator.pop(context, 'today'),
+          ),
+          _CounterMenuRow(
+            icon: CupertinoIcons.gear,
+            title: 'Counter settings',
+            subtitle: 'Bead style, haptics, and daily goal',
+            dark: dark,
+            onTap: () => Navigator.pop(context, 'settings'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _CounterMenuRow extends StatelessWidget {
+  const _CounterMenuRow({
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.dark,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final bool dark;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: S.page,
+          vertical: S.s12,
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: dark ? C.dark3 : C.light3,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                icon,
+                size: 18,
+                color: dark ? C.onDark1 : C.onLight1,
+              ),
+            ),
+            const SizedBox(width: S.s12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      color: dark ? C.onDark1 : C.onLight1,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    subtitle,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: dark ? C.onDark3 : C.onLight3,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(
+              CupertinoIcons.chevron_right,
+              size: 14,
+              color: dark ? C.onDark3 : C.onLight3,
+            ),
+          ],
+        ),
       ),
     );
   }

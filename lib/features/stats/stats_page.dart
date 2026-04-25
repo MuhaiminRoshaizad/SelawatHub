@@ -5,10 +5,12 @@ import 'package:selawathub/core/animations/bounce_tap.dart';
 import 'package:selawathub/core/animations/fade_in.dart';
 import 'package:selawathub/core/constants.dart';
 import 'package:selawathub/core/services/counter_service.dart';
+import 'package:selawathub/core/services/custom_dhikr_service.dart';
 import 'package:selawathub/core/services/settings_service.dart';
 import 'package:selawathub/core/services/stats_cache.dart';
 import 'package:selawathub/core/services/supabase_service.dart';
 import 'package:selawathub/features/counter/models/dhikr.dart';
+import 'package:selawathub/features/counter/widgets/today_log_sheet.dart';
 import 'package:selawathub/core/theme/colors.dart';
 import 'package:selawathub/core/widgets/app_bottom_sheet.dart';
 import 'package:selawathub/core/widgets/app_refresh_indicator.dart';
@@ -45,6 +47,7 @@ class _StatsPageState extends State<StatsPage> {
   int _bestStreak = 0;
   int _daysActive = 0;
   int _todayTotal = 0;
+  Map<String, int> _todayCounts = const {};
   int _dailyGoal = SettingsService.dailyGoal;
 
   @override
@@ -64,6 +67,9 @@ class _StatsPageState extends State<StatsPage> {
     _heatmapData = heatmap;
     _weeklyData = StatsCache.weeklyData<WeekData>();
     _todayTotal = StatsCache.totalToday;
+    _todayCounts = {
+      for (final (id, _, count) in heatmap.last.topDhikr) id: count,
+    };
     _hasData = heatmap.any((d) => d.total > 0);
     _loading = false;
   }
@@ -209,6 +215,11 @@ class _StatsPageState extends State<StatsPage> {
       _bestStreak = best;
       _daysActive = daysActive;
       _todayTotal = heatmap.isNotEmpty ? heatmap.last.total : 0;
+      _todayCounts = heatmap.isEmpty
+          ? const {}
+          : {
+              for (final (id, _, count) in heatmap.last.topDhikr) id: count,
+            };
       _hasData = heatmap.any((d) => d.total > 0);
       _loading = false;
     });
@@ -226,6 +237,70 @@ class _StatsPageState extends State<StatsPage> {
     setState(() {
       _selectedHeatmapIdx = _selectedHeatmapIdx == idx ? null : idx;
     });
+  }
+
+  /// Open the "Today's log" sheet from the stats page so users who notice
+  /// a wrong number while reviewing can correct it without leaving stats.
+  Future<void> _openTodayLog() async {
+    final customs = SupabaseService.isAuthenticated
+        ? await CustomDhikrService.list()
+        : const <Dhikr>[];
+    if (!mounted) return;
+    HapticFeedback.lightImpact();
+    await TodayLogSheet.show(
+      context,
+      counts: _todayCounts,
+      customs: customs,
+      onEdit: _setExactCount,
+    );
+  }
+
+  /// Overwrite today's count for [dhikr] to exactly [newCount]. After a
+  /// successful edit, refresh stats so the heatmap, totals, and breakdown
+  /// reflect the corrected number.
+  Future<bool> _setExactCount(Dhikr dhikr, int newCount) async {
+    if (newCount < 0) return false;
+    final prev = _todayCounts[dhikr.id] ?? 0;
+
+    final now = DateTime.now();
+    final today =
+        '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
+    SettingsService.saveLocalCount(
+      dhikr.id,
+      dhikr.category.name,
+      newCount,
+      today,
+    );
+
+    if (SupabaseService.isAuthenticated) {
+      try {
+        await CounterService.upsertCount(
+          dhikrId: dhikr.id,
+          category: dhikr.category.name,
+          count: newCount,
+        );
+      } catch (_) {
+        if (mounted) {
+          showAppSnackBar(
+            context,
+            'Failed to update. Please try again.',
+            backgroundColor: C.error,
+          );
+        }
+        return false;
+      }
+    }
+
+    if (mounted) {
+      showAppSnackBar(
+        context,
+        'Updated · ${dhikr.name} · $prev → $newCount',
+      );
+      // Reload to recompute today's total, streak, and breakdown.
+      StatsCache.invalidate();
+      _loadStats();
+    }
+    return true;
   }
 
   void _showEditGoal() {
@@ -279,7 +354,7 @@ class _StatsPageState extends State<StatsPage> {
                   SettingsService.dailyGoal = val;
                   setState(() => _dailyGoal = val);
                   Navigator.pop(ctx);
-                  showAppSnackBar(context, 'Daily goal updated');
+                  showAppSnackBar(context, 'Daily goal set to $val');
                 },
                 child: Container(
                   padding: const EdgeInsets.symmetric(vertical: 14),
@@ -373,6 +448,66 @@ class _StatsPageState extends State<StatsPage> {
               ),
             ),
           ),
+
+          if (!_loading && _todayCounts.isNotEmpty) ...[
+            const SizedBox(height: S.s8),
+            FadeIn(
+              delay: const Duration(milliseconds: 60),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: S.page),
+                child: BounceTap(
+                  onTap: _openTodayLog,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: S.s12,
+                      vertical: S.s12,
+                    ),
+                    decoration: BoxDecoration(
+                      color: dark ? C.dark2 : C.light2,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: dark ? C.dark3 : C.light3,
+                        width: 1,
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          CupertinoIcons.pencil,
+                          size: 14,
+                          color: dark ? C.onDark2 : C.onLight2,
+                        ),
+                        const SizedBox(width: S.s8),
+                        Expanded(
+                          child: Text(
+                            "Edit today's log",
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                              color: dark ? C.onDark1 : C.onLight1,
+                            ),
+                          ),
+                        ),
+                        Text(
+                          'Made a mistake?',
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: dark ? C.onDark3 : C.onLight3,
+                          ),
+                        ),
+                        const SizedBox(width: S.s4),
+                        Icon(
+                          CupertinoIcons.chevron_right,
+                          size: 12,
+                          color: dark ? C.onDark3 : C.onLight3,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
 
           const SizedBox(height: S.s16),
 
