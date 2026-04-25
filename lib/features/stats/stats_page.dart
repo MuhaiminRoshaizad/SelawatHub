@@ -171,9 +171,9 @@ class _StatsPageState extends State<StatsPage> {
       }
       // If today exists in the range but the goal hasn't been met yet,
       // skip it so it doesn't look like the streak is already broken.
-      if (isToday && heatmap[i].total < goal) i--;
+      if (isToday && heatmap[i].total < (goal > 0 ? goal : 1)) i--;
     }
-    while (i >= 0 && heatmap[i].total >= goal) {
+    while (i >= 0 && heatmap[i].total >= (goal > 0 ? goal : 1)) {
       current++;
       i--;
     }
@@ -182,7 +182,7 @@ class _StatsPageState extends State<StatsPage> {
     int run = 0;
     for (final d in heatmap) {
       if (d.total > 0) daysActive++;
-      if (d.total >= goal) {
+      if (d.total >= (goal > 0 ? goal : 1)) {
         run++;
         if (run > best) best = run;
       } else {

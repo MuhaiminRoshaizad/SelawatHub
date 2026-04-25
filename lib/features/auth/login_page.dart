@@ -126,11 +126,13 @@ class _LoginPageState extends State<LoginPage> {
             'An account with this email already exists. Try signing in instead.',
             backgroundColor: C.error,
           );
+          AuthService.expectingManualAuth = false;
           setState(() => _loading = false);
           return;
         }
         if (user != null && user.emailConfirmedAt == null) {
           showAppSnackBar(context, 'Check your email to verify your account');
+          AuthService.expectingManualAuth = false;
           setState(() => _loading = false);
           return;
         }
@@ -146,14 +148,14 @@ class _LoginPageState extends State<LoginPage> {
       );
     } on AuthException catch (e) {
       if (!mounted) return;
+      AuthService.expectingManualAuth = false;
       showAppSnackBar(context, e.message);
       setState(() => _loading = false);
     } catch (e) {
       if (!mounted) return;
+      AuthService.expectingManualAuth = false;
       showAppSnackBar(context, 'Something went wrong. Please try again.');
       setState(() => _loading = false);
-    } finally {
-      AuthService.expectingManualAuth = false;
     }
   }
 

@@ -53,8 +53,13 @@ class _SelawatHubAppState extends State<SelawatHubApp> {
         );
         return;
       }
-      if (state.event == AuthChangeEvent.signedIn &&
-          !AuthService.expectingManualAuth) {
+      if (state.event == AuthChangeEvent.signedIn) {
+        if (AuthService.expectingManualAuth) {
+          // This signedIn was triggered by an in-app form — consume the flag
+          // and let the login page handle its own navigation.
+          AuthService.expectingManualAuth = false;
+          return;
+        }
         _handleVerificationDeepLink(state.session?.user.email);
       }
     });

@@ -425,6 +425,7 @@ class _CounterPageState extends State<CounterPage>
       }
       return true;
     } catch (_) {
+      if (!mounted) return false;
       setState(() {
         _todayCounts[dhikr.id] = prev;
         if (isCurrent) _total = prev;

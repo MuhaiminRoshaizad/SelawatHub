@@ -592,22 +592,14 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   void _showChangePassword(BuildContext context) {
-    final currentCtrl = TextEditingController();
-    final newCtrl = TextEditingController();
-    final confirmCtrl = TextEditingController();
     showAppFormSheet(
       context: context,
-      builder: (ctx) {
-        return _ChangePasswordSheet(
-          currentCtrl: currentCtrl,
-          newCtrl: newCtrl,
-          confirmCtrl: confirmCtrl,
-          onSaved: () {
-            Navigator.pop(ctx);
-            showAppSnackBar(context, 'Password changed successfully');
-          },
-        );
-      },
+      builder: (ctx) => _ChangePasswordSheet(
+        onSaved: () {
+          Navigator.pop(ctx);
+          showAppSnackBar(context, 'Password changed successfully');
+        },
+      ),
     );
   }
 
@@ -638,15 +630,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
 // ── Change password sheet with visibility toggles ──
 class _ChangePasswordSheet extends StatefulWidget {
-  const _ChangePasswordSheet({
-    required this.currentCtrl,
-    required this.newCtrl,
-    required this.confirmCtrl,
-    required this.onSaved,
-  });
-  final TextEditingController currentCtrl;
-  final TextEditingController newCtrl;
-  final TextEditingController confirmCtrl;
+  const _ChangePasswordSheet({required this.onSaved});
   final VoidCallback onSaved;
 
   @override
@@ -654,16 +638,27 @@ class _ChangePasswordSheet extends StatefulWidget {
 }
 
 class _ChangePasswordSheetState extends State<_ChangePasswordSheet> {
+  final _currentCtrl = TextEditingController();
+  final _newCtrl = TextEditingController();
+  final _confirmCtrl = TextEditingController();
   bool _showCurrent = false;
   bool _showNew = false;
   bool _showConfirm = false;
   bool _saving = false;
   bool _sendingReset = false;
 
+  @override
+  void dispose() {
+    _currentCtrl.dispose();
+    _newCtrl.dispose();
+    _confirmCtrl.dispose();
+    super.dispose();
+  }
+
   Future<void> _changePassword() async {
-    final currentPw = widget.currentCtrl.text;
-    final newPw = widget.newCtrl.text;
-    final confirmPw = widget.confirmCtrl.text;
+    final currentPw = _currentCtrl.text;
+    final newPw = _newCtrl.text;
+    final confirmPw = _confirmCtrl.text;
     if (currentPw.isEmpty) {
       showAppSnackBar(context, 'Please enter your current password',
           backgroundColor: C.error);
@@ -733,7 +728,7 @@ class _ChangePasswordSheetState extends State<_ChangePasswordSheet> {
           Text('Change Password', style: tt.titleLarge?.copyWith(fontWeight: FontWeight.w600)),
           const SizedBox(height: S.s24),
           TextField(
-            controller: widget.currentCtrl,
+            controller: _currentCtrl,
             obscureText: !_showCurrent,
             decoration: InputDecoration(
               labelText: 'Current Password',
@@ -763,7 +758,7 @@ class _ChangePasswordSheetState extends State<_ChangePasswordSheet> {
           ),
           const SizedBox(height: S.s16),
           TextField(
-            controller: widget.newCtrl,
+            controller: _newCtrl,
             obscureText: !_showNew,
             decoration: InputDecoration(
               labelText: 'New Password',
@@ -779,7 +774,7 @@ class _ChangePasswordSheetState extends State<_ChangePasswordSheet> {
           ),
           const SizedBox(height: S.s16),
           TextField(
-            controller: widget.confirmCtrl,
+            controller: _confirmCtrl,
             obscureText: !_showConfirm,
             decoration: InputDecoration(
               labelText: 'Confirm Password',
