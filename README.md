@@ -103,5 +103,6 @@ Detailed documentation lives in the [`docs/`](docs/) folder:
 
 ## License
 
-*To be determined*
+MIT License — Copyright (c) 2025 Muhammad Muhaimin Bin Roshaizad.
+See [LICENSE](./LICENSE) for the full text.
 
