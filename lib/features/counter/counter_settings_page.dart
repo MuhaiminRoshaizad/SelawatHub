@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:selawathub/core/constants.dart';
+import 'package:selawathub/core/services/tick_sound_service.dart';
 import 'package:selawathub/core/theme/colors.dart';
 import 'package:selawathub/core/widgets/action_buttons.dart';
 import 'package:selawathub/core/widgets/app_bottom_sheet.dart';
@@ -23,11 +24,32 @@ const colorThemes = [
   ('Ivory', Color(0xFFC4B998)),
 ];
 
+class CounterSettingsResult {
+  const CounterSettingsResult({
+    required this.hapticEnabled,
+    required this.hapticIntensity,
+    required this.soundEnabled,
+    required this.soundStyle,
+    required this.counterStyle,
+    required this.customTargets,
+    required this.colorThemeIndex,
+  });
+  final bool hapticEnabled;
+  final int hapticIntensity;
+  final bool soundEnabled;
+  final int soundStyle;
+  final int counterStyle;
+  final Map<String, int> customTargets;
+  final int colorThemeIndex;
+}
+
 class CounterSettingsPage extends StatefulWidget {
   const CounterSettingsPage({
     super.key,
     required this.hapticEnabled,
     required this.hapticIntensity,
+    required this.soundEnabled,
+    required this.soundStyle,
     required this.counterStyle,
     required this.customTargets,
     required this.colorThemeIndex,
@@ -35,6 +57,8 @@ class CounterSettingsPage extends StatefulWidget {
 
   final bool hapticEnabled;
   final int hapticIntensity;
+  final bool soundEnabled;
+  final int soundStyle;
   final int counterStyle;
   final Map<String, int> customTargets;
   final int colorThemeIndex;
@@ -46,6 +70,8 @@ class CounterSettingsPage extends StatefulWidget {
 class _CounterSettingsPageState extends State<CounterSettingsPage> {
   late bool _hapticEnabled;
   late int _hapticIntensity;
+  late bool _soundEnabled;
+  late int _soundStyle;
   late int _counterStyle;
   late Map<String, int> _customTargets;
   late int _colorThemeIndex;
@@ -55,15 +81,25 @@ class _CounterSettingsPageState extends State<CounterSettingsPage> {
     super.initState();
     _hapticEnabled = widget.hapticEnabled;
     _hapticIntensity = widget.hapticIntensity;
+    _soundEnabled = widget.soundEnabled;
+    _soundStyle = widget.soundStyle;
     _counterStyle = widget.counterStyle;
     _customTargets = Map.of(widget.customTargets);
     _colorThemeIndex = widget.colorThemeIndex;
   }
 
   void _pop() {
-    Navigator.pop<(bool, int, int, Map<String, int>, int)>(
+    Navigator.pop<CounterSettingsResult>(
       context,
-      (_hapticEnabled, _hapticIntensity, _counterStyle, _customTargets, _colorThemeIndex),
+      CounterSettingsResult(
+        hapticEnabled: _hapticEnabled,
+        hapticIntensity: _hapticIntensity,
+        soundEnabled: _soundEnabled,
+        soundStyle: _soundStyle,
+        counterStyle: _counterStyle,
+        customTargets: _customTargets,
+        colorThemeIndex: _colorThemeIndex,
+      ),
     );
   }
 
@@ -200,6 +236,62 @@ class _CounterSettingsPageState extends State<CounterSettingsPage> {
                     padding: const EdgeInsets.only(top: S.s6),
                     child: Text(
                       'May not be available on all devices',
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: dark ? C.onDark3 : C.onLight3,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: S.s24),
+
+                // ── Tick Sound ──
+                _MenuContainer(
+                  dark: dark,
+                  children: [
+                    _SwitchRow(
+                      icon: CupertinoIcons.speaker_2_fill,
+                      label: 'Tick Sound',
+                      value: _soundEnabled,
+                      onChanged: (v) => setState(() => _soundEnabled = v),
+                    ),
+                    if (_soundEnabled) ...[
+                      Divider(
+                        height: 1,
+                        color: dark ? C.darkDivider : C.lightDivider,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: S.s16, vertical: S.s12,
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            for (var i = 0;
+                                i < TickSoundService.styleNames.length;
+                                i++)
+                              _TickStyleRow(
+                                dark: dark,
+                                label: TickSoundService.styleNames[i],
+                                selected: _soundStyle == i,
+                                onTap: () {
+                                  setState(() => _soundStyle = i);
+                                  TickSoundService.play(i);
+                                },
+                                onPreview: () => TickSoundService.play(i),
+                              ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: S.s20),
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: S.s6),
+                    child: Text(
+                      'Plays a soft click on every tap. Useful when your phone\'s vibration is off.',
                       style: TextStyle(
                         fontSize: 11,
                         color: dark ? C.onDark3 : C.onLight3,
@@ -425,6 +517,81 @@ class _CounterSettingsPageState extends State<CounterSettingsPage> {
 }
 
 // ── Helpers ──
+
+class _TickStyleRow extends StatelessWidget {
+  const _TickStyleRow({
+    required this.dark,
+    required this.label,
+    required this.selected,
+    required this.onTap,
+    required this.onPreview,
+  });
+  final bool dark;
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+  final VoidCallback onPreview;
+
+  @override
+  Widget build(BuildContext context) {
+    final accent = dark ? C.primarySoft : C.primary;
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: S.s8),
+        child: Row(
+          children: [
+            Container(
+              width: 22,
+              height: 22,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: selected ? accent : (dark ? C.onDark3 : C.onLight3),
+                  width: 2,
+                ),
+              ),
+              child: selected
+                  ? Center(
+                      child: Container(
+                        width: 10,
+                        height: 10,
+                        decoration: BoxDecoration(
+                          color: accent,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                    )
+                  : null,
+            ),
+            const SizedBox(width: S.s12),
+            Expanded(
+              child: Text(
+                label,
+                style: TextStyle(color: dark ? C.onDark1 : C.onLight1),
+              ),
+            ),
+            GestureDetector(
+              onTap: onPreview,
+              behavior: HitTestBehavior.opaque,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: S.s12, vertical: S.s4,
+                ),
+                child: Icon(
+                  CupertinoIcons.play_circle,
+                  size: 22,
+                  color: accent,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
 
 class _MenuContainer extends StatelessWidget {
   const _MenuContainer({required this.dark, required this.children});

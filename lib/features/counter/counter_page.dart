@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:app_settings/app_settings.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -9,6 +10,7 @@ import 'package:selawathub/core/services/counter_service.dart';
 import 'package:selawathub/core/services/custom_dhikr_service.dart';
 import 'package:selawathub/core/services/settings_service.dart';
 import 'package:selawathub/core/services/supabase_service.dart';
+import 'package:selawathub/core/services/tick_sound_service.dart';
 import 'package:selawathub/core/theme/colors.dart';
 import 'package:selawathub/core/widgets/app_snackbar.dart';
 import 'package:selawathub/core/widgets/bead_circle.dart';
@@ -36,6 +38,8 @@ class _CounterPageState extends State<CounterPage>
   bool _arabicExpanded = false;
   bool _hapticEnabled = true;
   int _hapticIntensity = 1;
+  bool _soundEnabled = false;
+  int _soundStyle = 0;
   int _counterStyle = 0;
   Map<String, int> _customTargets = {};
   int _colorThemeIndex = 0;
@@ -56,6 +60,8 @@ class _CounterPageState extends State<CounterPage>
     // primed in main.dart, so these getters are non-blocking.
     _hapticEnabled = SettingsService.hapticEnabled;
     _hapticIntensity = SettingsService.hapticIntensity;
+    _soundEnabled = SettingsService.soundEnabled;
+    _soundStyle = SettingsService.soundStyle;
     _counterStyle = SettingsService.counterStyle;
     _colorThemeIndex = SettingsService.colorThemeIndex;
     _customTargets = SettingsService.getAllCustomTargets(
@@ -146,6 +152,10 @@ class _CounterPageState extends State<CounterPage>
     // has disabled vibration system-wide (e.g. Pixel vibration toggle), so
     // we just guard against unexpected platform exceptions.
     _triggerHaptic(_hapticIntensity);
+    if (_soundEnabled) {
+      TickSoundService.play(_soundStyle);
+    }
+    _maybeShowHapticHint();
     _pulse.forward(from: 0);
     setState(() {
       _count++;
@@ -166,13 +176,40 @@ class _CounterPageState extends State<CounterPage>
     }
   }
 
+  /// Heuristic nudge: if haptics are enabled in app but the user has
+  /// tapped 50+ times without enabling Tick Sound, show a one-time toast
+  /// pointing them at system vibration settings (Android can deep-link;
+  /// iOS just shows the message). We can't actually detect whether the
+  /// platform fired the vibration, but if they've tapped this much with
+  /// haptics on and haven't enabled the sound fallback, it's a reasonable
+  /// time to surface the option.
+  int _sessionTaps = 0;
+  void _maybeShowHapticHint() {
+    if (SettingsService.hapticHintShown) return;
+    if (!_hapticEnabled || _soundEnabled) return;
+    _sessionTaps++;
+    if (_sessionTaps != 50) return;
+    SettingsService.hapticHintShown = true;
+    if (!mounted) return;
+    showAppSnackBar(
+      context,
+      'Haptics not buzzing? Check your phone\'s vibration settings — or enable Tick Sound below.',
+      actionLabel: 'Settings',
+      onAction: () {
+        AppSettings.openAppSettings(type: AppSettingsType.sound);
+      },
+    );
+  }
+
   void _openSettings() async {
-    final result = await Navigator.push<(bool, int, int, Map<String, int>, int)>(
+    final result = await Navigator.push<CounterSettingsResult>(
       context,
       MaterialPageRoute(
         builder: (_) => CounterSettingsPage(
           hapticEnabled: _hapticEnabled,
           hapticIntensity: _hapticIntensity,
+          soundEnabled: _soundEnabled,
+          soundStyle: _soundStyle,
           counterStyle: _counterStyle,
           customTargets: Map.of(_customTargets),
           colorThemeIndex: _colorThemeIndex,
@@ -181,14 +218,18 @@ class _CounterPageState extends State<CounterPage>
     );
     if (result != null) {
       setState(() {
-        _hapticEnabled = result.$1;
-        _hapticIntensity = result.$2;
-        _counterStyle = result.$3;
-        _customTargets = result.$4;
-        _colorThemeIndex = result.$5;
+        _hapticEnabled = result.hapticEnabled;
+        _hapticIntensity = result.hapticIntensity;
+        _soundEnabled = result.soundEnabled;
+        _soundStyle = result.soundStyle;
+        _counterStyle = result.counterStyle;
+        _customTargets = result.customTargets;
+        _colorThemeIndex = result.colorThemeIndex;
       });
       SettingsService.hapticEnabled = _hapticEnabled;
       SettingsService.hapticIntensity = _hapticIntensity;
+      SettingsService.soundEnabled = _soundEnabled;
+      SettingsService.soundStyle = _soundStyle;
       SettingsService.counterStyle = _counterStyle;
       SettingsService.colorThemeIndex = _colorThemeIndex;
       SettingsService.saveAllCustomTargets(_customTargets);

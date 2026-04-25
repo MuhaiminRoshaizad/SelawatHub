@@ -13,6 +13,9 @@ class SettingsService {
   // Keys
   static const _kHapticEnabled = 'haptic_enabled';
   static const _kHapticIntensity = 'haptic_intensity';
+  static const _kSoundEnabled = 'sound_enabled';
+  static const _kSoundStyle = 'sound_style';
+  static const _kHapticHintShown = 'haptic_hint_shown';
   static const _kCounterStyle = 'counter_style';
   static const _kColorThemeIndex = 'color_theme_index';
   static const _kThemeMode = 'theme_mode';
@@ -23,6 +26,21 @@ class SettingsService {
 
   static int get hapticIntensity => _prefs?.getInt(_kHapticIntensity) ?? 1;
   static set hapticIntensity(int v) => _prefs?.setInt(_kHapticIntensity, v);
+
+  /// Tick sound on each tap. Off by default — most users prefer haptic only.
+  /// Useful as a fallback when the OS-level vibration toggle is disabled,
+  /// since the audio plays via the media channel and bypasses the system
+  /// "Touch sounds" toggle on Android.
+  static bool get soundEnabled => _prefs?.getBool(_kSoundEnabled) ?? false;
+  static set soundEnabled(bool v) => _prefs?.setBool(_kSoundEnabled, v);
+
+  /// 0 = light click, 1 = wood click, 2 = soft tap.
+  static int get soundStyle => _prefs?.getInt(_kSoundStyle) ?? 0;
+  static set soundStyle(int v) => _prefs?.setInt(_kSoundStyle, v);
+
+  /// Tracks whether we've shown the one-time "haptics not buzzing?" nudge.
+  static bool get hapticHintShown => _prefs?.getBool(_kHapticHintShown) ?? false;
+  static set hapticHintShown(bool v) => _prefs?.setBool(_kHapticHintShown, v);
 
   static int get counterStyle => _prefs?.getInt(_kCounterStyle) ?? 0;
   static set counterStyle(int v) => _prefs?.setInt(_kCounterStyle, v);
