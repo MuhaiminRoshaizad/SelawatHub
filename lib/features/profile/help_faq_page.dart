@@ -14,7 +14,7 @@ class HelpFaqPage extends StatelessWidget {
         (
           question: 'How do I count selawat or zikir?',
           answer:
-              'Go to the Tasbih tab and tap the counter area to count. You can switch between different selawat and zikir types by tapping the dhikr name at the top. There are two counter styles available — digital and bead — which you can switch in the counter settings.',
+              'Go to the Tasbih tab and tap the counter area to count. You can switch between different selawat and zikir types by tapping the dhikr name at the top. There are three counter styles available — Digital, Bead, and Minimal — which you can switch in the counter settings.',
         ),
         (
           question: 'How do I change the dhikr type?',
@@ -25,6 +25,11 @@ class HelpFaqPage extends StatelessWidget {
           question: 'Can I set a target count for my dhikr?',
           answer:
               'Yes! Go to the counter settings (⋮ menu on the Tasbih tab) and set your desired target count. The counter will track your progress toward that target. The target must be a whole number greater than zero.',
+        ),
+        (
+          question: 'The vibration/haptic is not working on my phone.',
+          answer:
+              'Some phones disable vibration system-wide (e.g. "Vibration & haptics" toggle in your phone\'s Sound settings). The app cannot override that — but you can enable Tick Sound as an alternative.\n\nGo to Counter settings (⋮ menu → Counter settings) and turn on Tick Sound. Choose from three styles: Click, Wood, or Soft tap. The sound plays through the media channel and works even when your phone\'s vibration is off.\n\nOn iOS, Tick Sound respects the ringer/silent switch — so it stays silent in the mosque when your phone is on silent.',
         ),
         (
           question: 'What is the ⋮ button at the top of the counter?',
@@ -71,7 +76,7 @@ class HelpFaqPage extends StatelessWidget {
         (
           question: 'How are streaks calculated?',
           answer:
-              'A streak counts consecutive days where you meet your daily goal. If you reach your daily goal today and did so yesterday, your streak continues. Missing a day resets it to zero.',
+              'A streak counts consecutive days where you meet your daily goal.\n\nThe streak fire works like this: if you had a 12-day streak and today is day 13, the fire shows as off (dim) until you hit your goal for today. Once you reach the goal, the fire turns on and your streak becomes 13.\n\nThis means the streak number only increases after you earn it — not just by opening the app. Missing a day resets the streak to zero.',
         ),
       ],
     ),
@@ -124,7 +129,7 @@ class HelpFaqPage extends StatelessWidget {
         (
           question: 'Is my data saved to the cloud?',
           answer:
-              'If you have an account, your dhikr counts, profile, and group data are synced to the cloud. Preferences like theme, haptic feedback, and daily goal are stored locally on your device. Guest data is stored locally only.',
+              'If you have an account, your dhikr counts, profile, and group data are synced to the cloud. Preferences like theme, haptic feedback, tick sound, and daily goal are stored locally on your device. Guest data is stored locally only.',
         ),
         (
           question: 'How do I change my profile picture?',

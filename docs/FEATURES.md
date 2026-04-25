@@ -41,6 +41,7 @@ Three visualization modes (user selectable in settings):
 
 - **Tap anywhere** on the counter area to increment
 - **Haptic feedback** — 3 intensity levels (light, medium, heavy), toggleable
+- **Tick sound** — 3 style options (Click, Wood, Soft tap), toggleable; plays via media channel bypassing Android touch-sounds toggle
 - **Auto-save** — Debounced: saves after 2 seconds idle or every 5 taps
 - **Dual persistence** — Supabase (cloud) + SharedPreferences (offline backup)
 - **Target tracking** — Progress shown relative to custom or default target
@@ -78,9 +79,15 @@ Long-press ⋮ as a shortcut to "Edit today's log".
 |---------|---------|---------|
 | Haptic feedback | On/Off | SharedPreferences |
 | Haptic intensity | Light, Medium, Heavy | SharedPreferences |
+| Tick sound | On/Off | SharedPreferences |
+| Tick sound style | Click, Wood, Soft tap | SharedPreferences |
 | Counter style | Digital, Bead, Minimal | SharedPreferences |
 | Color theme | 6 themes (Emerald, Gold, Ocean, Rose, Lavender, Ivory) | SharedPreferences |
 | Custom target | Per-dhikr (digits only, must be > 0) | SharedPreferences |
+
+> **Tick Sound** plays a short audio click on every tap, routed through the media channel. On Android this bypasses the "Touch sounds" system toggle, so it works even when vibration is off. On iOS it respects the ringer/silent switch (silent in mosque = no sound).
+>
+> If haptic feedback is enabled but tick sound is off, the app shows a one-time nudge after ~50 taps suggesting the user check their phone's vibration settings or enable tick sound as a fallback.
 
 ---
 
@@ -155,6 +162,15 @@ Personal analytics dashboard with multiple visualisation components.
 | Burning | 1–29 | Small flame |
 | Blazing | 30–99 | Medium flame |
 | Legendary | 100+ | Large flame |
+
+### Streak Behaviour (TikTok-style)
+
+The streak fire reflects whether **today's goal has been met yet**:
+
+- **Goal not yet met today** — fire is shown as **off** (dim/grey) with the last completed streak count. E.g. "🔥 12 days" = you had 12 consecutive days but haven't hit goal yet today.
+- **Goal met today** — fire turns **on** and the streak increments. E.g. "🔥 13 days".
+
+This means the fire only activates once you earn it each day, not just because you opened the app.
 
 ### Daily Goal
 - Default: 100 counts
