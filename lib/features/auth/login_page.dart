@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:selawathub/core/animations/bounce_tap.dart';
@@ -9,6 +10,8 @@ import 'package:selawathub/core/services/auth_service.dart';
 import 'package:selawathub/core/widgets/app_snackbar.dart';
 import 'package:selawathub/core/widgets/app_bottom_sheet.dart';
 import 'package:selawathub/app/app_shell.dart';
+import 'package:selawathub/features/profile/privacy_policy_page.dart';
+import 'package:selawathub/features/profile/terms_of_service_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key, this.isSignUp = false});
@@ -21,11 +24,22 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   late bool _isSignUp = widget.isSignUp;
   bool _loading = false;
+  bool _agreedToTerms = false;
 
   final _nameCtrl = TextEditingController();
   final _emailCtrl = TextEditingController();
   final _passwordCtrl = TextEditingController();
   final _confirmPasswordCtrl = TextEditingController();
+
+  final _termsRecognizer = TapGestureRecognizer();
+  final _privacyRecognizer = TapGestureRecognizer();
+
+  @override
+  void initState() {
+    super.initState();
+    _termsRecognizer.onTap = _openTerms;
+    _privacyRecognizer.onTap = _openPrivacy;
+  }
 
   @override
   void dispose() {
@@ -33,7 +47,21 @@ class _LoginPageState extends State<LoginPage> {
     _emailCtrl.dispose();
     _passwordCtrl.dispose();
     _confirmPasswordCtrl.dispose();
+    _termsRecognizer.dispose();
+    _privacyRecognizer.dispose();
     super.dispose();
+  }
+
+  void _openTerms() {
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => const TermsOfServicePage()),
+    );
+  }
+
+  void _openPrivacy() {
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => const PrivacyPolicyPage()),
+    );
   }
 
   Future<void> _submit() async {
@@ -55,6 +83,11 @@ class _LoginPageState extends State<LoginPage> {
     }
     if (_isSignUp && password != _confirmPasswordCtrl.text.trim()) {
       showAppSnackBar(context, 'Passwords do not match');
+      return;
+    }
+    if (_isSignUp && !_agreedToTerms) {
+      showAppSnackBar(
+          context, 'Please agree to the Terms of Service and Privacy Policy');
       return;
     }
 
@@ -237,42 +270,64 @@ class _LoginPageState extends State<LoginPage> {
 
             const SizedBox(height: S.s32),
 
+            // Terms & Privacy agreement (sign-up only)
+            if (_isSignUp) ...[
+              FadeIn(
+                delay: const Duration(milliseconds: 260),
+                child: _AgreementRow(
+                  dark: dark,
+                  tt: tt,
+                  checked: _agreedToTerms,
+                  onChanged: (v) => setState(() => _agreedToTerms = v),
+                  termsRecognizer: _termsRecognizer,
+                  privacyRecognizer: _privacyRecognizer,
+                ),
+              ),
+              const SizedBox(height: S.s20),
+            ],
+
             // Submit
             FadeIn(
               delay: Duration(milliseconds: _isSignUp ? 280 : 240),
               offset: const Offset(0, 20),
-              child: BounceTap(
-                onTap: _loading ? null : _submit,
-                child: Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  decoration: BoxDecoration(
-                    color: _loading
-                        ? (dark ? C.primarySoft.withValues(alpha: 0.5) : C.primary.withValues(alpha: 0.5))
-                        : (dark ? C.primarySoft : C.primary),
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  child: Center(
-                    child: _loading
-                        ? SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: C.white,
+              child: Builder(builder: (_) {
+                final disabled =
+                    _loading || (_isSignUp && !_agreedToTerms);
+                return BounceTap(
+                  onTap: disabled ? null : _submit,
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    decoration: BoxDecoration(
+                      color: disabled
+                          ? (dark
+                              ? C.primarySoft.withValues(alpha: 0.5)
+                              : C.primary.withValues(alpha: 0.5))
+                          : (dark ? C.primarySoft : C.primary),
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: Center(
+                      child: _loading
+                          ? SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: C.white,
+                              ),
+                            )
+                          : Text(
+                              _isSignUp ? 'Create Account' : 'Sign In',
+                              style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w600,
+                                color: C.white,
+                              ),
                             ),
-                          )
-                        : Text(
-                            _isSignUp ? 'Create Account' : 'Sign In',
-                            style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w600,
-                              color: C.white,
-                            ),
-                          ),
+                    ),
                   ),
-                ),
-              ),
+                );
+              }),
             ),
 
             const SizedBox(height: S.s24),
@@ -376,6 +431,98 @@ class _FieldState extends State<_Field> {
                   )
                 : null,
             suffixIconConstraints: const BoxConstraints(minWidth: 0, minHeight: 0),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// ── Terms & Privacy agreement row (sign-up only) ──
+
+class _AgreementRow extends StatelessWidget {
+  const _AgreementRow({
+    required this.dark,
+    required this.tt,
+    required this.checked,
+    required this.onChanged,
+    required this.termsRecognizer,
+    required this.privacyRecognizer,
+  });
+
+  final bool dark;
+  final TextTheme tt;
+  final bool checked;
+  final ValueChanged<bool> onChanged;
+  final TapGestureRecognizer termsRecognizer;
+  final TapGestureRecognizer privacyRecognizer;
+
+  @override
+  Widget build(BuildContext context) {
+    final accent = dark ? C.primarySoft : C.primary;
+    final muted = dark ? C.onDark2 : C.onLight2;
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Checkbox — tap target also toggles when label area tapped via parent
+        GestureDetector(
+          onTap: () => onChanged(!checked),
+          behavior: HitTestBehavior.opaque,
+          child: Container(
+            margin: const EdgeInsets.only(top: 2),
+            width: 22,
+            height: 22,
+            decoration: BoxDecoration(
+              color: checked ? accent : Colors.transparent,
+              border: Border.all(
+                color: checked
+                    ? accent
+                    : (dark ? C.darkDivider : C.lightDivider),
+                width: 1.5,
+              ),
+              borderRadius: BorderRadius.circular(6),
+            ),
+            child: checked
+                ? Icon(CupertinoIcons.check_mark,
+                    size: 16, color: C.white)
+                : null,
+          ),
+        ),
+        const SizedBox(width: S.s12),
+        Expanded(
+          child: GestureDetector(
+            onTap: () => onChanged(!checked),
+            behavior: HitTestBehavior.opaque,
+            child: RichText(
+              text: TextSpan(
+                style: tt.bodySmall?.copyWith(color: muted, height: 1.45),
+                children: [
+                  const TextSpan(text: 'I have read and agree to the '),
+                  TextSpan(
+                    text: 'Terms of Service',
+                    style: TextStyle(
+                      color: accent,
+                      fontWeight: FontWeight.w600,
+                      decoration: TextDecoration.underline,
+                      decorationColor: accent,
+                    ),
+                    recognizer: termsRecognizer,
+                  ),
+                  const TextSpan(text: ' and '),
+                  TextSpan(
+                    text: 'Privacy Policy',
+                    style: TextStyle(
+                      color: accent,
+                      fontWeight: FontWeight.w600,
+                      decoration: TextDecoration.underline,
+                      decorationColor: accent,
+                    ),
+                    recognizer: privacyRecognizer,
+                  ),
+                  const TextSpan(text: '.'),
+                ],
+              ),
+            ),
           ),
         ),
       ],
