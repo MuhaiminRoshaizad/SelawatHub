@@ -722,7 +722,7 @@ class AppL10nMs extends AppL10n {
 
   @override
   String get aboutDescription =>
-      'SelawatHub ialah teman anda untuk selawat dan zikir harian. Kira zikir anda dengan tasbih digital yang cantik, pantau siri dan perkembangan dari masa ke masa, tetapkan matlamat harian peribadi, dan berkembang bersama komuniti melalui ciri kumpulan.';
+      'SelawatHub ialah teman anda untuk selawat dan zikir harian. Kira zikir anda dengan tasbih digital yang cantik, pantau siri dan perkembangan dari masa ke masa, tetapkan matlamat harian peribadi, dan berkembang bersama komuniti melalui ciri kumpulan. Tersedia dalam Bahasa Melayu dan English.';
 
   @override
   String get aboutFeature1 => 'Tasbih digital dengan pelbagai jenis zikir';
@@ -870,7 +870,7 @@ class AppL10nMs extends AppL10n {
 
   @override
   String get faqQ_groups_admin_a =>
-      'Admin kumpulan boleh menyunting nama kumpulan, keterangan, dan matlamat harian. Mereka juga boleh menaikkan ahli ke admin, menurunkan admin, dan mengeluarkan ahli dari kumpulan.';
+      'Ketua kumpulan boleh menyunting nama kumpulan, keterangan, dan matlamat harian. Mereka juga boleh menaikkan ahli ke co-leader, menurunkan co-leader ke ahli, dan mengeluarkan ahli dari kumpulan.';
 
   @override
   String get faqQ_account_guest_q => 'Bolehkah saya guna aplikasi tanpa akaun?';
@@ -899,7 +899,7 @@ class AppL10nMs extends AppL10n {
 
   @override
   String get faqQ_data_cloud_a =>
-      'Jika anda ada akaun, kiraan zikir, profil, dan data kumpulan disegerakkan ke awan. Keutamaan seperti tema, maklum balas haptik, bunyi ketik, dan matlamat harian disimpan secara setempat pada peranti anda. Data tetamu disimpan secara setempat sahaja.';
+      'Jika anda ada akaun, kiraan zikir, profil, dan data kumpulan disegerakkan ke awan. Keutamaan seperti tema, maklum balas haptik, bunyi ketik, matlamat harian, dan bahasa disimpan secara setempat pada peranti anda. Data tetamu disimpan secara setempat sahaja.';
 
   @override
   String get faqQ_data_picture_q => 'Bagaimana saya tukar gambar profil?';
@@ -950,7 +950,7 @@ class AppL10nMs extends AppL10n {
 
   @override
   String get privacy3Body =>
-      'Data anda disimpan di Supabase, platform awan selamat dengan amalan keselamatan piawai industri termasuk:\n\n• Transmisi data tersulit (HTTPS/TLS)\n• Polisi Row Level Security (RLS) memastikan pengguna hanya boleh akses data mereka sendiri\n• Hashing kata laluan selamat menggunakan bcrypt\n• Gambar profil disimpan dalam storan awan terkawal akses\n\nData setempat (kiraan mod tetamu, keutamaan aplikasi seperti pilihan tema, tetapan maklum balas haptik, dan matlamat harian) disimpan pada peranti anda menggunakan SharedPreferences dan tidak dihantar ke pelayan kami.';
+      'Data anda disimpan di Supabase, platform awan selamat dengan amalan keselamatan piawai industri termasuk:\n\n• Transmisi data tersulit (HTTPS/TLS)\n• Polisi Row Level Security (RLS) memastikan pengguna hanya boleh akses data mereka sendiri\n• Hashing kata laluan selamat menggunakan bcrypt\n• Gambar profil disimpan dalam storan awan terkawal akses\n\nData setempat (kiraan mod tetamu, keutamaan aplikasi seperti pilihan tema, tetapan maklum balas haptik, matlamat harian, dan pilihan bahasa) disimpan pada peranti anda menggunakan SharedPreferences dan tidak dihantar ke pelayan kami.';
 
   @override
   String get privacy4Title => '4. Perkongsian Data & Pemindahan Antarabangsa';
@@ -1989,4 +1989,14 @@ class AppL10nMs extends AppL10n {
 
   @override
   String get groupDailyGoal => 'Sasaran Harian';
+
+  @override
+  String get faqQ_data_language_q => 'Bagaimana saya menukar bahasa aplikasi?';
+
+  @override
+  String get faqQ_data_language_a =>
+      'Pergi ke Profil > Bahasa dan pilih English atau Bahasa Melayu. Anda juga boleh menukar bahasa dari skrin onboarding atau log masuk dengan mengetik ikon bahasa. Pilihan bahasa anda disimpan secara setempat dan kekal setiap kali anda membuka aplikasi.';
+
+  @override
+  String get aboutFeature8 => 'Sokongan English & Bahasa Melayu';
 }

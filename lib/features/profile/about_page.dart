@@ -108,6 +108,8 @@ class AboutPage extends StatelessWidget {
                   _FeatureRow(icon: Icons.menu_book, label: l.aboutFeature6, dark: dark, tt: tt),
                   const SizedBox(height: S.s12),
                   _FeatureRow(icon: Icons.person_outline, label: l.aboutFeature7, dark: dark, tt: tt),
+                  const SizedBox(height: S.s12),
+                  _FeatureRow(icon: Icons.language, label: l.aboutFeature8, dark: dark, tt: tt),
                 ],
               ),
             ),

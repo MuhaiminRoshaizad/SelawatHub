@@ -1456,7 +1456,7 @@ abstract class AppL10n {
   /// No description provided for @aboutDescription.
   ///
   /// In en, this message translates to:
-  /// **'SelawatHub is your companion for daily selawat and zikir. Count your dhikr with a beautiful digital tasbih, track your streaks and progress over time, set personal daily goals, and grow together with your community through group features.'**
+  /// **'SelawatHub is your companion for daily selawat and zikir. Count your dhikr with a beautiful digital tasbih, track your streaks and progress over time, set personal daily goals, and grow together with your community through group features. Available in English and Bahasa Melayu.'**
   String get aboutDescription;
 
   /// No description provided for @aboutFeature1.
@@ -1708,7 +1708,7 @@ abstract class AppL10n {
   /// No description provided for @faqQ_groups_admin_a.
   ///
   /// In en, this message translates to:
-  /// **'Group admins can edit the group name, description, and daily goal. They can also promote members to admin, demote admins, and remove members from the group.'**
+  /// **'The group leader can edit the group name, description, and daily goal. They can also promote members to co-leader, demote co-leaders to member, and remove members from the group.'**
   String get faqQ_groups_admin_a;
 
   /// No description provided for @faqQ_account_guest_q.
@@ -1756,7 +1756,7 @@ abstract class AppL10n {
   /// No description provided for @faqQ_data_cloud_a.
   ///
   /// In en, this message translates to:
-  /// **'If you have an account, your dhikr counts, profile, and group data are synced to the cloud. Preferences like theme, haptic feedback, tick sound, and daily goal are stored locally on your device. Guest data is stored locally only.'**
+  /// **'If you have an account, your dhikr counts, profile, and group data are synced to the cloud. Preferences like theme, haptic feedback, tick sound, daily goal, and language are stored locally on your device. Guest data is stored locally only.'**
   String get faqQ_data_cloud_a;
 
   /// No description provided for @faqQ_data_picture_q.
@@ -1840,7 +1840,7 @@ abstract class AppL10n {
   /// No description provided for @privacy3Body.
   ///
   /// In en, this message translates to:
-  /// **'Your data is stored on Supabase, a secure cloud platform with industry-standard security practices including:\n\n• Encrypted data transmission (HTTPS/TLS)\n• Row Level Security (RLS) policies ensuring users can only access their own data\n• Secure password hashing using bcrypt\n• Profile pictures stored in access-controlled cloud storage\n\nLocal data (guest mode counts, app preferences such as theme selection, haptic feedback settings, and daily goals) is stored on your device using SharedPreferences and is not transmitted to our servers.'**
+  /// **'Your data is stored on Supabase, a secure cloud platform with industry-standard security practices including:\n\n• Encrypted data transmission (HTTPS/TLS)\n• Row Level Security (RLS) policies ensuring users can only access their own data\n• Secure password hashing using bcrypt\n• Profile pictures stored in access-controlled cloud storage\n\nLocal data (guest mode counts, app preferences such as theme selection, haptic feedback settings, daily goals, and language preference) is stored on your device using SharedPreferences and is not transmitted to our servers.'**
   String get privacy3Body;
 
   /// No description provided for @privacy4Title.
@@ -3636,6 +3636,24 @@ abstract class AppL10n {
   /// In en, this message translates to:
   /// **'Daily Goal'**
   String get groupDailyGoal;
+
+  /// No description provided for @faqQ_data_language_q.
+  ///
+  /// In en, this message translates to:
+  /// **'How do I change the app language?'**
+  String get faqQ_data_language_q;
+
+  /// No description provided for @faqQ_data_language_a.
+  ///
+  /// In en, this message translates to:
+  /// **'Go to Profile > Language and choose English or Bahasa Melayu. You can also change the language from the onboarding or sign-in screens by tapping the language icon. Your language preference is saved locally and stays the same every time you open the app.'**
+  String get faqQ_data_language_a;
+
+  /// No description provided for @aboutFeature8.
+  ///
+  /// In en, this message translates to:
+  /// **'English & Bahasa Melayu support'**
+  String get aboutFeature8;
 }
 
 class _AppL10nDelegate extends LocalizationsDelegate<AppL10n> {

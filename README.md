@@ -15,9 +15,10 @@ Built with **Flutter** + **Supabase** (Auth, Database, Storage).
 | 🧿 **Tasbih Counter** | 17 built-in dhikr items (10 selawat, 7 zikir) plus user-defined custom entries, manual count entry, 3 visualisation styles, 6 color themes, haptic feedback & tick sound |
 | 📊 **Statistics** | 52-week heatmap, streaks with fire tiers, weekly chart, daily goal tracking |
 | 👥 **Groups** | Create/join groups, leaderboard, role hierarchy (leader/co-leader/member) |
-| 📖 **Daily Content** | Nawawi hadiths, duas, adkar, and post-salaah zikr |
+| 📖 **Daily Content** | Nawawi hadiths, duas, daily dhikr, and post-salaah zikr |
 | 👤 **Profile** | Editable profile with avatar, bio, and account management |
 | 🌙 **Dark/Light Mode** | Full theme support with system toggle |
+| 🌍 **Language** | English & Bahasa Melayu with persisted preference |
 | 👻 **Guest Mode** | Use the counter and stats without creating an account |
 
 ## Design
@@ -99,6 +100,7 @@ Detailed documentation lives in the [`docs/`](docs/) folder:
 | Backend | Supabase (PostgreSQL + Auth + Storage) |
 | External API | [Naikiyah Dua Data API](https://dua-data-api.vercel.app/api) |
 | Local Storage | SharedPreferences |
+| Localisation | flutter_localizations + intl (ARB) |
 | Audio | audioplayers |
 | Sharing | share_plus |
 

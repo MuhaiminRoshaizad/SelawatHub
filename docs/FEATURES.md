@@ -195,7 +195,7 @@ Curated Islamic content hub sourced from the Naikiyah Dua Data API.
 | Type | Source Endpoint | Count |
 |------|----------------|-------|
 | **Forty Nawawi Hadiths** | `/hadith/nawawi` | 42 |
-| **Daily Adkar** | `/adkar/daily` | Variable |
+| **Daily Dhikr (Zikir)** | `/adkar/daily` | Variable |
 | **Duas** | `/dua` | Variable |
 | **Post-Salaah Zikr** | `/adkar/post-salaah` | Variable |
 
@@ -203,7 +203,7 @@ Curated Islamic content hub sourced from the Naikiyah Dua Data API.
 1. **Daily Hadith Card** — Featured hadith with Arabic + English translation + narrator + source
 2. **Post-Salaah Zikr List** — Horizontal scrollable preview cards
 3. **Daily Dua Card** — Featured dua
-4. **Daily Adkar Card** — Featured adkar with times + benefits
+4. **Daily Dhikr / Zikir Card** — Featured daily dhikr with times + benefits
 5. **Category Browse Cards** — Navigate to full lists
 6. **Sources** — API attribution and links
 
@@ -238,7 +238,7 @@ Three tappable stats that navigate to the Stats page:
 | Setting | Type | Default |
 |---------|------|---------|
 | Dark mode | Toggle | System |
-| Language | Selector | English (placeholder) |
+| Language | Selector | English / Bahasa Melayu (persisted) |
 
 ### Account Actions
 - **Change password** — Verifies current password first, then updates
@@ -247,7 +247,7 @@ Three tappable stats that navigate to the Stats page:
 - **Delete account** — Destructive action (placeholder)
 
 ### Support Section
-- **Help & FAQ** — Stacked accordion with 5 categories, 14 questions
+- **Help & FAQ** — Stacked accordion with 6 categories, 21 questions
 - **About SelawatHub** — App description, feature list, version
 - **Privacy Policy** — Full legal document (8 sections)
 - **Terms of Service** — Full legal document (12 sections)

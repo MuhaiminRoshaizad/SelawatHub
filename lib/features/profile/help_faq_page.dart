@@ -66,6 +66,7 @@ class HelpFaqPage extends StatelessWidget {
           (question: l.faqQ_data_cloud_q, answer: l.faqQ_data_cloud_a),
           (question: l.faqQ_data_picture_q, answer: l.faqQ_data_picture_a),
           (question: l.faqQ_data_theme_q, answer: l.faqQ_data_theme_a),
+          (question: l.faqQ_data_language_q, answer: l.faqQ_data_language_a),
         ],
       ),
     ];

@@ -719,7 +719,7 @@ class AppL10nEn extends AppL10n {
 
   @override
   String get aboutDescription =>
-      'SelawatHub is your companion for daily selawat and zikir. Count your dhikr with a beautiful digital tasbih, track your streaks and progress over time, set personal daily goals, and grow together with your community through group features.';
+      'SelawatHub is your companion for daily selawat and zikir. Count your dhikr with a beautiful digital tasbih, track your streaks and progress over time, set personal daily goals, and grow together with your community through group features. Available in English and Bahasa Melayu.';
 
   @override
   String get aboutFeature1 => 'Digital tasbih with multiple dhikr types';
@@ -865,7 +865,7 @@ class AppL10nEn extends AppL10n {
 
   @override
   String get faqQ_groups_admin_a =>
-      'Group admins can edit the group name, description, and daily goal. They can also promote members to admin, demote admins, and remove members from the group.';
+      'The group leader can edit the group name, description, and daily goal. They can also promote members to co-leader, demote co-leaders to member, and remove members from the group.';
 
   @override
   String get faqQ_account_guest_q => 'Can I use the app without an account?';
@@ -894,7 +894,7 @@ class AppL10nEn extends AppL10n {
 
   @override
   String get faqQ_data_cloud_a =>
-      'If you have an account, your dhikr counts, profile, and group data are synced to the cloud. Preferences like theme, haptic feedback, tick sound, and daily goal are stored locally on your device. Guest data is stored locally only.';
+      'If you have an account, your dhikr counts, profile, and group data are synced to the cloud. Preferences like theme, haptic feedback, tick sound, daily goal, and language are stored locally on your device. Guest data is stored locally only.';
 
   @override
   String get faqQ_data_picture_q => 'How do I change my profile picture?';
@@ -945,7 +945,7 @@ class AppL10nEn extends AppL10n {
 
   @override
   String get privacy3Body =>
-      'Your data is stored on Supabase, a secure cloud platform with industry-standard security practices including:\n\n• Encrypted data transmission (HTTPS/TLS)\n• Row Level Security (RLS) policies ensuring users can only access their own data\n• Secure password hashing using bcrypt\n• Profile pictures stored in access-controlled cloud storage\n\nLocal data (guest mode counts, app preferences such as theme selection, haptic feedback settings, and daily goals) is stored on your device using SharedPreferences and is not transmitted to our servers.';
+      'Your data is stored on Supabase, a secure cloud platform with industry-standard security practices including:\n\n• Encrypted data transmission (HTTPS/TLS)\n• Row Level Security (RLS) policies ensuring users can only access their own data\n• Secure password hashing using bcrypt\n• Profile pictures stored in access-controlled cloud storage\n\nLocal data (guest mode counts, app preferences such as theme selection, haptic feedback settings, daily goals, and language preference) is stored on your device using SharedPreferences and is not transmitted to our servers.';
 
   @override
   String get privacy4Title => '4. Data Sharing & International Transfers';
@@ -1988,4 +1988,14 @@ class AppL10nEn extends AppL10n {
 
   @override
   String get groupDailyGoal => 'Daily Goal';
+
+  @override
+  String get faqQ_data_language_q => 'How do I change the app language?';
+
+  @override
+  String get faqQ_data_language_a =>
+      'Go to Profile > Language and choose English or Bahasa Melayu. You can also change the language from the onboarding or sign-in screens by tapping the language icon. Your language preference is saved locally and stays the same every time you open the app.';
+
+  @override
+  String get aboutFeature8 => 'English & Bahasa Melayu support';
 }

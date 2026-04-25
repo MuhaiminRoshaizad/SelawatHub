@@ -60,12 +60,18 @@ Current status, completed features, and planned future work.
 #### Daily Content
 - [x] 40 Nawawi hadiths (Arabic + English)
 - [x] Daily duas collection
-- [x] Daily adkar (morning/evening)
+- [x] Daily adkar / daily dhikr (morning/evening zikir)
 - [x] Post-salaah zikr
 - [x] Category browser pages
 - [x] Source attribution page
 
-#### UX & Polish
+#### Localisation
+- [x] English & Bahasa Melayu support (flutter_localizations + ARB)
+- [x] Language selector in profile settings (persisted via SharedPreferences)
+- [x] Language picker on onboarding & sign-in screens (bottom sheet)
+- [x] Smooth skeleton/shimmer transition on language switch
+
+
 - [x] Dark/light mode toggle (persisted)
 - [x] Frosted glass bottom navigation bar
 - [x] Overlay-based toast notifications (visible above bottom sheets)
@@ -80,7 +86,7 @@ Current status, completed features, and planned future work.
 #### Documentation & Legal
 - [x] Privacy Policy (8 sections)
 - [x] Terms of Service (12 sections)
-- [x] Help & FAQ (stacked accordion, 5 categories, 14 questions)
+- [x] Help & FAQ (stacked accordion, 6 categories, 21 questions)
 - [x] About page with feature list
 - [x] Project documentation (docs/ folder)
 
@@ -104,21 +110,6 @@ Current status, completed features, and planned future work.
 - **Phase 2b:** Push notifications (group events) — requires Firebase Cloud Messaging setup, Supabase Edge Functions, FCM token storage
 
 **Group settings:** Mute notifications toggle already exists in group settings UI (currently non-functional, to be wired when notifications are implemented).
-
-### 🌍 Multi-Language Support (i18n)
-
-**Priority:** Medium
-
-**Languages:**
-- English (current, default)
-- Bahasa Melayu (primary target)
-- Arabic (future consideration)
-
-**Approach:**
-- Flutter `intl` package (already a dependency)
-- ARB files for string localisation
-- Language selector already exists in profile settings (currently placeholder)
-- RTL layout support needed for Arabic
 
 ### 📱 Additional Planned Features
 

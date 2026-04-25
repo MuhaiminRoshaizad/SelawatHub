@@ -264,7 +264,7 @@
       }
     }
   },
-  "aboutDescription": "SelawatHub is your companion for daily selawat and zikir. Count your dhikr with a beautiful digital tasbih, track your streaks and progress over time, set personal daily goals, and grow together with your community through group features.",
+  "aboutDescription": "SelawatHub is your companion for daily selawat and zikir. Count your dhikr with a beautiful digital tasbih, track your streaks and progress over time, set personal daily goals, and grow together with your community through group features. Available in English and Bahasa Melayu.",
   "aboutFeature1": "Digital tasbih with multiple dhikr types",
   "aboutFeature2": "Manual count entry & custom dhikr",
   "aboutFeature3": "Personal statistics & streak tracking",
@@ -306,7 +306,7 @@
   "faqQ_groups_create_q": "How do I create a group?",
   "faqQ_groups_create_a": "Go to the Group tab and tap \"Create New Group\". Enter a group name and optional description. You'll become the group admin and receive an invite code to share with others.",
   "faqQ_groups_admin_q": "What can a group admin do?",
-  "faqQ_groups_admin_a": "Group admins can edit the group name, description, and daily goal. They can also promote members to admin, demote admins, and remove members from the group.",
+  "faqQ_groups_admin_a": "The group leader can edit the group name, description, and daily goal. They can also promote members to co-leader, demote co-leaders to member, and remove members from the group.",
   "faqQ_account_guest_q": "Can I use the app without an account?",
   "faqQ_account_guest_a": "Yes! You can use SelawatHub as a guest. Guest users can count dhikr and view statistics stored locally on their device. However, group features and cloud sync require a registered account. Guest data may be lost if the app is uninstalled.",
   "faqQ_account_changepw_q": "How do I change my password?",
@@ -314,7 +314,7 @@
   "faqQ_account_forgotpw_q": "I forgot my password. How do I reset it?",
   "faqQ_account_forgotpw_a": "On the sign-in page, tap \"Forgot password?\" and enter your email address. You'll receive an email with a link to reset your password. If you're already logged in, you can also trigger a reset from Profile > Change Password.",
   "faqQ_data_cloud_q": "Is my data saved to the cloud?",
-  "faqQ_data_cloud_a": "If you have an account, your dhikr counts, profile, and group data are synced to the cloud. Preferences like theme, haptic feedback, tick sound, and daily goal are stored locally on your device. Guest data is stored locally only.",
+  "faqQ_data_cloud_a": "If you have an account, your dhikr counts, profile, and group data are synced to the cloud. Preferences like theme, haptic feedback, tick sound, daily goal, and language are stored locally on your device. Guest data is stored locally only.",
   "faqQ_data_picture_q": "How do I change my profile picture?",
   "faqQ_data_picture_a": "Go to Profile > Edit Profile and tap the camera icon or your current photo. You can upload a new image from your device. To remove your photo, tap the remove option in the photo picker.",
   "faqQ_data_theme_q": "How do I switch between dark and light mode?",
@@ -335,7 +335,7 @@
   "privacy2Title": "2. How We Use Your Information",
   "privacy2Body": "We use the information we collect to:\n\n• Provide core app functionality — counting selawat/zikir, tracking progress, and displaying statistics\n• Enable group features — allowing you to join groups, share progress, and view group leaderboards\n• Authenticate your identity and secure your account\n• Send password reset emails when requested\n• Store and display your profile information to other group members\n• Calculate streaks, daily goals, and weekly/monthly/yearly statistics\n• Improve the app experience based on usage patterns",
   "privacy3Title": "3. Data Storage & Security",
-  "privacy3Body": "Your data is stored on Supabase, a secure cloud platform with industry-standard security practices including:\n\n• Encrypted data transmission (HTTPS/TLS)\n• Row Level Security (RLS) policies ensuring users can only access their own data\n• Secure password hashing using bcrypt\n• Profile pictures stored in access-controlled cloud storage\n\nLocal data (guest mode counts, app preferences such as theme selection, haptic feedback settings, and daily goals) is stored on your device using SharedPreferences and is not transmitted to our servers.",
+  "privacy3Body": "Your data is stored on Supabase, a secure cloud platform with industry-standard security practices including:\n\n• Encrypted data transmission (HTTPS/TLS)\n• Row Level Security (RLS) policies ensuring users can only access their own data\n• Secure password hashing using bcrypt\n• Profile pictures stored in access-controlled cloud storage\n\nLocal data (guest mode counts, app preferences such as theme selection, haptic feedback settings, daily goals, and language preference) is stored on your device using SharedPreferences and is not transmitted to our servers.",
   "privacy4Title": "4. Data Sharing & International Transfers",
   "privacy4Body": "We do not sell, trade, or rent your personal information to third parties. Your data may be shared in the following limited circumstances:\n\n• Group Members — Your display name, profile picture, and dhikr counts are visible to members of groups you join\n• Service Providers — We use Supabase for authentication, database, and storage services. Supabase processes data on our behalf under strict data processing agreements\n• Legal Requirements — We may disclose information if required by law or to protect our rights and safety\n\nInternational Transfers\nSupabase may store and process data in jurisdictions outside Malaysia. Such transfers are made only to jurisdictions providing a level of data protection equivalent to that required by the Malaysian Personal Data Protection Act 2010 (as amended), and are subject to Supabase's contractual security and privacy commitments.",
   "privacy5Title": "5. Your Rights",
@@ -895,5 +895,11 @@
   "groupNeedCoLeaderBody": "You must promote a member to co-leader or transfer leadership before leaving the group.",
   "groupSettingsDescNone": "None",
   "groupMembersTitle": "Members",
-  "groupDailyGoal": "Daily Goal"
+  "groupDailyGoal": "Daily Goal",
+  "faqQ_data_language_q": "How do I change the app language?",
+  "@faqQ_data_language_q": {},
+  "faqQ_data_language_a": "Go to Profile > Language and choose English or Bahasa Melayu. You can also change the language from the onboarding or sign-in screens by tapping the language icon. Your language preference is saved locally and stays the same every time you open the app.",
+  "@faqQ_data_language_a": {},
+  "aboutFeature8": "English & Bahasa Melayu support",
+  "@aboutFeature8": {}
 }
