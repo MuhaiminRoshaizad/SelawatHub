@@ -1,4 +1,5 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:selawathub/core/services/custom_dhikr_service.dart';
 import 'package:selawathub/core/services/settings_service.dart';
 import 'package:selawathub/core/services/supabase_service.dart';
 
@@ -40,6 +41,7 @@ class AuthService {
   static Future<void> signOut() async {
     await _auth.signOut();
     SettingsService.clearCachedProfile();
+    CustomDhikrService.invalidate();
   }
 
   /// Send a password reset email.

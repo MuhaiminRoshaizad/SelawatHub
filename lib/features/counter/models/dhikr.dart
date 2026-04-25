@@ -19,6 +19,49 @@ class Dhikr {
     required this.category,
   });
 
+  /// User-defined dhikr. Arabic/transliteration are empty because the user
+  /// hasn't supplied them — only the [name] and [category] are meaningful.
+  /// [id] should be `custom:<slug>` where slug is derived from the name.
+  factory Dhikr.custom({
+    required String id,
+    required String name,
+    required DhikrCategory category,
+    int defaultTarget = 100,
+  }) =>
+      Dhikr(
+        id: id,
+        arabic: '',
+        transliteration: '',
+        name: name,
+        defaultTarget: defaultTarget,
+        category: category,
+      );
+
+  bool get isCustom => id.startsWith('custom:');
+
+  /// Convert a user-entered display name into a stable dhikr_id suffix.
+  /// Lowercased, non-alphanumerics collapsed to single hyphens, trimmed.
+  /// E.g. "Selawat Munjiyat!" -> "custom:selawat-munjiyat".
+  static String slugify(String raw) {
+    final lower = raw.trim().toLowerCase();
+    final sb = StringBuffer();
+    var lastDash = true;
+    for (final r in lower.runes) {
+      final c = String.fromCharCode(r);
+      final isAlphaNum = RegExp(r'[a-z0-9]').hasMatch(c);
+      if (isAlphaNum) {
+        sb.write(c);
+        lastDash = false;
+      } else if (!lastDash) {
+        sb.write('-');
+        lastDash = true;
+      }
+    }
+    var s = sb.toString();
+    if (s.endsWith('-')) s = s.substring(0, s.length - 1);
+    return 'custom:$s';
+  }
+
   static const List<Dhikr> all = [...selawatList, ...zikirList];
 
   static const List<Dhikr> selawatList = [

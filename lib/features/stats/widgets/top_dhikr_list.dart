@@ -154,7 +154,8 @@ class TopDhikrList extends StatelessWidget {
 
   /// Converts "selawat-jibril" → "Selawat Jibril"
   String _prettifyName(String raw) {
-    return raw
+    final s = raw.startsWith('custom:') ? raw.substring(7) : raw;
+    return s
         .replaceAll('-', ' ')
         .replaceAll('_', ' ')
         .split(' ')

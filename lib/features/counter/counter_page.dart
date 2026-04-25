@@ -15,6 +15,7 @@ import 'package:selawathub/features/counter/counter_settings_page.dart';
 import 'package:selawathub/features/counter/models/dhikr.dart';
 import 'package:selawathub/features/counter/widgets/dhikr_selector_sheet.dart';
 import 'package:selawathub/features/counter/widgets/digital_counter.dart';
+import 'package:selawathub/features/counter/widgets/manual_count_sheet.dart';
 import 'package:selawathub/features/counter/widgets/minimal_counter.dart';
 
 class CounterPage extends StatefulWidget {
@@ -207,6 +208,85 @@ class _CounterPageState extends State<CounterPage>
     }
   }
 
+  Future<void> _openManualAdd() async {
+    final result = await ManualCountSheet.show(context, _dhikr);
+    if (result == null || result.amount <= 0) return;
+    final picked = result.dhikr;
+    final amount = result.amount;
+    final isCurrent = picked.id == _dhikr.id;
+
+    // Cancel the auto-save timer so it doesn't race with our RPC.
+    _saveTimer?.cancel();
+
+    // Optimistic local update. If user added to a different dhikr (e.g. a
+    // custom amalan) we only update the per-dhikr map; _total stays on
+    // whatever the user has currently selected on the counter.
+    final prevTotalForPicked = _todayCounts[picked.id] ?? 0;
+    final newTotalForPicked = prevTotalForPicked + amount;
+    setState(() {
+      _todayCounts[picked.id] = newTotalForPicked;
+      if (isCurrent) _total = newTotalForPicked;
+    });
+
+    // Persist locally for the guest/offline path (current dhikr only —
+    // guests can't pick custom dhikr, so picked is always built-in here).
+    final now = DateTime.now();
+    final today =
+        '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
+    SettingsService.saveLocalCount(
+      picked.id,
+      picked.category.name,
+      newTotalForPicked,
+      today,
+    );
+
+    if (!SupabaseService.isAuthenticated) {
+      if (mounted) _showManualAddToast(picked, amount, newTotalForPicked);
+      return;
+    }
+
+    try {
+      // If we're adding to the currently-selected dhikr, flush any
+      // un-saved taps first (as an overwrite) so the RPC additive layer
+      // on top is correct relative to server state. For a different
+      // dhikr we don't touch pending taps on the current one.
+      if (isCurrent && _tapsSinceLastSave > 0) {
+        await CounterService.upsertCount(
+          dhikrId: _dhikr.id,
+          category: _dhikr.category.name,
+          count: _total - amount,
+        );
+        _tapsSinceLastSave = 0;
+      }
+
+      await CounterService.addManualCount(
+        dhikrId: picked.id,
+        category: picked.category.name,
+        amount: amount,
+      );
+      if (mounted) _showManualAddToast(picked, amount, newTotalForPicked);
+    } catch (_) {
+      setState(() {
+        _todayCounts[picked.id] = prevTotalForPicked;
+        if (isCurrent) _total = prevTotalForPicked;
+      });
+      if (mounted) {
+        showAppSnackBar(
+          context,
+          'Failed to add. Please try again.',
+          backgroundColor: C.error,
+        );
+      }
+    }
+  }
+
+  void _showManualAddToast(Dhikr dhikr, int amount, int newTotal) {
+    showAppSnackBar(
+      context,
+      'Added $amount to ${dhikr.name} · Today: $newTotal',
+    );
+  }
+
   void _reset() async {
     if (_total == 0) return;
     final ok = await showDialog<bool>(
@@ -254,7 +334,22 @@ class _CounterPageState extends State<CounterPage>
               padding: const EdgeInsets.fromLTRB(S.page, S.s12, S.page, 0),
               child: Row(
                 children: [
-                  const SizedBox(width: 36),
+                  GestureDetector(
+                    onTap: _openManualAdd,
+                    child: Container(
+                      width: 36,
+                      height: 36,
+                      decoration: BoxDecoration(
+                        color: dark ? C.dark3 : C.light3,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        CupertinoIcons.add,
+                        size: 16,
+                        color: dark ? C.onDark2 : C.onLight2,
+                      ),
+                    ),
+                  ),
                   Expanded(
                     child: GestureDetector(
                       onTap: _openSelector,

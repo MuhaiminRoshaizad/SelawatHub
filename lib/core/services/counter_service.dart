@@ -32,6 +32,30 @@ class CounterService {
     }
   }
 
+  /// Atomically add [amount] to today's count for [dhikrId] via the
+  /// `add_to_count` Postgres RPC. Used by the "Add manually" sheet for
+  /// users logging counts from a physical tasbih. Safe against races
+  /// because the add is performed in a single SQL statement.
+  static Future<void> addManualCount({
+    required String dhikrId,
+    required String category,
+    required int amount,
+  }) async {
+    if (amount <= 0) return;
+    StatsCache.invalidate();
+    if (!SupabaseService.isAuthenticated) return;
+    try {
+      await _db.rpc('add_to_count', params: {
+        'p_dhikr_id': dhikrId,
+        'p_category': category,
+        'p_amount': amount,
+      });
+    } catch (e) {
+      debugPrint('[CounterService] addManualCount error: $e');
+      rethrow;
+    }
+  }
+
   /// Get today's counts for all dhikr for current user.
   /// Returns a map of dhikrId to count.
   static Future<Map<String, int>> getTodayCounts() async {
