@@ -14,6 +14,13 @@ class AuthService {
 
   static final _auth = SupabaseService.auth;
 
+  /// Set to `true` while a manual sign-in / sign-up is in flight from the
+  /// login page so the global auth listener in `app.dart` can ignore the
+  /// resulting `signedIn` event (the login page handles its own navigation).
+  /// Any `signedIn` event that arrives while this is `false` is treated as a
+  /// deep-link event (e.g. user just clicked the email-verification link).
+  static bool expectingManualAuth = false;
+
   /// Sign up with email, password, and name.
   /// Name is stored in user metadata and auto-copied to profiles via trigger.
   static Future<AuthResponse> signUp({

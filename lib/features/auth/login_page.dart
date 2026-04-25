@@ -14,8 +14,9 @@ import 'package:selawathub/features/profile/privacy_policy_page.dart';
 import 'package:selawathub/features/profile/terms_of_service_page.dart';
 
 class LoginPage extends StatefulWidget {
-  const LoginPage({super.key, this.isSignUp = false});
+  const LoginPage({super.key, this.isSignUp = false, this.initialEmail});
   final bool isSignUp;
+  final String? initialEmail;
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -30,6 +31,7 @@ class _LoginPageState extends State<LoginPage> {
   final _emailCtrl = TextEditingController();
   final _passwordCtrl = TextEditingController();
   final _confirmPasswordCtrl = TextEditingController();
+  final _passwordFocus = FocusNode();
 
   final _termsRecognizer = TapGestureRecognizer();
   final _privacyRecognizer = TapGestureRecognizer();
@@ -39,6 +41,12 @@ class _LoginPageState extends State<LoginPage> {
     super.initState();
     _termsRecognizer.onTap = _openTerms;
     _privacyRecognizer.onTap = _openPrivacy;
+    if (widget.initialEmail != null && widget.initialEmail!.isNotEmpty) {
+      _emailCtrl.text = widget.initialEmail!;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _passwordFocus.requestFocus();
+      });
+    }
   }
 
   @override
@@ -47,6 +55,7 @@ class _LoginPageState extends State<LoginPage> {
     _emailCtrl.dispose();
     _passwordCtrl.dispose();
     _confirmPasswordCtrl.dispose();
+    _passwordFocus.dispose();
     _termsRecognizer.dispose();
     _privacyRecognizer.dispose();
     super.dispose();
@@ -93,6 +102,7 @@ class _LoginPageState extends State<LoginPage> {
 
     setState(() => _loading = true);
 
+    AuthService.expectingManualAuth = true;
     try {
       if (_isSignUp) {
         final res = await AuthService.signUp(
@@ -142,6 +152,8 @@ class _LoginPageState extends State<LoginPage> {
       if (!mounted) return;
       showAppSnackBar(context, 'Something went wrong. Please try again.');
       setState(() => _loading = false);
+    } finally {
+      AuthService.expectingManualAuth = false;
     }
   }
 
@@ -242,6 +254,7 @@ class _LoginPageState extends State<LoginPage> {
               delay: Duration(milliseconds: _isSignUp ? 200 : 160),
               child: _Field(
                 controller: _passwordCtrl,
+                focusNode: _passwordFocus,
                 label: 'Password',
                 hint: 'Enter your password',
                 icon: CupertinoIcons.lock,
@@ -394,6 +407,7 @@ class _Field extends StatefulWidget {
     required this.dark,
     this.obscure = false,
     this.keyboardType,
+    this.focusNode,
   });
 
   final TextEditingController controller;
@@ -403,6 +417,7 @@ class _Field extends StatefulWidget {
   final bool dark;
   final bool obscure;
   final TextInputType? keyboardType;
+  final FocusNode? focusNode;
 
   @override
   State<_Field> createState() => _FieldState();
@@ -423,6 +438,7 @@ class _FieldState extends State<_Field> {
         ),
         TextField(
           controller: widget.controller,
+          focusNode: widget.focusNode,
           obscureText: _hidden,
           keyboardType: widget.keyboardType,
           style: tt.bodyMedium?.copyWith(

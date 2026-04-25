@@ -5,9 +5,11 @@ import 'package:selawathub/core/services/auth_service.dart';
 import 'package:selawathub/core/services/settings_service.dart';
 import 'package:selawathub/core/services/supabase_service.dart';
 import 'package:selawathub/core/theme/theme.dart';
+import 'package:selawathub/features/auth/login_page.dart';
 import 'package:selawathub/features/auth/onboarding_page.dart';
 import 'package:selawathub/features/auth/reset_password_page.dart';
 import 'package:selawathub/features/auth/welcome_page.dart';
+import 'package:selawathub/core/widgets/app_snackbar.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SelawatHubApp extends StatefulWidget {
@@ -34,18 +36,52 @@ class _SelawatHubAppState extends State<SelawatHubApp> {
     _themeMode = ValueNotifier<ThemeMode>(_modeMap[saved]);
     _themeMode.addListener(_persistTheme);
 
-    // Only one reason to listen to the supabase auth stream: password-reset
-    // email deep links. Sign-in / sign-out navigation is handled imperatively
-    // at the callsite (login_page.dart / profile_page.dart) — the imperative
-    // pattern is simpler, survives hot-reload, and isn't affected by the
-    // gotrue 2.20+ regression that drops signedOut events.
+    // Listen to the supabase auth stream for deep-link events:
+    //   - `passwordRecovery`: user clicked the password-reset email link.
+    //   - `signedIn`: user clicked the email-verification link (Supabase
+    //     auto-creates a session). We force them to sign in manually so
+    //     they can confirm credentials, matching the standard pattern used
+    //     by most banking / consumer apps.
+    //
+    // Sign-in / sign-out triggered from inside the app sets
+    // `AuthService.expectingManualAuth = true` so we ignore those events
+    // here (the originating screen handles its own navigation).
     _authSub = AuthService.onAuthStateChange.listen((state) {
       if (state.event == AuthChangeEvent.passwordRecovery) {
         SelawatHubApp.navKey.currentState?.push(
           MaterialPageRoute(builder: (_) => const ResetPasswordPage()),
         );
+        return;
+      }
+      if (state.event == AuthChangeEvent.signedIn &&
+          !AuthService.expectingManualAuth) {
+        _handleVerificationDeepLink(state.session?.user.email);
       }
     });
+  }
+
+  Future<void> _handleVerificationDeepLink(String? email) async {
+    // Sign the just-auto-signed-in user out so they have to enter their
+    // password — this confirms ownership of the device and avoids surprises
+    // (e.g. someone else clicking the verification link on a shared phone).
+    await AuthService.signOut();
+    final nav = SelawatHubApp.navKey.currentState;
+    if (nav == null) return;
+    nav.pushAndRemoveUntil(
+      MaterialPageRoute(
+        builder: (_) => LoginPage(initialEmail: email),
+      ),
+      (_) => false,
+    );
+    // Toast after the new page is on screen so it lands in the right overlay.
+    final ctx = SelawatHubApp.navKey.currentContext;
+    if (ctx != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (ctx.mounted) {
+          showAppSnackBar(ctx, 'Email verified · Please sign in to continue');
+        }
+      });
+    }
   }
 
   void _persistTheme() {
