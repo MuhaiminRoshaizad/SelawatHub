@@ -1,6 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:selawathub/core/services/counter_service.dart';
+import 'package:selawathub/core/services/settings_service.dart';
 import 'package:selawathub/core/services/supabase_service.dart';
+import 'package:selawathub/core/utils/streak_utils.dart';
 
 /// Stats data model for the stats page.
 class StatsData {
@@ -9,6 +11,7 @@ class StatsData {
   final List<Map<String, dynamic>> weeklyData;
   final int currentStreak;
   final int bestStreak;
+  final bool streakActive;
   final int daysActive;
   final int todayTotal;
   final bool hasData;
@@ -19,6 +22,7 @@ class StatsData {
     this.weeklyData = const [],
     this.currentStreak = 0,
     this.bestStreak = 0,
+    this.streakActive = false,
     this.daysActive = 0,
     this.todayTotal = 0,
     this.hasData = false,
@@ -122,30 +126,25 @@ final statsProvider = FutureProvider<StatsData>((ref) async {
     }
   }
 
-  // Compute streaks
-  int currentStreak = 0, bestStreak = 0, tempStreak = 0;
-  for (int i = 363; i >= 0; i--) {
-    final d = start.add(Duration(days: i));
-    final key =
-        '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
-    if (activeDates.contains(key)) {
-      tempStreak++;
-      if (tempStreak > bestStreak) bestStreak = tempStreak;
-    } else {
-      tempStreak = 0;
-    }
+  // Compute streaks via shared utility so the Profile and Stats pages agree.
+  // Build per-day totals (selawat + zikir) keyed by 'YYYY-MM-DD'.
+  final dailyTotals = <String, int>{};
+  for (final entry in dayMap.entries) {
+    final sel = (entry.value['selawat'] as int?) ?? 0;
+    final zik = (entry.value['zikir'] as int?) ?? 0;
+    dailyTotals[entry.key] = sel + zik;
   }
-  // Current streak from today backwards
-  for (int i = 0; i < 364; i++) {
-    final d = now.subtract(Duration(days: i));
-    final key =
-        '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
-    if (activeDates.contains(key)) {
-      currentStreak++;
-    } else if (i > 0) {
-      break;
-    }
-  }
+  final goal = SettingsService.dailyGoal;
+  final streak = computeStreak(
+    dailyTotals: dailyTotals,
+    dailyGoal: goal,
+    today: now,
+  );
+  final bestStreak = computeBestStreak(
+    dailyTotals: dailyTotals,
+    dailyGoal: goal,
+  );
+  final currentStreak = streak.days;
 
   // Today total
   final todayKey =
@@ -170,6 +169,7 @@ final statsProvider = FutureProvider<StatsData>((ref) async {
     weeklyData: weeklyData,
     currentStreak: currentStreak,
     bestStreak: bestStreak,
+    streakActive: streak.todayMet,
     daysActive: activeDates.length,
     todayTotal: todayTotal,
     hasData: heatmapData.any((d) => d.total > 0),

@@ -43,6 +43,7 @@ class _ProfilePageState extends State<ProfilePage> {
   bool _loading = true;
   int _totalDhikr = 0;
   int _streak = 0;
+  bool _streakActive = false;
   int _daysActive = 0;
   late final bool _isGuest = widget.isGuest;
   String _language = 'English';
@@ -78,6 +79,7 @@ class _ProfilePageState extends State<ProfilePage> {
             : (SupabaseService.currentUser?.email ?? '');
     _totalDhikr = (cached['total_dhikr'] as int?) ?? 0;
     _streak = (cached['streak'] as int?) ?? 0;
+    _streakActive = (cached['streak_active'] as bool?) ?? false;
     _daysActive = (cached['days_active'] as int?) ?? 0;
     _loading = false;
   }
@@ -97,6 +99,7 @@ class _ProfilePageState extends State<ProfilePage> {
       final email = SupabaseService.currentUser?.email ?? '';
       final totalDhikr = (stats['total_dhikr'] as num?)?.toInt() ?? 0;
       final streak = (stats['streak'] as num?)?.toInt() ?? 0;
+      final streakActive = (stats['streak_active'] as bool?) ?? false;
       final daysActive = (stats['days_active'] as num?)?.toInt() ?? 0;
       setState(() {
         _name = name;
@@ -105,6 +108,7 @@ class _ProfilePageState extends State<ProfilePage> {
         _email = email;
         _totalDhikr = totalDhikr;
         _streak = streak;
+        _streakActive = streakActive;
         _daysActive = daysActive;
         _loading = false;
       });
@@ -119,6 +123,7 @@ class _ProfilePageState extends State<ProfilePage> {
           email: email,
           totalDhikr: totalDhikr,
           streak: streak,
+          streakActive: streakActive,
           daysActive: daysActive,
         );
       }
@@ -260,6 +265,7 @@ class _ProfilePageState extends State<ProfilePage> {
               totalDhikr: _numFmt.format(_totalDhikr),
               streak: _numFmt.format(_streak),
               daysActive: _numFmt.format(_daysActive),
+              streakActive: _streakActive,
             ),
           ),
         ),

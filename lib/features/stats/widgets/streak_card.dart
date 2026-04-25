@@ -12,6 +12,7 @@ class StreakCard extends StatelessWidget {
     required this.streakDays,
     required this.todayTotal,
     required this.dailyGoal,
+    this.streakActive = true,
     this.onGoalTap,
   });
   final bool dark;
@@ -19,23 +20,43 @@ class StreakCard extends StatelessWidget {
   final int streakDays;
   final int todayTotal;
   final int dailyGoal;
+  final bool streakActive;
   final VoidCallback? onGoalTap;
 
   @override
   Widget build(BuildContext context) {
-    final tier = streakTierFromDays(streakDays);
-    final tierLabel = switch (tier) {
-      StreakTier.dead => 'No Streak',
-      StreakTier.burning => '$streakDays Day Streak',
-      StreakTier.blazing => '$streakDays Day Streak 🔥',
-      StreakTier.legendary => '$streakDays Day Streak ⚡',
-    };
-    final subtitle = switch (tier) {
-      StreakTier.dead => 'Start reciting today!',
-      StreakTier.burning => 'Keep it going!',
-      StreakTier.blazing => 'You\'re on fire!',
-      StreakTier.legendary => 'Legendary status!',
-    };
+    // When today's goal isn't met yet we still show the existing streak
+    // count (TikTok-style — it isn't lost until the day rolls over) but the
+    // fire is shown as "off" until the user qualifies today.
+    final liveTier = streakTierFromDays(streakDays);
+    final tier = streakActive ? liveTier : StreakTier.dead;
+
+    final String tierLabel;
+    final String subtitle;
+    if (streakDays == 0) {
+      tierLabel = 'No Streak';
+      subtitle = dailyGoal > 0
+          ? 'Hit ${fmtNum(dailyGoal)} today to start your streak'
+          : 'Start reciting today!';
+    } else if (!streakActive) {
+      tierLabel = '$streakDays Day Streak';
+      subtitle = dailyGoal > 0
+          ? 'Hit ${fmtNum(dailyGoal)} today to keep it alive'
+          : 'Recite today to keep it alive';
+    } else {
+      tierLabel = switch (liveTier) {
+        StreakTier.dead => '$streakDays Day Streak',
+        StreakTier.burning => '$streakDays Day Streak',
+        StreakTier.blazing => '$streakDays Day Streak 🔥',
+        StreakTier.legendary => '$streakDays Day Streak ⚡',
+      };
+      subtitle = switch (liveTier) {
+        StreakTier.dead => 'Keep it going!',
+        StreakTier.burning => 'Keep it going!',
+        StreakTier.blazing => 'You\'re on fire!',
+        StreakTier.legendary => 'Legendary status!',
+      };
+    }
 
     final progress = dailyGoal > 0
         ? (todayTotal / dailyGoal).clamp(0.0, 1.0)

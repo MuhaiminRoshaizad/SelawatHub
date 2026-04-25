@@ -77,6 +77,7 @@ class SettingsService {
   static const _kCachedEmail = 'cached_profile_email';
   static const _kCachedTotalDhikr = 'cached_profile_total_dhikr';
   static const _kCachedStreak = 'cached_profile_streak';
+  static const _kCachedStreakActive = 'cached_profile_streak_active';
   static const _kCachedDaysActive = 'cached_profile_days_active';
   static const _kCachedProfileUserId = 'cached_profile_user_id';
 
@@ -93,6 +94,7 @@ class SettingsService {
       'email': _prefs!.getString(_kCachedEmail) ?? '',
       'total_dhikr': _prefs!.getInt(_kCachedTotalDhikr) ?? 0,
       'streak': _prefs!.getInt(_kCachedStreak) ?? 0,
+      'streak_active': _prefs!.getBool(_kCachedStreakActive) ?? false,
       'days_active': _prefs!.getInt(_kCachedDaysActive) ?? 0,
     };
   }
@@ -105,6 +107,7 @@ class SettingsService {
     String? email,
     int? totalDhikr,
     int? streak,
+    bool? streakActive,
     int? daysActive,
   }) {
     final p = _prefs;
@@ -120,6 +123,7 @@ class SettingsService {
     if (email != null) p.setString(_kCachedEmail, email);
     if (totalDhikr != null) p.setInt(_kCachedTotalDhikr, totalDhikr);
     if (streak != null) p.setInt(_kCachedStreak, streak);
+    if (streakActive != null) p.setBool(_kCachedStreakActive, streakActive);
     if (daysActive != null) p.setInt(_kCachedDaysActive, daysActive);
   }
 
@@ -135,6 +139,7 @@ class SettingsService {
     p.remove(_kCachedEmail);
     p.remove(_kCachedTotalDhikr);
     p.remove(_kCachedStreak);
+    p.remove(_kCachedStreakActive);
     p.remove(_kCachedDaysActive);
   }
 

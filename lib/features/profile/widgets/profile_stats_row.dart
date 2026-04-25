@@ -14,16 +14,19 @@ class ProfileStatsRow extends StatelessWidget {
     required this.totalDhikr,
     required this.streak,
     required this.daysActive,
+    this.streakActive = true,
   });
 
   final Color accent;
   final String totalDhikr;
   final String streak;
   final String daysActive;
+  final bool streakActive;
 
   @override
   Widget build(BuildContext context) {
     final dark = Theme.of(context).brightness == Brightness.dark;
+    final mutedFlame = dark ? C.onDark3 : C.onLight3;
     return Container(
       padding: const EdgeInsets.symmetric(vertical: S.s20),
       decoration: BoxDecoration(
@@ -49,8 +52,10 @@ class ProfileStatsRow extends StatelessWidget {
             StatItem(
               value: streak,
               label: 'Day Streak',
-              icon: CupertinoIcons.flame_fill,
-              iconColor: C.gold,
+              icon: streakActive
+                  ? CupertinoIcons.flame_fill
+                  : CupertinoIcons.flame,
+              iconColor: streakActive ? C.gold : mutedFlame,
             ),
             VerticalDivider(
                 width: 1,

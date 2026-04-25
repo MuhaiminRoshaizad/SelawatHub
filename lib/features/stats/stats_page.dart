@@ -44,6 +44,7 @@ class _StatsPageState extends State<StatsPage> {
       (sel: 0, zik: 0, top: []);
   List<WeekData> _weeklyData = [];
   int _currentStreak = 0;
+  bool _streakActive = false;
   int _bestStreak = 0;
   int _daysActive = 0;
   int _todayTotal = 0;
@@ -156,6 +157,7 @@ class _StatsPageState extends State<StatsPage> {
     final today = DateTime(now.year, now.month, now.day);
 
     int current = 0, best = 0, daysActive = 0;
+    bool todayMet = false;
 
     // Current streak: walk from most recent day backwards.
     int i = heatmap.length - 1;
@@ -164,6 +166,9 @@ class _StatsPageState extends State<StatsPage> {
       final isToday = lastDate.year == today.year &&
           lastDate.month == today.month &&
           lastDate.day == today.day;
+      if (isToday) {
+        todayMet = heatmap[i].total >= (goal > 0 ? goal : 1);
+      }
       // If today exists in the range but the goal hasn't been met yet,
       // skip it so it doesn't look like the streak is already broken.
       if (isToday && heatmap[i].total < goal) i--;
@@ -212,6 +217,7 @@ class _StatsPageState extends State<StatsPage> {
           (sel: totalSel, zik: totalZik, top: topList.take(7).toList());
       _weeklyData = weeklyData;
       _currentStreak = current;
+      _streakActive = todayMet;
       _bestStreak = best;
       _daysActive = daysActive;
       _todayTotal = heatmap.isNotEmpty ? heatmap.last.total : 0;
@@ -444,6 +450,7 @@ class _StatsPageState extends State<StatsPage> {
                 streakDays: _loading ? 7 : _currentStreak,
                 todayTotal: _loading ? 120 : _todayTotal,
                 dailyGoal: _dailyGoal,
+                streakActive: _loading ? true : _streakActive,
                 onGoalTap: _showEditGoal,
               ),
             ),

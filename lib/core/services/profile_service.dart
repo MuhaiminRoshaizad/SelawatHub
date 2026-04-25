@@ -1,6 +1,8 @@
 import 'dart:typed_data';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:selawathub/core/services/settings_service.dart';
 import 'package:selawathub/core/services/supabase_service.dart';
+import 'package:selawathub/core/utils/streak_utils.dart';
 
 class ProfileService {
   ProfileService._();
@@ -61,10 +63,21 @@ class ProfileService {
     return null;
   }
 
-  /// Get profile stats: total dhikr count, streak, days active
-  static Future<Map<String, int>> getProfileStats() async {
+  /// Get profile stats: total dhikr count, streak, days active.
+  ///
+  /// Streak is computed using the shared [computeStreak] utility so that the
+  /// Profile page and the Stats page always agree. Includes a `streak_active`
+  /// flag indicating whether today's daily goal has already been met.
+  static Future<Map<String, dynamic>> getProfileStats() async {
     final uid = SupabaseService.userId;
-    if (uid == null) return {'total_dhikr': 0, 'streak': 0, 'days_active': 0};
+    if (uid == null) {
+      return {
+        'total_dhikr': 0,
+        'streak': 0,
+        'streak_active': false,
+        'days_active': 0,
+      };
+    }
 
     final rows = await _db
         .from('counter_sessions')
@@ -73,29 +86,28 @@ class ProfileService {
         .order('date', ascending: false);
 
     int total = 0;
-    final activeDates = <String>{};
+    final dailyTotals = <String, int>{};
     for (final row in rows) {
-      total += (row['count'] as int?) ?? 0;
-      activeDates.add(row['date'] as String);
+      final c = (row['count'] as int?) ?? 0;
+      final date = row['date'] as String;
+      total += c;
+      dailyTotals[date] = (dailyTotals[date] ?? 0) + c;
     }
 
-    // Calculate streak
-    int streak = 0;
-    final today = DateTime.now();
-    for (int i = 0; i < 365; i++) {
-      final d = today.subtract(Duration(days: i));
-      final key = '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
-      if (activeDates.contains(key)) {
-        streak++;
-      } else if (i > 0) {
-        break;
-      }
-    }
+    final goal = SettingsService.dailyGoal;
+    final result = computeStreak(
+      dailyTotals: dailyTotals,
+      dailyGoal: goal,
+      today: DateTime.now(),
+    );
+
+    final activeDays = dailyTotals.values.where((v) => v > 0).length;
 
     return {
       'total_dhikr': total,
-      'streak': streak,
-      'days_active': activeDates.length,
+      'streak': result.days,
+      'streak_active': result.todayMet,
+      'days_active': activeDays,
     };
   }
 }

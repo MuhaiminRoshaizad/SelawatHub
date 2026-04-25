@@ -12,6 +12,7 @@ class ProfileData {
   final DateTime? memberSince;
   final int totalDhikr;
   final int streak;
+  final bool streakActive;
   final int daysActive;
 
   const ProfileData({
@@ -22,6 +23,7 @@ class ProfileData {
     this.memberSince,
     this.totalDhikr = 0,
     this.streak = 0,
+    this.streakActive = false,
     this.daysActive = 0,
   });
 }
@@ -45,8 +47,9 @@ final profileProvider = FutureProvider<ProfileData>((ref) async {
     memberSince: user?.createdAt != null
         ? DateTime.tryParse(user!.createdAt)
         : null,
-    totalDhikr: stats['total'] ?? 0,
-    streak: stats['streak'] ?? 0,
-    daysActive: stats['daysActive'] ?? 0,
+    totalDhikr: (stats['total_dhikr'] as num?)?.toInt() ?? 0,
+    streak: (stats['streak'] as num?)?.toInt() ?? 0,
+    streakActive: (stats['streak_active'] as bool?) ?? false,
+    daysActive: (stats['days_active'] as num?)?.toInt() ?? 0,
   );
 });
