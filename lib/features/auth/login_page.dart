@@ -12,6 +12,7 @@ import 'package:selawathub/core/widgets/app_bottom_sheet.dart';
 import 'package:selawathub/app/app_shell.dart';
 import 'package:selawathub/features/profile/privacy_policy_page.dart';
 import 'package:selawathub/features/profile/terms_of_service_page.dart';
+import 'package:selawathub/l10n/generated/app_localizations.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key, this.isSignUp = false, this.initialEmail});
@@ -77,26 +78,26 @@ class _LoginPageState extends State<LoginPage> {
     final email = _emailCtrl.text.trim();
     final password = _passwordCtrl.text.trim();
     final name = _nameCtrl.text.trim();
+    final l = AppL10n.of(context);
 
     if (email.isEmpty || password.isEmpty) {
-      showAppSnackBar(context, 'Please fill in all fields');
+      showAppSnackBar(context, l.loginErrorFillFields);
       return;
     }
     if (_isSignUp && name.isEmpty) {
-      showAppSnackBar(context, 'Please enter your name');
+      showAppSnackBar(context, l.loginErrorNameRequired);
       return;
     }
     if (password.length < 6) {
-      showAppSnackBar(context, 'Password must be at least 6 characters');
+      showAppSnackBar(context, l.loginErrorPasswordLength);
       return;
     }
     if (_isSignUp && password != _confirmPasswordCtrl.text.trim()) {
-      showAppSnackBar(context, 'Passwords do not match');
+      showAppSnackBar(context, l.loginErrorPasswordMismatch);
       return;
     }
     if (_isSignUp && !_agreedToTerms) {
-      showAppSnackBar(
-          context, 'Please agree to the Terms of Service and Privacy Policy');
+      showAppSnackBar(context, l.loginErrorAgreeTerms);
       return;
     }
 
@@ -123,7 +124,7 @@ class _LoginPageState extends State<LoginPage> {
         if (alreadyRegistered) {
           showAppSnackBar(
             context,
-            'An account with this email already exists. Try signing in instead.',
+            l.loginErrorEmailExists,
             backgroundColor: C.error,
           );
           AuthService.expectingManualAuth = false;
@@ -131,7 +132,7 @@ class _LoginPageState extends State<LoginPage> {
           return;
         }
         if (user != null && user.emailConfirmedAt == null) {
-          showAppSnackBar(context, 'Check your email to verify your account');
+          showAppSnackBar(context, l.loginCheckEmailVerify);
           AuthService.expectingManualAuth = false;
           setState(() => _loading = false);
           return;
@@ -154,7 +155,7 @@ class _LoginPageState extends State<LoginPage> {
     } catch (e) {
       if (!mounted) return;
       AuthService.expectingManualAuth = false;
-      showAppSnackBar(context, 'Something went wrong. Please try again.');
+      showAppSnackBar(context, l.loginGenericError);
       setState(() => _loading = false);
     }
   }
@@ -171,6 +172,7 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     final dark = Theme.of(context).brightness == Brightness.dark;
     final tt = Theme.of(context).textTheme;
+    final l = AppL10n.of(context);
 
     return Scaffold(
       body: SafeArea(
@@ -205,7 +207,7 @@ class _LoginPageState extends State<LoginPage> {
             // Heading
             FadeIn(
               child: Text(
-                _isSignUp ? 'Create Account' : 'Welcome back',
+                _isSignUp ? l.loginCreateTitle : l.loginTitle,
                 style: tt.headlineLarge,
               ),
             ),
@@ -213,9 +215,7 @@ class _LoginPageState extends State<LoginPage> {
             FadeIn(
               delay: const Duration(milliseconds: 80),
               child: Text(
-                _isSignUp
-                    ? 'Start your selawat journey'
-                    : 'Continue your selawat journey',
+                _isSignUp ? l.loginSubtitleSignUp : l.loginSubtitleSignIn,
                 style: tt.bodyMedium,
               ),
             ),
@@ -228,8 +228,8 @@ class _LoginPageState extends State<LoginPage> {
                 delay: const Duration(milliseconds: 120),
                 child: _Field(
                   controller: _nameCtrl,
-                  label: 'Full Name',
-                  hint: 'Enter your name',
+                  label: l.loginNameLabel,
+                  hint: l.loginNameHint,
                   icon: CupertinoIcons.person,
                   dark: dark,
                 ),
@@ -242,8 +242,8 @@ class _LoginPageState extends State<LoginPage> {
               delay: Duration(milliseconds: _isSignUp ? 160 : 120),
               child: _Field(
                 controller: _emailCtrl,
-                label: 'Email',
-                hint: 'Enter your email',
+                label: l.loginEmailLabel,
+                hint: l.loginEmailHint,
                 icon: CupertinoIcons.mail,
                 dark: dark,
                 keyboardType: TextInputType.emailAddress,
@@ -257,8 +257,8 @@ class _LoginPageState extends State<LoginPage> {
               child: _Field(
                 controller: _passwordCtrl,
                 focusNode: _passwordFocus,
-                label: 'Password',
-                hint: 'Enter your password',
+                label: l.loginPasswordLabel,
+                hint: l.loginPasswordHint,
                 icon: CupertinoIcons.lock,
                 dark: dark,
                 obscure: true,
@@ -272,8 +272,8 @@ class _LoginPageState extends State<LoginPage> {
                 delay: const Duration(milliseconds: 240),
                 child: _Field(
                   controller: _confirmPasswordCtrl,
-                  label: 'Confirm Password',
-                  hint: 'Re-enter your password',
+                  label: l.loginConfirmPasswordLabel,
+                  hint: l.loginConfirmPasswordHint,
                   icon: CupertinoIcons.lock,
                   dark: dark,
                   obscure: true,
@@ -290,7 +290,7 @@ class _LoginPageState extends State<LoginPage> {
                   child: GestureDetector(
                     onTap: _showForgotPassword,
                     child: Text(
-                      'Forgot password?',
+                      l.loginForgotPassword,
                       style: tt.bodySmall?.copyWith(
                         color: dark ? C.primarySoft : C.primary,
                         fontWeight: FontWeight.w500,
@@ -310,6 +310,7 @@ class _LoginPageState extends State<LoginPage> {
                 child: _AgreementRow(
                   dark: dark,
                   tt: tt,
+                  l: l,
                   checked: _agreedToTerms,
                   onChanged: (v) => setState(() => _agreedToTerms = v),
                   termsRecognizer: _termsRecognizer,
@@ -350,7 +351,7 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                             )
                           : Text(
-                              _isSignUp ? 'Create Account' : 'Sign In',
+                              _isSignUp ? l.loginSubmitSignUp : l.loginSubmitSignIn,
                               style: TextStyle(
                                 fontSize: 15,
                                 fontWeight: FontWeight.w600,
@@ -376,12 +377,10 @@ class _LoginPageState extends State<LoginPage> {
                       style: tt.bodySmall,
                       children: [
                         TextSpan(
-                          text: _isSignUp
-                              ? 'Already have an account? '
-                              : 'Don\'t have an account? ',
+                          text: _isSignUp ? l.loginHaveAccount : l.loginNoAccount,
                         ),
                         TextSpan(
-                          text: _isSignUp ? 'Sign In' : 'Sign Up',
+                          text: _isSignUp ? l.loginSignInLink : l.loginSignUpLink,
                           style: TextStyle(
                             color: dark ? C.primarySoft : C.primary,
                             fontWeight: FontWeight.w600,
@@ -480,6 +479,7 @@ class _AgreementRow extends StatelessWidget {
   const _AgreementRow({
     required this.dark,
     required this.tt,
+    required this.l,
     required this.checked,
     required this.onChanged,
     required this.termsRecognizer,
@@ -488,6 +488,7 @@ class _AgreementRow extends StatelessWidget {
 
   final bool dark;
   final TextTheme tt;
+  final AppL10n l;
   final bool checked;
   final ValueChanged<bool> onChanged;
   final TapGestureRecognizer termsRecognizer;
@@ -533,9 +534,9 @@ class _AgreementRow extends StatelessWidget {
               text: TextSpan(
                 style: tt.bodySmall?.copyWith(color: muted, height: 1.45),
                 children: [
-                  const TextSpan(text: 'I have read and agree to the '),
+                  TextSpan(text: l.loginAgreementPrefix),
                   TextSpan(
-                    text: 'Terms of Service',
+                    text: l.loginAgreementTerms,
                     style: TextStyle(
                       color: accent,
                       fontWeight: FontWeight.w600,
@@ -544,9 +545,9 @@ class _AgreementRow extends StatelessWidget {
                     ),
                     recognizer: termsRecognizer,
                   ),
-                  const TextSpan(text: ' and '),
+                  TextSpan(text: l.loginAgreementAnd),
                   TextSpan(
-                    text: 'Privacy Policy',
+                    text: l.loginAgreementPrivacy,
                     style: TextStyle(
                       color: accent,
                       fontWeight: FontWeight.w600,
@@ -555,7 +556,7 @@ class _AgreementRow extends StatelessWidget {
                     ),
                     recognizer: privacyRecognizer,
                   ),
-                  const TextSpan(text: '.'),
+                  TextSpan(text: l.loginAgreementSuffix),
                 ],
               ),
             ),
@@ -581,8 +582,9 @@ class _ForgotPasswordSheetState extends State<_ForgotPasswordSheet> {
 
   Future<void> _send() async {
     final email = widget.controller.text.trim();
+    final l = AppL10n.of(context);
     if (email.isEmpty) {
-      showAppSnackBar(context, 'Please enter your email',
+      showAppSnackBar(context, l.forgotPasswordEmailRequired,
           backgroundColor: C.error);
       return;
     }
@@ -592,7 +594,7 @@ class _ForgotPasswordSheetState extends State<_ForgotPasswordSheet> {
       await AuthService.sendPasswordReset(email);
       if (!mounted) return;
       Navigator.pop(context);
-      showAppSnackBar(context, 'Reset link sent! Check your email');
+      showAppSnackBar(context, l.forgotPasswordSent);
     } on AuthException catch (e) {
       if (!mounted) return;
       setState(() => _sending = false);
@@ -600,7 +602,7 @@ class _ForgotPasswordSheetState extends State<_ForgotPasswordSheet> {
     } catch (_) {
       if (!mounted) return;
       setState(() => _sending = false);
-      showAppSnackBar(context, 'Something went wrong. Try again.',
+      showAppSnackBar(context, l.loginGenericError,
           backgroundColor: C.error);
     }
   }
@@ -609,6 +611,7 @@ class _ForgotPasswordSheetState extends State<_ForgotPasswordSheet> {
   Widget build(BuildContext context) {
     final dark = Theme.of(context).brightness == Brightness.dark;
     final tt = Theme.of(context).textTheme;
+    final l = AppL10n.of(context);
 
     return Padding(
       padding: EdgeInsets.fromLTRB(
@@ -621,11 +624,11 @@ class _ForgotPasswordSheetState extends State<_ForgotPasswordSheet> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Reset Password',
+          Text(l.forgotPasswordTitle,
               style: tt.titleLarge?.copyWith(fontWeight: FontWeight.w700)),
           const SizedBox(height: S.s8),
           Text(
-            'Enter your email and we\'ll send you a link to reset your password.',
+            l.forgotPasswordBody,
             style: tt.bodySmall?.copyWith(
               color: dark ? C.onDark2 : C.onLight2,
             ),
@@ -639,7 +642,7 @@ class _ForgotPasswordSheetState extends State<_ForgotPasswordSheet> {
               color: dark ? C.onDark1 : C.onLight1,
             ),
             decoration: InputDecoration(
-              hintText: 'Email address',
+              hintText: l.forgotPasswordEmailHint,
               prefixIcon: Padding(
                 padding: const EdgeInsets.only(left: 16, right: 12),
                 child: Icon(CupertinoIcons.mail,
@@ -675,7 +678,7 @@ class _ForgotPasswordSheetState extends State<_ForgotPasswordSheet> {
                           ),
                         )
                       : Text(
-                          'Send Reset Link',
+                          l.forgotPasswordSubmit,
                           style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w600,

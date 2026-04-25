@@ -8,6 +8,7 @@ import 'package:selawathub/core/services/supabase_service.dart';
 import 'package:selawathub/core/theme/colors.dart';
 import 'package:selawathub/core/widgets/app_snackbar.dart';
 import 'package:selawathub/features/counter/models/dhikr.dart';
+import 'package:selawathub/l10n/generated/app_localizations.dart';
 
 /// Result returned by the manual-add sheet.
 typedef ManualCountResult = ({Dhikr dhikr, int amount});
@@ -138,7 +139,7 @@ class _ManualCountBodyState extends State<_ManualCountBody> {
     if (created == null) {
       showAppSnackBar(
         context,
-        "Couldn't save custom ${_newCategory.name}. Try again.",
+        AppL10n.of(context).manualSaveCustomFailed(_newCategory.name),
         backgroundColor: C.error,
       );
       return;
@@ -147,7 +148,7 @@ class _ManualCountBodyState extends State<_ManualCountBody> {
     if (!mounted) return;
     showAppSnackBar(
       context,
-      'Added "${created.name}" to your ${_newCategory.name} list',
+      AppL10n.of(context).manualAddedCustomToast(created.name, _newCategory.name),
     );
     _pickDhikr(created);
   }
@@ -197,7 +198,8 @@ class _ManualCountBodyState extends State<_ManualCountBody> {
     final tt = Theme.of(context).textTheme;
     final accent = dark ? C.primarySoft : C.primary;
     final canSubmit = _parsed > 0;
-    final titleText = _subtract ? 'Subtract manually' : 'Add manually';
+    final l = AppL10n.of(context);
+    final titleText = _subtract ? l.manualSubtractTitle : l.manualAddTitle;
 
     return Column(
       key: const ValueKey('amount'),
@@ -375,9 +377,9 @@ class _ManualCountBodyState extends State<_ManualCountBody> {
                 Text(
                   canSubmit
                       ? (_subtract
-                          ? 'Subtract $_parsed'
-                          : 'Add $_parsed')
-                      : 'Enter an amount',
+                          ? l.manualSubtractCta(_parsed)
+                          : l.manualAddCta(_parsed))
+                      : l.manualEnterAmount,
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
@@ -408,7 +410,7 @@ class _ManualCountBodyState extends State<_ManualCountBody> {
                   ),
                   const SizedBox(width: S.s6),
                   Text(
-                    "Edit today's log",
+                    l.counterMenuTodayLog,
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w500,
@@ -431,6 +433,7 @@ class _ManualCountBodyState extends State<_ManualCountBody> {
   Widget _pickView(bool dark) {
     final tt = Theme.of(context).textTheme;
     final accent = dark ? C.primarySoft : C.primary;
+    final l = AppL10n.of(context);
     final selawatBuiltIns =
         Dhikr.selawatList.where((d) => d.category == DhikrCategory.selawat);
     final zikirBuiltIns =
@@ -463,7 +466,7 @@ class _ManualCountBodyState extends State<_ManualCountBody> {
               ),
               const SizedBox(width: S.s8),
               Text(
-                'What are you reciting?',
+                l.manualWhatReciting,
                 style: tt.titleMedium?.copyWith(
                   fontWeight: FontWeight.w700,
                   color: dark ? C.onDark1 : C.onLight1,
@@ -478,11 +481,11 @@ class _ManualCountBodyState extends State<_ManualCountBody> {
               children: [
                 if (SupabaseService.isAuthenticated)
                   _addNewButton(dark, accent),
-                _sectionHeader('Selawat', dark),
+                _sectionHeader(l.manualCategorySelawat, dark),
                 ...customSelawat.map((d) => _dhikrRow(d, dark, accent)),
                 ...selawatBuiltIns.map((d) => _dhikrRow(d, dark, accent)),
                 const SizedBox(height: S.s12),
-                _sectionHeader('Zikir', dark),
+                _sectionHeader(l.manualCategoryZikir, dark),
                 ...customZikir.map((d) => _dhikrRow(d, dark, accent)),
                 ...zikirBuiltIns.map((d) => _dhikrRow(d, dark, accent)),
               ],
@@ -506,7 +509,9 @@ class _ManualCountBodyState extends State<_ManualCountBody> {
         ),
       );
 
-  Widget _addNewButton(bool dark, Color accent) => Padding(
+  Widget _addNewButton(bool dark, Color accent) {
+    final l = AppL10n.of(context);
+    return Padding(
         padding: const EdgeInsets.only(bottom: S.s8),
         child: BounceTap(
           onTap: _startAddNew,
@@ -525,7 +530,7 @@ class _ManualCountBodyState extends State<_ManualCountBody> {
                 Icon(CupertinoIcons.add_circled, size: 18, color: accent),
                 const SizedBox(width: S.s12),
                 Text(
-                  'Add your own Selawat/Zikir',
+                  l.manualAddYourOwn,
                   style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
@@ -537,6 +542,7 @@ class _ManualCountBodyState extends State<_ManualCountBody> {
           ),
         ),
       );
+  }
 
   Widget _dhikrRow(Dhikr d, bool dark, Color accent) {
     final selected = d.id == _dhikr.id;
@@ -596,6 +602,7 @@ class _ManualCountBodyState extends State<_ManualCountBody> {
     final tt = Theme.of(context).textTheme;
     final accent = dark ? C.primarySoft : C.primary;
     final canSave = _nameCtrl.text.trim().isNotEmpty && !_saving;
+    final l = AppL10n.of(context);
 
     return Column(
       key: const ValueKey('addNew'),
@@ -618,7 +625,7 @@ class _ManualCountBodyState extends State<_ManualCountBody> {
             ),
             const SizedBox(width: S.s8),
             Text(
-              'Add your own Selawat/Zikir',
+              l.manualAddYourOwn,
               style: tt.titleMedium?.copyWith(
                 fontWeight: FontWeight.w700,
                 color: dark ? C.onDark1 : C.onLight1,
@@ -653,7 +660,7 @@ class _ManualCountBodyState extends State<_ManualCountBody> {
             ),
             decoration: InputDecoration(
               border: InputBorder.none,
-              hintText: 'e.g. Selawat Munjiyat',
+              hintText: l.manualNameHintExample,
               hintStyle: TextStyle(
                 fontSize: 15,
                 color: dark ? C.onDark3 : C.onLight3,
@@ -670,7 +677,7 @@ class _ManualCountBodyState extends State<_ManualCountBody> {
           children: [
             Expanded(
               child: _catToggle(
-                label: 'Selawat',
+                label: l.manualCategorySelawat,
                 selected: _newCategory == DhikrCategory.selawat,
                 onTap: () =>
                     setState(() => _newCategory = DhikrCategory.selawat),
@@ -681,7 +688,7 @@ class _ManualCountBodyState extends State<_ManualCountBody> {
             const SizedBox(width: S.s8),
             Expanded(
               child: _catToggle(
-                label: 'Zikir',
+                label: l.manualCategoryZikir,
                 selected: _newCategory == DhikrCategory.zikir,
                 onTap: () =>
                     setState(() => _newCategory = DhikrCategory.zikir),
@@ -714,7 +721,7 @@ class _ManualCountBodyState extends State<_ManualCountBody> {
                     ),
                   )
                 : Text(
-                    'Save & continue',
+                    l.manualSaveAndContinue,
                     style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
@@ -771,6 +778,7 @@ class _ManualCountBodyState extends State<_ManualCountBody> {
       );
 
   Widget _modeToggle(bool dark, Color accent) {
+    final l = AppL10n.of(context);
     Widget seg(String label, IconData icon, bool selected, VoidCallback onTap,
         Color activeColor) {
       return Expanded(
@@ -820,9 +828,9 @@ class _ManualCountBodyState extends State<_ManualCountBody> {
       ),
       child: Row(
         children: [
-          seg('Add', CupertinoIcons.plus, !_subtract,
+          seg(l.manualSegmentAdd, CupertinoIcons.plus, !_subtract,
               () => setState(() => _subtract = false), accent),
-          seg('Subtract', CupertinoIcons.minus, _subtract,
+          seg(l.manualSegmentSubtract, CupertinoIcons.minus, _subtract,
               () => setState(() => _subtract = true), C.error),
         ],
       ),

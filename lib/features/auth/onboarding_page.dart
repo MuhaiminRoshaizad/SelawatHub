@@ -1,10 +1,13 @@
 import 'dart:math' as math;
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:selawathub/core/animations/bounce_tap.dart';
 import 'package:selawathub/core/animations/fade_in.dart';
 import 'package:selawathub/core/constants.dart';
 import 'package:selawathub/core/theme/colors.dart';
+import 'package:selawathub/core/widgets/language_picker_sheet.dart';
 import 'package:selawathub/features/auth/welcome_page.dart';
+import 'package:selawathub/l10n/generated/app_localizations.dart';
 
 class OnboardingPage extends StatefulWidget {
   const OnboardingPage({super.key});
@@ -19,23 +22,7 @@ class _OnboardingPageState extends State<OnboardingPage>
   int _page = 0;
   late final AnimationController _gradientCtrl;
 
-  static const _slides = [
-    (
-      emoji: '🕌',
-      title: 'Count Your Selawat',
-      subtitle: 'Track your daily selawat and zikir\nwith a beautiful tasbih counter',
-    ),
-    (
-      emoji: '📊',
-      title: 'Track Your Progress',
-      subtitle: 'See your streaks, heatmaps, and\ndetailed statistics over time',
-    ),
-    (
-      emoji: '🤝',
-      title: 'Grow Together',
-      subtitle: 'Join groups, count together, and\nmotivate each other',
-    ),
-  ];
+  static const _emojis = ['🕌', '📊', '🤝'];
 
   @override
   void initState() {
@@ -68,7 +55,13 @@ class _OnboardingPageState extends State<OnboardingPage>
   Widget build(BuildContext context) {
     final dark = Theme.of(context).brightness == Brightness.dark;
     final tt = Theme.of(context).textTheme;
-    final isLast = _page == _slides.length - 1;
+    final l = AppL10n.of(context);
+    final slides = [
+      (emoji: _emojis[0], title: l.onboardingTitle1, subtitle: l.onboardingSubtitle1),
+      (emoji: _emojis[1], title: l.onboardingTitle2, subtitle: l.onboardingSubtitle2),
+      (emoji: _emojis[2], title: l.onboardingTitle3, subtitle: l.onboardingSubtitle3),
+    ];
+    final isLast = _page == slides.length - 1;
 
     return Scaffold(
       body: Stack(
@@ -117,23 +110,37 @@ class _OnboardingPageState extends State<OnboardingPage>
           SafeArea(
             child: Column(
               children: [
-                // Skip button
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: Padding(
-                    padding: const EdgeInsets.only(top: S.s12, right: S.s16),
-                    child: GestureDetector(
-                      onTap: _goToWelcome,
-                      child: Padding(
-                        padding: const EdgeInsets.all(S.s8),
-                        child: Text(
-                          'Skip',
-                          style: tt.bodyMedium?.copyWith(
-                            color: dark ? C.onDark3 : C.onLight3,
+                // Top row: language picker (left) + Skip (right)
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(S.s8, S.s12, S.s8, 0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      GestureDetector(
+                        onTap: () => showLanguagePickerSheet(context),
+                        behavior: HitTestBehavior.opaque,
+                        child: Padding(
+                          padding: const EdgeInsets.all(S.s8),
+                          child: Icon(
+                            CupertinoIcons.globe,
+                            size: 22,
+                            color: dark ? C.onDark2 : C.onLight2,
                           ),
                         ),
                       ),
-                    ),
+                      GestureDetector(
+                        onTap: _goToWelcome,
+                        child: Padding(
+                          padding: const EdgeInsets.all(S.s8),
+                          child: Text(
+                            l.commonSkip,
+                            style: tt.bodyMedium?.copyWith(
+                              color: dark ? C.onDark3 : C.onLight3,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
 
@@ -141,9 +148,9 @@ class _OnboardingPageState extends State<OnboardingPage>
                 Expanded(
                   child: PageView.builder(
                     controller: _controller,
-                    itemCount: _slides.length,
+                    itemCount: slides.length,
                     itemBuilder: (context, index) {
-                      final slide = _slides[index];
+                      final slide = slides[index];
                       return Padding(
                         padding:
                             const EdgeInsets.symmetric(horizontal: S.page),
@@ -191,7 +198,7 @@ class _OnboardingPageState extends State<OnboardingPage>
                   padding: const EdgeInsets.only(bottom: S.s24),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    children: List.generate(_slides.length, (i) {
+                    children: List.generate(slides.length, (i) {
                       final active = i == _page;
                       return AnimatedContainer(
                         duration: const Duration(milliseconds: 300),
@@ -230,7 +237,7 @@ class _OnboardingPageState extends State<OnboardingPage>
                             ),
                             child: Center(
                               child: Text(
-                                'Get Started',
+                                l.commonGetStarted,
                                 style: TextStyle(
                                   fontSize: 15,
                                   fontWeight: FontWeight.w600,

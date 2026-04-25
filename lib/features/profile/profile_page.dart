@@ -7,6 +7,7 @@ import 'package:selawathub/core/animations/bounce_tap.dart';
 import 'package:selawathub/core/animations/fade_in.dart';
 import 'package:selawathub/core/constants.dart';
 import 'package:selawathub/core/services/auth_service.dart';
+import 'package:selawathub/core/services/locale_controller.dart';
 import 'package:selawathub/core/services/profile_service.dart';
 import 'package:selawathub/core/services/settings_service.dart';
 import 'package:selawathub/core/services/supabase_service.dart';
@@ -18,6 +19,7 @@ import 'package:selawathub/core/widgets/app_bottom_sheet.dart';
 import 'package:selawathub/core/widgets/app_refresh_indicator.dart';
 import 'package:selawathub/core/widgets/app_snackbar.dart';
 import 'package:selawathub/core/widgets/confirmation_dialog.dart';
+import 'package:selawathub/core/widgets/language_picker_sheet.dart';
 import 'package:selawathub/features/auth/welcome_page.dart';
 import 'package:selawathub/features/profile/about_page.dart';
 import 'package:selawathub/features/profile/edit_profile_page.dart';
@@ -25,6 +27,7 @@ import 'package:selawathub/features/profile/help_faq_page.dart';
 import 'package:selawathub/features/profile/widgets/profile_header.dart';
 import 'package:selawathub/features/profile/widgets/profile_rows.dart';
 import 'package:selawathub/features/profile/widgets/profile_stats_row.dart';
+import 'package:selawathub/l10n/generated/app_localizations.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -46,7 +49,6 @@ class _ProfilePageState extends State<ProfilePage> {
   bool _streakActive = false;
   int _daysActive = 0;
   late final bool _isGuest = widget.isGuest;
-  String _language = 'English';
 
 
   static final _numFmt = NumberFormat.decimalPattern();
@@ -140,12 +142,13 @@ class _ProfilePageState extends State<ProfilePage> {
     return '${parts.first[0]}${parts.last[0]}'.toUpperCase();
   }
 
-  String get _memberSince {
+  String _memberSince(BuildContext context) {
     final created = SupabaseService.currentUser?.createdAt;
     if (created == null) return '';
     final dt = DateTime.tryParse(created);
     if (dt == null) return created;
-    return DateFormat.yMMMM().format(dt);
+    final localeStr = Localizations.localeOf(context).toString();
+    return DateFormat.yMMMM(localeStr).format(dt);
   }
 
   Future<void> _openEditProfile() async {
@@ -196,6 +199,7 @@ class _ProfilePageState extends State<ProfilePage> {
     final themeCtrl = ThemeController.of(context);
     final topPad = MediaQuery.of(context).padding.top;
     final accent = dark ? C.primarySoft : C.primary;
+    final l = AppL10n.of(context);
 
     return Skeletonizer(
       enabled: _loading,
@@ -233,7 +237,7 @@ class _ProfilePageState extends State<ProfilePage> {
               children: [
                 const SizedBox(height: S.s16),
                 Text(
-                  _isGuest ? 'Guest' : (_name.isEmpty ? (SupabaseService.currentUser?.userMetadata?['name'] as String? ?? 'Set your name') : _name),
+                  _isGuest ? l.profileGuestBadge : (_name.isEmpty ? (SupabaseService.currentUser?.userMetadata?['name'] as String? ?? l.profileSetYourName) : _name),
                   style: tt.headlineMedium?.copyWith(
                     fontWeight: FontWeight.w700,
                   ),
@@ -242,7 +246,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 if (!_isGuest) ...[
                   const SizedBox(height: S.s4),
                   Text(
-                    _bio.isEmpty ? 'Tap the pencil to add a bio' : _bio,
+                    _bio.isEmpty ? l.profileBioPlaceholder : _bio,
                     style: tt.bodyMedium?.copyWith(
                       color: dark ? C.onDark2 : C.onLight2,
                     ),
@@ -275,7 +279,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
         // ── Account Info section (authenticated only) ──
         if (!_isGuest) ...[
-        _sectionHeader('Account Info', 200, dark),
+        _sectionHeader(l.profileSectionAccountInfo, 200, dark),
         FadeIn(
           delay: const Duration(milliseconds: 240),
           child: Padding(
@@ -293,14 +297,14 @@ class _ProfilePageState extends State<ProfilePage> {
                 children: [
                   InfoRow(
                     icon: CupertinoIcons.mail,
-                    label: 'Email',
+                    label: l.profileEmailLabel,
                     value: _email,
                   ),
                   _divider(dark),
                   InfoRow(
                     icon: CupertinoIcons.calendar,
-                    label: 'Member Since',
-                    value: _memberSince,
+                    label: l.profileMemberSinceLabel,
+                    value: _memberSince(context),
                   ),
                 ],
               ),
@@ -318,7 +322,7 @@ class _ProfilePageState extends State<ProfilePage> {
         const SizedBox(height: S.s24),
 
         // ── Settings section ──
-        _sectionHeader('Settings', 360, dark),
+        _sectionHeader(l.profileSectionSettings, 360, dark),
         FadeIn(
           delay: const Duration(milliseconds: 400),
           child: Padding(
@@ -345,15 +349,15 @@ class _ProfilePageState extends State<ProfilePage> {
                   _divider(dark),
                   MenuRow(
                     icon: CupertinoIcons.globe,
-                    label: 'Language',
-                    trailing: _language,
-                    onTap: () => _showLanguagePicker(context),
+                    label: l.languageCurrent,
+                    trailing: _languageLabel(context),
+                    onTap: () => showLanguagePickerSheet(context),
                   ),
                   if (!_isGuest) ...[
                     _divider(dark),
                     MenuRow(
                       icon: CupertinoIcons.lock_fill,
-                      label: 'Change Password',
+                      label: l.profileChangePassword,
                       onTap: () => _showChangePassword(context),
                     ),
                   ],
@@ -366,7 +370,7 @@ class _ProfilePageState extends State<ProfilePage> {
         const SizedBox(height: S.s24),
 
         // ── About & Help section ──
-        _sectionHeader('Support', 440, dark),
+        _sectionHeader(l.profileSectionSupport, 440, dark),
         FadeIn(
           delay: const Duration(milliseconds: 480),
           child: Padding(
@@ -384,13 +388,13 @@ class _ProfilePageState extends State<ProfilePage> {
                 children: [
                   MenuRow(
                     icon: CupertinoIcons.question_circle,
-                    label: 'Help & FAQ',
+                    label: l.profileHelpAndFaq,
                     onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const HelpFaqPage())),
                   ),
                   _divider(dark),
                   MenuRow(
                     icon: CupertinoIcons.info_circle,
-                    label: 'About SelawatHub',
+                    label: l.profileAboutApp,
                     onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AboutPage())),
                   ),
                 ],
@@ -430,7 +434,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           ),
                           const SizedBox(width: S.s8),
                           Text(
-                            'Sign In',
+                            l.profileSignIn,
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
@@ -445,10 +449,10 @@ class _ProfilePageState extends State<ProfilePage> {
                     onTap: () {
                       showConfirmDialog(
                         context: context,
-                        title: 'Sign out?',
-                        message: 'Are you sure you want to sign out of your account?',
-                        actionLabel: 'Sign Out',
-                        errorMessage: 'Failed to sign out',
+                        title: l.profileSignOutConfirmTitle,
+                        message: l.profileSignOutConfirmBody,
+                        actionLabel: l.profileSignOutAction,
+                        errorMessage: l.profileSignOutFailed,
                         onConfirm: () async {
                           await AuthService.signOut();
                           // Let showConfirmDialog auto-pop the dialog first,
@@ -488,7 +492,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           ),
                           const SizedBox(width: S.s8),
                           Text(
-                            'Sign Out',
+                            l.profileSignOut,
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
@@ -509,7 +513,7 @@ class _ProfilePageState extends State<ProfilePage> {
           delay: const Duration(milliseconds: 580),
           child: Center(
             child: Text(
-              'SelawatHub v1.0.0',
+              l.profileVersion('1.0.0'),
               style: tt.bodySmall?.copyWith(
                 color: dark ? C.onDark3 : C.onLight3,
                 fontSize: 11,
@@ -528,77 +532,29 @@ class _ProfilePageState extends State<ProfilePage> {
 
   // ── Helpers ──
 
-  void _showLanguagePicker(BuildContext context) {
-    showAppFormSheet(
-      context: context,
-      isScrollControlled: false,
-      builder: (ctx) {
-        return StatefulBuilder(
-          builder: (ctx, setSheetState) {
-            final dark = Theme.of(ctx).brightness == Brightness.dark;
-            final tt = Theme.of(ctx).textTheme;
-            return Padding(
-              padding: const EdgeInsets.fromLTRB(S.page, S.s8, S.page, S.page),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Language', style: tt.titleLarge?.copyWith(fontWeight: FontWeight.w600)),
-                  const SizedBox(height: S.s24),
-                  for (final lang in ['English', 'Bahasa Melayu'])
-                    BounceTap(
-                      onTap: () {
-                        setState(() => _language = lang);
-                        setSheetState(() {});
-                        Navigator.pop(ctx);
-                        showAppSnackBar(context, 'Language changed to $lang');
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: S.s16),
-                        child: Row(
-                          children: [
-                            Container(
-                              width: 24,
-                              height: 24,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: _language == lang
-                                      ? (dark ? C.primarySoft : C.primary)
-                                      : (dark ? C.onDark3 : C.onLight3),
-                                  width: 2,
-                                ),
-                                color: _language == lang
-                                    ? (dark ? C.primarySoft : C.primary)
-                                    : Colors.transparent,
-                              ),
-                              child: _language == lang
-                                  ? const Icon(Icons.check, size: 16, color: C.white)
-                                  : null,
-                            ),
-                            const SizedBox(width: S.s16),
-                            Text(lang, style: tt.bodyLarge),
-                          ],
-                        ),
-                      ),
-                    ),
-                  SizedBox(height: MediaQuery.of(ctx).padding.bottom),
-                ],
-              ),
-            );
-          },
-        );
-      },
-    );
+  /// Trailing text for the Language MenuRow — reflects current LocaleController
+  /// state. "System" for follow-system, otherwise the native name.
+  String _languageLabel(BuildContext context) {
+    final mode = LocaleController.of(context).value;
+    final l = AppL10n.of(context);
+    switch (mode) {
+      case LocaleMode.english:
+        return l.languageEnglish;
+      case LocaleMode.malay:
+        return l.languageMalay;
+      default:
+        return l.languageSystem;
+    }
   }
 
   void _showChangePassword(BuildContext context) {
+    final l = AppL10n.of(context);
     showAppFormSheet(
       context: context,
       builder: (ctx) => _ChangePasswordSheet(
         onSaved: () {
           Navigator.pop(ctx);
-          showAppSnackBar(context, 'Password changed successfully');
+          showAppSnackBar(context, l.changePasswordSuccess);
         },
       ),
     );
@@ -657,21 +613,22 @@ class _ChangePasswordSheetState extends State<_ChangePasswordSheet> {
   }
 
   Future<void> _changePassword() async {
+    final l = AppL10n.of(context);
     final currentPw = _currentCtrl.text;
     final newPw = _newCtrl.text;
     final confirmPw = _confirmCtrl.text;
     if (currentPw.isEmpty) {
-      showAppSnackBar(context, 'Please enter your current password',
+      showAppSnackBar(context, l.changePasswordCurrentRequired,
           backgroundColor: C.error);
       return;
     }
     if (newPw.length < 6) {
-      showAppSnackBar(context, 'Password must be at least 6 characters',
+      showAppSnackBar(context, l.resetPasswordTooShort,
           backgroundColor: C.error);
       return;
     }
     if (newPw != confirmPw) {
-      showAppSnackBar(context, 'Passwords do not match',
+      showAppSnackBar(context, l.resetPasswordMismatch,
           backgroundColor: C.error);
       return;
     }
@@ -684,21 +641,22 @@ class _ChangePasswordSheetState extends State<_ChangePasswordSheet> {
       if (!mounted) return;
       setState(() => _saving = false);
       final msg = e.message.contains('Invalid login')
-          ? 'Current password is incorrect'
+          ? l.changePasswordCurrentIncorrect
           : e.message;
       showAppSnackBar(context, msg, backgroundColor: C.error);
     } catch (_) {
       if (!mounted) return;
       setState(() => _saving = false);
-      showAppSnackBar(context, 'Failed to change password',
+      showAppSnackBar(context, l.changePasswordFailed,
           backgroundColor: C.error);
     }
   }
 
   Future<void> _sendResetEmail() async {
+    final l = AppL10n.of(context);
     final email = AuthService.currentEmail;
     if (email == null) {
-      showAppSnackBar(context, 'Could not find your email',
+      showAppSnackBar(context, l.changePasswordEmailMissing,
           backgroundColor: C.error);
       return;
     }
@@ -707,11 +665,11 @@ class _ChangePasswordSheetState extends State<_ChangePasswordSheet> {
       await AuthService.sendPasswordReset(email);
       if (!mounted) return;
       Navigator.pop(context);
-      showAppSnackBar(context, 'Reset link sent to $email');
+      showAppSnackBar(context, l.changePasswordResetSent(email));
     } catch (_) {
       if (!mounted) return;
       setState(() => _sendingReset = false);
-      showAppSnackBar(context, 'Failed to send reset email',
+      showAppSnackBar(context, l.changePasswordResetFailed,
           backgroundColor: C.error);
     }
   }
@@ -720,19 +678,20 @@ class _ChangePasswordSheetState extends State<_ChangePasswordSheet> {
   Widget build(BuildContext context) {
     final tt = Theme.of(context).textTheme;
     final dark = Theme.of(context).brightness == Brightness.dark;
+    final l = AppL10n.of(context);
     return Padding(
       padding: EdgeInsets.fromLTRB(S.page, S.s8, S.page, MediaQuery.of(context).viewInsets.bottom + S.page),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Change Password', style: tt.titleLarge?.copyWith(fontWeight: FontWeight.w600)),
+          Text(l.changePasswordTitle, style: tt.titleLarge?.copyWith(fontWeight: FontWeight.w600)),
           const SizedBox(height: S.s24),
           TextField(
             controller: _currentCtrl,
             obscureText: !_showCurrent,
             decoration: InputDecoration(
-              labelText: 'Current Password',
+              labelText: l.changePasswordCurrentLabel,
               suffixIcon: GestureDetector(
                 onTap: () => setState(() => _showCurrent = !_showCurrent),
                 child: Icon(
@@ -749,7 +708,7 @@ class _ChangePasswordSheetState extends State<_ChangePasswordSheet> {
             child: GestureDetector(
               onTap: _sendingReset ? null : _sendResetEmail,
               child: Text(
-                _sendingReset ? 'Sending...' : 'Forgot your current password?',
+                _sendingReset ? l.changePasswordSending : l.changePasswordForgotLink,
                 style: tt.bodySmall?.copyWith(
                   color: dark ? C.primarySoft : C.primary,
                   fontWeight: FontWeight.w500,
@@ -762,7 +721,7 @@ class _ChangePasswordSheetState extends State<_ChangePasswordSheet> {
             controller: _newCtrl,
             obscureText: !_showNew,
             decoration: InputDecoration(
-              labelText: 'New Password',
+              labelText: l.changePasswordNewLabel,
               suffixIcon: GestureDetector(
                 onTap: () => setState(() => _showNew = !_showNew),
                 child: Icon(
@@ -778,7 +737,7 @@ class _ChangePasswordSheetState extends State<_ChangePasswordSheet> {
             controller: _confirmCtrl,
             obscureText: !_showConfirm,
             decoration: InputDecoration(
-              labelText: 'Confirm Password',
+              labelText: l.changePasswordConfirmLabel,
               suffixIcon: GestureDetector(
                 onTap: () => setState(() => _showConfirm = !_showConfirm),
                 child: Icon(

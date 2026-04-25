@@ -9,6 +9,7 @@ import 'package:selawathub/core/services/profile_service.dart';
 import 'package:selawathub/core/theme/colors.dart';
 import 'package:selawathub/core/widgets/app_snackbar.dart';
 import 'package:selawathub/core/widgets/frosted_bar.dart';
+import 'package:selawathub/l10n/generated/app_localizations.dart';
 
 // ─────────────────────────────────────────────────────────
 //  Edit Profile Page — Instagram / WhatsApp style
@@ -83,6 +84,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
   }
 
   Future<void> _pickImage(ImageSource source) async {
+    final l = AppL10n.of(context);
     try {
       final picked = await ImagePicker().pickImage(
         source: source,
@@ -95,7 +97,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
       final bytes = await picked.readAsBytes();
       if (bytes.length > _maxImageBytes) {
         if (!mounted) return;
-        showAppSnackBar(context, 'Image must be under 2 MB',
+        showAppSnackBar(context, l.editProfilePhotoTooLarge,
             backgroundColor: C.error);
         return;
       }
@@ -103,7 +105,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
       final ext = picked.path.split('.').last.toLowerCase();
       if (!['jpg', 'jpeg', 'png', 'webp'].contains(ext)) {
         if (!mounted) return;
-        showAppSnackBar(context, 'Only JPG, PNG, or WebP allowed',
+        showAppSnackBar(context, l.editProfilePhotoBadType,
             backgroundColor: C.error);
         return;
       }
@@ -118,22 +120,23 @@ class _EditProfilePageState extends State<EditProfilePage> {
           _uploadingAvatar = false;
         });
         _onChanged();
-        showAppSnackBar(context, 'Photo updated');
+        showAppSnackBar(context, l.editProfilePhotoUpdated);
       } else {
         setState(() => _uploadingAvatar = false);
-        showAppSnackBar(context, 'Failed to upload photo',
+        showAppSnackBar(context, l.editProfilePhotoUploadFailed,
             backgroundColor: C.error);
       }
     } catch (_) {
       if (!mounted) return;
       setState(() => _uploadingAvatar = false);
-      showAppSnackBar(context, 'Failed to upload photo',
+      showAppSnackBar(context, l.editProfilePhotoUploadFailed,
           backgroundColor: C.error);
     }
   }
 
   void _showImageSourcePicker() {
     final dark = Theme.of(context).brightness == Brightness.dark;
+    final l = AppL10n.of(context);
     showModalBottomSheet(
       context: context,
       backgroundColor: dark ? C.dark2 : C.light1,
@@ -158,7 +161,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
               ListTile(
                 leading: Icon(CupertinoIcons.camera,
                     color: dark ? C.onDark1 : C.onLight1),
-                title: Text('Take Photo',
+                title: Text(l.editProfileTakePhoto,
                     style: TextStyle(color: dark ? C.onDark1 : C.onLight1)),
                 onTap: () {
                   Navigator.pop(ctx);
@@ -168,7 +171,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
               ListTile(
                 leading: Icon(CupertinoIcons.photo,
                     color: dark ? C.onDark1 : C.onLight1),
-                title: Text('Choose from Gallery',
+                title: Text(l.editProfileChooseGallery,
                     style: TextStyle(color: dark ? C.onDark1 : C.onLight1)),
                 onTap: () {
                   Navigator.pop(ctx);
@@ -179,12 +182,12 @@ class _EditProfilePageState extends State<EditProfilePage> {
                 ListTile(
                   leading: const Icon(CupertinoIcons.trash, color: C.error),
                   title:
-                      const Text('Remove Photo', style: TextStyle(color: C.error)),
+                      Text(l.editProfileRemovePhoto, style: const TextStyle(color: C.error)),
                   onTap: () {
                     Navigator.pop(ctx);
                     setState(() => _avatarUrl = null);
                     _onChanged();
-                    showAppSnackBar(context, 'Photo removed');
+                    showAppSnackBar(context, l.editProfilePhotoRemoved);
                   },
                 ),
             ],
@@ -196,10 +199,11 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
   void _save() async {
     if (!_hasChanges || _saving) return;
+    final l = AppL10n.of(context);
     final name = _nameCtrl.text.trim();
     if (name.isEmpty) {
       _nameFocus.requestFocus();
-      showAppSnackBar(context, 'Name cannot be empty', backgroundColor: C.error);
+      showAppSnackBar(context, l.editProfileNameEmpty, backgroundColor: C.error);
       return;
     }
     setState(() => _saving = true);
@@ -209,7 +213,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
         bio: _bioCtrl.text.trim(),
       );
       if (!mounted) return;
-      showAppSnackBar(context, 'Profile updated');
+      showAppSnackBar(context, l.editProfileSaved);
       Navigator.of(context).pop({
         'name': name,
         'bio': _bioCtrl.text.trim(),
@@ -218,7 +222,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     } catch (e) {
       if (!mounted) return;
       setState(() => _saving = false);
-      showAppSnackBar(context, 'Failed to save profile', backgroundColor: C.error);
+      showAppSnackBar(context, l.editProfileSaveFailed, backgroundColor: C.error);
     }
   }
 
@@ -228,27 +232,28 @@ class _EditProfilePageState extends State<EditProfilePage> {
       return;
     }
     final dark = Theme.of(context).brightness == Brightness.dark;
+    final l = AppL10n.of(context);
     showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: dark ? C.dark3 : C.light2,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Text(
-          'Discard changes?',
+          l.editProfileDiscardTitle,
           style: TextStyle(
             fontWeight: FontWeight.w600,
             color: dark ? C.onDark1 : C.onLight1,
           ),
         ),
         content: Text(
-          'You have unsaved changes that will be lost.',
+          l.editProfileDiscardBody,
           style: TextStyle(color: dark ? C.onDark2 : C.onLight2),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
             child: Text(
-              'Keep Editing',
+              l.editProfileKeepEditing,
               style: TextStyle(color: dark ? C.primarySoft : C.primary),
             ),
           ),
@@ -257,7 +262,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
               Navigator.of(ctx).pop(true);
               Navigator.of(context).pop();
             },
-            child: Text('Discard', style: TextStyle(color: C.error)),
+            child: Text(l.editProfileDiscard, style: const TextStyle(color: C.error)),
           ),
         ],
       ),
@@ -270,6 +275,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
     final tt = Theme.of(context).textTheme;
     final accent = dark ? C.primarySoft : C.primary;
     final muted = dark ? C.onDark3 : C.onLight3;
+    final l = AppL10n.of(context);
 
     return PopScope(
       canPop: !_hasChanges && !_saving,
@@ -393,7 +399,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                           BounceTap(
                             onTap: _uploadingAvatar ? null : _showImageSourcePicker,
                             child: Text(
-                              'Edit photo',
+                              l.editProfileEditPhoto,
                               style: TextStyle(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w600,
@@ -419,8 +425,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
                         FadeIn(
                           delay: const Duration(milliseconds: 80),
                           child: _Field(
-                            label: 'Full Name',
-                            hint: 'Enter your name',
+                            label: l.editProfileNameLabel,
+                            hint: l.editProfileNameHint,
                             icon: CupertinoIcons.person,
                             controller: _nameCtrl,
                             focusNode: _nameFocus,
@@ -441,8 +447,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                 CrossAxisAlignment.start,
                             children: [
                               _Field(
-                                label: 'Bio',
-                                hint: 'Write something about yourself...',
+                                label: l.editProfileBioLabel,
+                                hint: l.editProfileBioHint,
                                 icon: CupertinoIcons.pencil,
                                 controller: _bioCtrl,
                                 focusNode: _bioFocus,
@@ -510,7 +516,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                             padding: const EdgeInsets.symmetric(
                                 horizontal: S.s8),
                             child: Text(
-                              'Cancel',
+                              l.editProfileCancel,
                               style: TextStyle(
                                 fontSize: 15,
                                 color: dark ? C.onDark1 : C.onLight1,
@@ -521,7 +527,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                         const Spacer(),
                         // Title
                         Text(
-                          'Edit Profile',
+                          l.editProfileTitle,
                           style: tt.titleMedium?.copyWith(
                             fontWeight: FontWeight.w600,
                           ),
@@ -547,7 +553,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                       ),
                                     )
                                   : Text(
-                                      'Done',
+                                      l.editProfileSave,
                                       style: TextStyle(
                                         fontSize: 15,
                                         fontWeight: FontWeight.w700,

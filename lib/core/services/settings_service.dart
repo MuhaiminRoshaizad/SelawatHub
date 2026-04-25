@@ -19,6 +19,7 @@ class SettingsService {
   static const _kCounterStyle = 'counter_style';
   static const _kColorThemeIndex = 'color_theme_index';
   static const _kThemeMode = 'theme_mode';
+  static const _kLocaleMode = 'locale_mode';
   static const _kCustomTargetsPrefix = 'custom_target_';
 
   static bool get hapticEnabled => _prefs?.getBool(_kHapticEnabled) ?? true;
@@ -53,6 +54,12 @@ class SettingsService {
   /// Theme mode: 0 = system, 1 = light, 2 = dark
   static int get themeMode => _prefs?.getInt(_kThemeMode) ?? 0;
   static set themeMode(int v) => _prefs?.setInt(_kThemeMode, v);
+
+  /// Locale mode: 0 = system, 1 = en, 2 = ms.
+  /// At runtime this is resolved against the device locale: system + Malay
+  /// device → ms; system + anything else → en.
+  static int get localeMode => _prefs?.getInt(_kLocaleMode) ?? 0;
+  static set localeMode(int v) => _prefs?.setInt(_kLocaleMode, v);
 
   /// Daily goal for stats progress bar (default 500).
   /// Also used as the streak threshold: a day only counts toward the

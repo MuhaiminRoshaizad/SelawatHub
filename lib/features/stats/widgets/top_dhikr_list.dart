@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:selawathub/core/constants.dart';
 import 'package:selawathub/core/theme/colors.dart';
 import 'package:selawathub/features/stats/stats_utils.dart';
+import 'package:selawathub/l10n/generated/app_localizations.dart';
 
 class TopDhikrList extends StatelessWidget {
   const TopDhikrList({
@@ -18,6 +19,7 @@ class TopDhikrList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppL10n.of(context);
     return AnimatedSize(
       duration: const Duration(milliseconds: 200),
       curve: Curves.easeOut,
@@ -36,12 +38,12 @@ class TopDhikrList extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Most Recited', style: tt.titleMedium),
+                      Text(l.statsTopMostRecited, style: tt.titleMedium),
                       const SizedBox(height: S.s4),
                       Text(
                         dateLabel != null
-                            ? 'On $dateLabel'
-                            : 'Your top selawat & zikir',
+                            ? l.statsTopOnDate(dateLabel!)
+                            : l.statsTopSubtitle,
                         style: tt.bodySmall?.copyWith(
                           color: dark ? C.onDark3 : C.onLight3,
                         ),
@@ -57,7 +59,7 @@ class TopDhikrList extends StatelessWidget {
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: S.s16),
                   child: Text(
-                    'No activity on this day',
+                    l.statsNoActivityOnDay,
                     style: tt.bodySmall?.copyWith(
                       color: dark ? C.onDark3 : C.onLight3,
                     ),

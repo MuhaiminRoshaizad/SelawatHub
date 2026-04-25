@@ -7,6 +7,7 @@ import 'package:selawathub/core/services/group_service.dart';
 import 'package:selawathub/core/theme/colors.dart';
 import 'package:selawathub/core/widgets/app_bottom_sheet.dart';
 import 'package:selawathub/core/widgets/app_snackbar.dart';
+import 'package:selawathub/l10n/generated/app_localizations.dart';
 
 class NoGroupView extends StatefulWidget {
   const NoGroupView({super.key, required this.onJoined});
@@ -27,8 +28,9 @@ class _NoGroupViewState extends State<NoGroupView> {
   }
 
   Future<void> _joinGroup() async {
+    final l = AppL10n.of(context);
     if (_codeCtrl.text.trim().isEmpty) {
-      showAppSnackBar(context, 'Please enter an invite code');
+      showAppSnackBar(context, l.noGroupEnterCode);
       return;
     }
     if (_joining) return;
@@ -38,10 +40,10 @@ class _NoGroupViewState extends State<NoGroupView> {
       if (!mounted) return;
       if (group == null) {
         setState(() => _joining = false);
-        showAppSnackBar(context, 'Invalid invite code');
+        showAppSnackBar(context, l.noGroupInvalidCode);
         return;
       }
-      final groupName = group['name'] as String? ?? 'Group';
+      final groupName = group['name'] as String? ?? l.groupGroupFallback;
       final dark = Theme.of(context).brightness == Brightness.dark;
       final tt = Theme.of(context).textTheme;
       final onJoined = widget.onJoined;
@@ -57,10 +59,10 @@ class _NoGroupViewState extends State<NoGroupView> {
               children: [
                 Icon(CupertinoIcons.checkmark_circle_fill, size: 56, color: C.success),
                 const SizedBox(height: S.s16),
-                Text("You've joined the group!", style: tt.titleLarge),
+                Text(l.noGroupJoinedTitle, style: tt.titleLarge),
                 const SizedBox(height: S.s8),
                 Text(
-                  'Welcome to $groupName',
+                  l.noGroupWelcomeTo(groupName),
                   style: tt.bodyMedium?.copyWith(color: dark ? C.onDark2 : C.onLight2),
                 ),
                 const SizedBox(height: S.s24),
@@ -79,7 +81,7 @@ class _NoGroupViewState extends State<NoGroupView> {
                       ),
                       child: Center(
                         child: Text(
-                          'Continue',
+                          l.commonContinue,
                           style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: C.white),
                         ),
                       ),
@@ -95,7 +97,7 @@ class _NoGroupViewState extends State<NoGroupView> {
       debugPrint('[JoinGroup] error: $e');
       if (mounted) {
         setState(() => _joining = false);
-        showAppSnackBar(context, 'Failed to join group');
+        showAppSnackBar(context, l.noGroupJoinFailed);
       }
     }
   }
@@ -103,6 +105,7 @@ class _NoGroupViewState extends State<NoGroupView> {
   Future<void> _createGroup() async {
     final dark = Theme.of(context).brightness == Brightness.dark;
     final tt = Theme.of(context).textTheme;
+    final l = AppL10n.of(context);
 
     showAppFormSheet(
       context: context,
@@ -125,19 +128,19 @@ class _NoGroupViewState extends State<NoGroupView> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Create New Group',
+                  l.noGroupCreateTitle,
                   style: tt.titleLarge?.copyWith(fontWeight: FontWeight.w600),
                 ),
                 const SizedBox(height: S.s24),
                 TextField(
                   controller: nameCtrl,
-                  decoration: const InputDecoration(hintText: 'Enter group name'),
+                  decoration: InputDecoration(hintText: l.noGroupNameHint),
                 ),
                 const SizedBox(height: S.s16),
                 TextField(
                   controller: descCtrl,
                   maxLines: 3,
-                  decoration: const InputDecoration(hintText: 'Add a description (optional)'),
+                  decoration: InputDecoration(hintText: l.noGroupDescHint),
                 ),
                 const SizedBox(height: S.s24),
                 Row(
@@ -153,7 +156,7 @@ class _NoGroupViewState extends State<NoGroupView> {
                           ),
                           child: Center(
                             child: Text(
-                              'Cancel',
+                              l.commonCancel,
                               style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w600,
@@ -171,7 +174,7 @@ class _NoGroupViewState extends State<NoGroupView> {
                             ? null
                             : () async {
                                 if (nameCtrl.text.trim().isEmpty) {
-                                  showAppSnackBar(ctx, 'Please enter a group name');
+                                  showAppSnackBar(ctx, l.noGroupNameRequired);
                                   return;
                                 }
                                 setSheetState(() => sheetCreating = true);
@@ -184,18 +187,18 @@ class _NoGroupViewState extends State<NoGroupView> {
                                   if (group != null) {
                                     Navigator.pop(ctx);
                                     if (mounted) {
-                                      showAppSnackBar(context, 'Group created');
+                                      showAppSnackBar(context, l.noGroupCreated);
                                     }
                                     widget.onJoined();
                                   } else {
                                     setSheetState(() => sheetCreating = false);
-                                    showAppSnackBar(ctx, 'Failed to create group');
+                                    showAppSnackBar(ctx, l.noGroupCreateFailed);
                                   }
                                 } catch (e) {
                                   debugPrint('[CreateGroup] error: $e');
                                   if (ctx.mounted) {
                                     setSheetState(() => sheetCreating = false);
-                                    showAppSnackBar(ctx, 'Error: ${e.toString()}');
+                                    showAppSnackBar(ctx, '${l.commonError}: ${e.toString()}');
                                   }
                                 }
                               },
@@ -215,7 +218,7 @@ class _NoGroupViewState extends State<NoGroupView> {
                                     child: CircularProgressIndicator(strokeWidth: 2, color: C.white),
                                   )
                                 : Text(
-                                    'Create',
+                                    l.commonCreate,
                                     style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: C.white),
                                   ),
                           ),
@@ -236,6 +239,7 @@ class _NoGroupViewState extends State<NoGroupView> {
   Widget build(BuildContext context) {
     final dark = Theme.of(context).brightness == Brightness.dark;
     final tt = Theme.of(context).textTheme;
+    final l = AppL10n.of(context);
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: S.page),
@@ -248,14 +252,14 @@ class _NoGroupViewState extends State<NoGroupView> {
 
           FadeIn(
             delay: const Duration(milliseconds: 80),
-            child: Text('Join a Group', style: tt.headlineLarge, textAlign: TextAlign.center),
+            child: Text(l.noGroupJoinTitle, style: tt.headlineLarge, textAlign: TextAlign.center),
           ),
           const SizedBox(height: S.s8),
 
           FadeIn(
             delay: const Duration(milliseconds: 120),
             child: Text(
-              'Count selawat together with\nyour family, friends, or community',
+              l.noGroupJoinSubtitle,
               style: tt.bodyMedium,
               textAlign: TextAlign.center,
             ),
@@ -276,7 +280,7 @@ class _NoGroupViewState extends State<NoGroupView> {
                 letterSpacing: 3,
               ),
               decoration: InputDecoration(
-                hintText: 'ENTER CODE',
+                hintText: l.noGroupCodePlaceholder,
                 hintStyle: TextStyle(fontSize: 14, letterSpacing: 3, color: dark ? C.onDark3 : C.onLight3),
               ),
             ),
@@ -307,7 +311,7 @@ class _NoGroupViewState extends State<NoGroupView> {
                             child: CircularProgressIndicator(strokeWidth: 2, color: C.white),
                           )
                         : Text(
-                            'Join Group',
+                            l.noGroupJoinCta,
                             style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: C.white),
                           ),
                   ),
@@ -349,7 +353,7 @@ class _NoGroupViewState extends State<NoGroupView> {
                   ),
                   child: Center(
                     child: Text(
-                      'Create New Group',
+                      l.noGroupCreateTitle,
                       style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w600,

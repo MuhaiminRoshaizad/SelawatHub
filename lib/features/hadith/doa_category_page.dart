@@ -7,6 +7,7 @@ import 'package:selawathub/core/theme/colors.dart';
 import 'package:selawathub/core/widgets/app_bottom_sheet.dart';
 import 'package:selawathub/core/widgets/frosted_bar.dart';
 import 'package:selawathub/features/hadith/models/doa.dart';
+import 'package:selawathub/l10n/generated/app_localizations.dart';
 
 // ─────────────────────────────────────────────────────────
 //  Doa Category Detail Page
@@ -281,6 +282,7 @@ String _capitalize(String s) =>
 
 void _showDoaSourceSheet(BuildContext context, bool dark) {
   final tt = Theme.of(context).textTheme;
+  final l = AppL10n.of(context);
 
   showAppBottomSheet(
     context: context,
@@ -290,7 +292,7 @@ void _showDoaSourceSheet(BuildContext context, bool dark) {
     headerChildren: [
       Expanded(
         child: Text(
-          'Source Info',
+          l.hadithSourceInfoTitle,
           style: tt.titleLarge?.copyWith(
             fontWeight: FontWeight.w700,
             color: dark ? C.primarySoft : C.primary,
@@ -316,7 +318,7 @@ void _showDoaSourceSheet(BuildContext context, bool dark) {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Source',
+              l.hadithSourceLabel,
               style: tt.labelSmall?.copyWith(
                 fontWeight: FontWeight.w700,
                 color: dark ? C.onDark3 : C.onLight3,
@@ -324,7 +326,7 @@ void _showDoaSourceSheet(BuildContext context, bool dark) {
             ),
             const SizedBox(height: S.s4),
             Text(
-              'Useful Duas Collection',
+              l.hadithDoaCollectionName,
               style: tt.titleSmall?.copyWith(
                 fontWeight: FontWeight.w600,
                 color: dark ? C.onDark1 : C.onLight1,
@@ -348,7 +350,7 @@ void _showDoaSourceSheet(BuildContext context, bool dark) {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Description',
+              l.hadithDescriptionLabel,
               style: tt.labelSmall?.copyWith(
                 fontWeight: FontWeight.w700,
                 color: dark ? C.onDark3 : C.onLight3,
@@ -356,7 +358,7 @@ void _showDoaSourceSheet(BuildContext context, bool dark) {
             ),
             const SizedBox(height: S.s4),
             Text(
-              '102 supplications from Quran & Sunnah, categorized by topic.',
+              l.hadithDoaShortDesc,
               style: tt.bodyMedium?.copyWith(
                 height: 1.5,
                 color: dark ? C.onDark2 : C.onLight2,

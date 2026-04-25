@@ -8,6 +8,7 @@ import 'package:selawathub/features/group/group_page.dart';
 import 'package:selawathub/features/stats/stats_page.dart';
 import 'package:selawathub/features/hadith/hadith_page.dart';
 import 'package:selawathub/features/profile/profile_page.dart';
+import 'package:selawathub/l10n/generated/app_localizations.dart';
 
 class AppShell extends StatefulWidget {
   const AppShell({super.key, this.isGuest = false});
@@ -29,17 +30,19 @@ class _AppShellState extends State<AppShell> {
   ];
 
   static const _items = [
-    (CupertinoIcons.circle_grid_3x3, CupertinoIcons.circle_grid_3x3_fill, 'Tasbih'),
-    (CupertinoIcons.person_3, CupertinoIcons.person_3_fill, 'Group'),
-    (CupertinoIcons.chart_bar, CupertinoIcons.chart_bar_fill, 'Stats'),
-    (CupertinoIcons.book, CupertinoIcons.book_fill, 'Daily'),
-    (CupertinoIcons.person, CupertinoIcons.person_fill, 'Profile'),
+    (CupertinoIcons.circle_grid_3x3, CupertinoIcons.circle_grid_3x3_fill),
+    (CupertinoIcons.person_3, CupertinoIcons.person_3_fill),
+    (CupertinoIcons.chart_bar, CupertinoIcons.chart_bar_fill),
+    (CupertinoIcons.book, CupertinoIcons.book_fill),
+    (CupertinoIcons.person, CupertinoIcons.person_fill),
   ];
 
   @override
   Widget build(BuildContext context) {
     final dark = Theme.of(context).brightness == Brightness.dark;
     final bottomPadding = MediaQuery.of(context).padding.bottom;
+    final l = AppL10n.of(context);
+    final labels = [l.tabTasbih, l.tabGroup, l.tabStats, l.tabDaily, l.tabProfile];
 
     return Scaffold(
       extendBody: true,
@@ -67,7 +70,8 @@ class _AppShellState extends State<AppShell> {
               child: Row(
                 children: List.generate(5, (i) {
                   final active = i == _tab;
-                  final (icon, activeIcon, label) = _items[i];
+                  final (icon, activeIcon) = _items[i];
+                  final label = labels[i];
                   return Expanded(
                     child: GestureDetector(
                       onTap: () => setState(() => _tab = i),

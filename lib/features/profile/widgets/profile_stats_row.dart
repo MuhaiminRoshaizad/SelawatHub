@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:selawathub/core/constants.dart';
 import 'package:selawathub/core/theme/colors.dart';
+import 'package:selawathub/l10n/generated/app_localizations.dart';
 
 // ─────────────────────────────────────────────────────────
 //  Stats row — Total Dhikr / Streak / Days Active
@@ -26,6 +27,7 @@ class ProfileStatsRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final dark = Theme.of(context).brightness == Brightness.dark;
+    final l = AppL10n.of(context);
     final mutedFlame = dark ? C.onDark3 : C.onLight3;
     return Container(
       padding: const EdgeInsets.symmetric(vertical: S.s20),
@@ -42,7 +44,7 @@ class ProfileStatsRow extends StatelessWidget {
           children: [
             StatItem(
               value: totalDhikr,
-              label: 'Total Dhikr',
+              label: l.profileTotalDhikr,
               icon: CupertinoIcons.heart_fill,
               iconColor: accent,
             ),
@@ -51,7 +53,7 @@ class ProfileStatsRow extends StatelessWidget {
                 color: dark ? C.darkDivider : C.lightDivider),
             StatItem(
               value: streak,
-              label: 'Day Streak',
+              label: l.profileDayStreak,
               icon: streakActive
                   ? CupertinoIcons.flame_fill
                   : CupertinoIcons.flame,
@@ -62,7 +64,7 @@ class ProfileStatsRow extends StatelessWidget {
                 color: dark ? C.darkDivider : C.lightDivider),
             StatItem(
               value: daysActive,
-              label: 'Days Active',
+              label: l.profileDaysActive,
               icon: CupertinoIcons.calendar,
               iconColor: accent,
             ),

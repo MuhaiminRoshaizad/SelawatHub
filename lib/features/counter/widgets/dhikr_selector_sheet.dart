@@ -4,6 +4,7 @@ import 'package:selawathub/core/constants.dart';
 import 'package:selawathub/core/theme/colors.dart';
 import 'package:selawathub/core/widgets/app_bottom_sheet.dart';
 import 'package:selawathub/features/counter/models/dhikr.dart';
+import 'package:selawathub/l10n/generated/app_localizations.dart';
 
 /// A bottom sheet that lets the user pick a selawat or zikir.
 class DhikrSelectorSheet extends StatefulWidget {
@@ -55,6 +56,7 @@ class _DhikrSelectorSheetState extends State<DhikrSelectorSheet>
   Widget build(BuildContext context) {
     final dark = Theme.of(context).brightness == Brightness.dark;
     final bottomPad = MediaQuery.of(context).padding.bottom;
+    final l = AppL10n.of(context);
 
     return Container(
       constraints: BoxConstraints(
@@ -66,7 +68,7 @@ class _DhikrSelectorSheetState extends State<DhikrSelectorSheet>
           // ── Title ──
           const SizedBox(height: S.s8),
           Text(
-            'Choose Dhikr',
+            l.dhikrSelectorTitle,
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w700,
@@ -101,9 +103,9 @@ class _DhikrSelectorSheetState extends State<DhikrSelectorSheet>
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
               ),
-              tabs: const [
-                Tab(text: 'Selawat', height: 38),
-                Tab(text: 'Zikir', height: 38),
+              tabs: [
+                Tab(text: l.dhikrTabSelawat, height: 38),
+                Tab(text: l.dhikrTabZikir, height: 38),
               ],
             ),
           ),

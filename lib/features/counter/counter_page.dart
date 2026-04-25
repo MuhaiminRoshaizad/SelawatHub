@@ -21,6 +21,7 @@ import 'package:selawathub/features/counter/widgets/digital_counter.dart';
 import 'package:selawathub/features/counter/widgets/manual_count_sheet.dart';
 import 'package:selawathub/features/counter/widgets/minimal_counter.dart';
 import 'package:selawathub/features/counter/widgets/today_log_sheet.dart';
+import 'package:selawathub/l10n/generated/app_localizations.dart';
 
 class CounterPage extends StatefulWidget {
   const CounterPage({super.key});
@@ -191,10 +192,11 @@ class _CounterPageState extends State<CounterPage>
     if (_sessionTaps != 50) return;
     SettingsService.hapticHintShown = true;
     if (!mounted) return;
+    final l = AppL10n.of(context);
     showAppSnackBar(
       context,
-      'Haptics not buzzing? Check your phone\'s vibration settings — or enable Tick Sound below.',
-      actionLabel: 'Settings',
+      l.counterHapticHint,
+      actionLabel: l.counterSettingsAction,
       onAction: () {
         AppSettings.openAppSettings(type: AppSettingsType.sound);
       },
@@ -283,7 +285,7 @@ class _CounterPageState extends State<CounterPage>
       if (mounted) {
         showAppSnackBar(
           context,
-          "Can't subtract below 0",
+          AppL10n.of(context).counterCantSubtractBelowZero,
           backgroundColor: C.error,
         );
       }
@@ -348,7 +350,7 @@ class _CounterPageState extends State<CounterPage>
       if (mounted) {
         showAppSnackBar(
           context,
-          'Failed to save. Please try again.',
+          AppL10n.of(context).counterFailedToSave,
           backgroundColor: C.error,
         );
       }
@@ -361,12 +363,15 @@ class _CounterPageState extends State<CounterPage>
     int newTotal, {
     required bool allowUndo,
   }) {
-    final verb = delta >= 0 ? 'Added' : 'Removed';
+    final l = AppL10n.of(context);
     final mag = delta.abs();
+    final msg = delta >= 0
+        ? l.counterManualToastAdded(mag, dhikr.name, newTotal)
+        : l.counterManualToastRemoved(mag, dhikr.name, newTotal);
     showAppSnackBar(
       context,
-      '$verb $mag · ${dhikr.name} · Today: $newTotal',
-      actionLabel: allowUndo ? 'Undo' : null,
+      msg,
+      actionLabel: allowUndo ? l.counterUndo : null,
       onAction: allowUndo
           ? () => _applyManualAdjust(dhikr, -delta, allowUndo: false)
           : null,
@@ -446,7 +451,7 @@ class _CounterPageState extends State<CounterPage>
       if (mounted) {
         showAppSnackBar(
           context,
-          'Updated · ${dhikr.name} · $prev → $newCount',
+          AppL10n.of(context).counterUpdatedToast(dhikr.name, prev, newCount),
         );
       }
       return true;
@@ -461,7 +466,7 @@ class _CounterPageState extends State<CounterPage>
       if (mounted) {
         showAppSnackBar(
           context,
-          'Updated · ${dhikr.name} · $prev → $newCount',
+          AppL10n.of(context).counterUpdatedToast(dhikr.name, prev, newCount),
         );
       }
       return true;
@@ -474,7 +479,7 @@ class _CounterPageState extends State<CounterPage>
       if (mounted) {
         showAppSnackBar(
           context,
-          'Failed to update. Please try again.',
+          AppL10n.of(context).counterFailedToUpdate,
           backgroundColor: C.error,
         );
       }
@@ -484,19 +489,20 @@ class _CounterPageState extends State<CounterPage>
 
   void _reset() async {
     if (_total == 0) return;
+    final l = AppL10n.of(context);
     final ok = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Reset Session?'),
-        content: const Text('This will clear your current session count.'),
+        title: Text(l.counterResetSessionTitle),
+        content: Text(l.counterResetSessionContent),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Cancel'),
+            child: Text(l.commonCancel),
           ),
           TextButton(
             onPressed: () => Navigator.pop(ctx, true),
-            child: Text('Reset', style: TextStyle(color: C.error)),
+            child: Text(l.counterResetConfirm, style: TextStyle(color: C.error)),
           ),
         ],
       ),
@@ -510,7 +516,7 @@ class _CounterPageState extends State<CounterPage>
       _todayCounts[_dhikr.id] = 0;
       _saveTimer?.cancel();
       _persistCount();
-      if (mounted) showAppSnackBar(context, 'Counter reset · ${_dhikr.name}');
+      if (mounted) showAppSnackBar(context, l.counterResetToast(_dhikr.name));
     }
   }
 
@@ -518,6 +524,7 @@ class _CounterPageState extends State<CounterPage>
   Widget build(BuildContext context) {
     final dark = Theme.of(context).brightness == Brightness.dark;
     final tt = Theme.of(context).textTheme;
+    final l = AppL10n.of(context);
 
     return SafeArea(
       bottom: false,
@@ -687,7 +694,7 @@ class _CounterPageState extends State<CounterPage>
                                   ),
                                 ),
                                 const SizedBox(height: S.s4),
-                                Text('of $_target', style: tt.bodySmall),
+                                Text(l.counterOfTarget(_target), style: tt.bodySmall),
                               ],
                             ),
                           ],
@@ -811,7 +818,7 @@ class _CounterPageState extends State<CounterPage>
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Text('$_round', style: tt.titleLarge),
-                            Text('Rounds', style: tt.bodySmall),
+                            Text(l.counterRounds, style: tt.bodySmall),
                           ],
                         ),
                       ),
@@ -824,7 +831,7 @@ class _CounterPageState extends State<CounterPage>
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Text('$_total', style: tt.titleLarge),
-                            Text('Total', style: tt.bodySmall),
+                            Text(l.counterTotal, style: tt.bodySmall),
                           ],
                         ),
                       ),
@@ -846,7 +853,7 @@ class _CounterPageState extends State<CounterPage>
                                     : (dark ? C.onDark3 : C.onLight3),
                               ),
                               const SizedBox(height: S.s2),
-                              Text('Reset', style: tt.bodySmall),
+                              Text(l.counterResetLabel, style: tt.bodySmall),
                             ],
                           ),
                         ),
@@ -876,6 +883,7 @@ class _CounterMenuSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bottomInset = MediaQuery.of(context).padding.bottom;
+    final l = AppL10n.of(context);
     return Container(
       decoration: BoxDecoration(
         color: dark ? C.dark2 : C.light2,
@@ -900,22 +908,22 @@ class _CounterMenuSheet extends StatelessWidget {
 
           _CounterMenuRow(
             icon: CupertinoIcons.add_circled,
-            title: 'Add manual count',
-            subtitle: 'Log counts from a physical tasbih',
+            title: l.counterMenuManual,
+            subtitle: l.counterMenuManualSub,
             dark: dark,
             onTap: () => Navigator.pop(context, 'manual'),
           ),
           _CounterMenuRow(
             icon: CupertinoIcons.list_bullet,
-            title: "Edit today's log",
-            subtitle: 'Fix a wrong number from earlier today',
+            title: l.counterMenuTodayLog,
+            subtitle: l.counterMenuTodayLogSub,
             dark: dark,
             onTap: () => Navigator.pop(context, 'today'),
           ),
           _CounterMenuRow(
             icon: CupertinoIcons.gear,
-            title: 'Counter settings',
-            subtitle: 'Bead style, haptics, and daily goal',
+            title: l.counterMenuSettings,
+            subtitle: l.counterMenuSettingsSub,
             dark: dark,
             onTap: () => Navigator.pop(context, 'settings'),
           ),

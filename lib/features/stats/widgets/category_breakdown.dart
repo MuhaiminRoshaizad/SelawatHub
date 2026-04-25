@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:selawathub/core/constants.dart';
 import 'package:selawathub/core/theme/colors.dart';
 import 'package:selawathub/features/stats/stats_utils.dart';
+import 'package:selawathub/l10n/generated/app_localizations.dart';
 
 class CategoryBreakdown extends StatelessWidget {
   const CategoryBreakdown({
@@ -20,6 +21,7 @@ class CategoryBreakdown extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppL10n.of(context);
     final total = selawatCount + zikirCount;
     final selawatRatio = total > 0 ? selawatCount / total : 0.5;
     final zikirRatio = total > 0 ? zikirCount / total : 0.5;
@@ -38,7 +40,7 @@ class CategoryBreakdown extends StatelessWidget {
           children: [
             Row(
               children: [
-                Text('Category Breakdown', style: tt.titleMedium),
+                Text(l.statsCategoryBreakdown, style: tt.titleMedium),
                 if (dateLabel != null) ...[
                   const SizedBox(width: S.s8),
                   Container(
@@ -69,7 +71,7 @@ class CategoryBreakdown extends StatelessWidget {
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: S.s16),
                   child: Text(
-                    'No activity on this day',
+                    l.statsNoActivityOnDay,
                     style: tt.bodySmall?.copyWith(
                       color: dark ? C.onDark3 : C.onLight3,
                     ),

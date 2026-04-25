@@ -8,6 +8,7 @@ import 'package:selawathub/core/theme/colors.dart';
 import 'package:selawathub/core/services/auth_service.dart';
 import 'package:selawathub/core/widgets/app_snackbar.dart';
 import 'package:selawathub/app/app_shell.dart';
+import 'package:selawathub/l10n/generated/app_localizations.dart';
 
 class ResetPasswordPage extends StatefulWidget {
   const ResetPasswordPage({super.key});
@@ -33,19 +34,20 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
   Future<void> _submit() async {
     final pw = _passwordCtrl.text.trim();
     final confirm = _confirmCtrl.text.trim();
+    final l = AppL10n.of(context);
 
     if (pw.isEmpty) {
-      showAppSnackBar(context, 'Please enter a new password',
+      showAppSnackBar(context, l.resetPasswordEmpty,
           backgroundColor: C.error);
       return;
     }
     if (pw.length < 6) {
-      showAppSnackBar(context, 'Password must be at least 6 characters',
+      showAppSnackBar(context, l.resetPasswordTooShort,
           backgroundColor: C.error);
       return;
     }
     if (pw != confirm) {
-      showAppSnackBar(context, 'Passwords do not match',
+      showAppSnackBar(context, l.resetPasswordMismatch,
           backgroundColor: C.error);
       return;
     }
@@ -54,7 +56,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
     try {
       await AuthService.updatePassword(pw);
       if (!mounted) return;
-      showAppSnackBar(context, 'Password updated successfully');
+      showAppSnackBar(context, l.resetPasswordSuccess);
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(builder: (_) => const AppShell()),
@@ -67,7 +69,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
     } catch (_) {
       if (!mounted) return;
       setState(() => _saving = false);
-      showAppSnackBar(context, 'Failed to update password',
+      showAppSnackBar(context, l.resetPasswordFailed,
           backgroundColor: C.error);
     }
   }
@@ -76,6 +78,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
   Widget build(BuildContext context) {
     final dark = Theme.of(context).brightness == Brightness.dark;
     final tt = Theme.of(context).textTheme;
+    final l = AppL10n.of(context);
 
     return Scaffold(
       body: SafeArea(
@@ -96,7 +99,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
             FadeIn(
               delay: const Duration(milliseconds: 80),
               child: Text(
-                'Set New Password',
+                l.resetPasswordTitle,
                 style: tt.headlineLarge?.copyWith(fontWeight: FontWeight.w800),
                 textAlign: TextAlign.center,
               ),
@@ -105,7 +108,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
             FadeIn(
               delay: const Duration(milliseconds: 120),
               child: Text(
-                'Choose a strong password for your account',
+                l.resetPasswordSubtitle,
                 style: tt.bodyMedium?.copyWith(
                   color: dark ? C.onDark2 : C.onLight2,
                 ),
@@ -120,8 +123,8 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
               delay: const Duration(milliseconds: 160),
               child: _PasswordField(
                 controller: _passwordCtrl,
-                label: 'New Password',
-                hint: 'Enter new password',
+                label: l.resetPasswordNewLabel,
+                hint: l.resetPasswordNewHint,
                 hidden: _hidePassword,
                 onToggle: () =>
                     setState(() => _hidePassword = !_hidePassword),
@@ -135,8 +138,8 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
               delay: const Duration(milliseconds: 200),
               child: _PasswordField(
                 controller: _confirmCtrl,
-                label: 'Confirm Password',
-                hint: 'Re-enter new password',
+                label: l.resetPasswordConfirmLabel,
+                hint: l.resetPasswordConfirmHint,
                 hidden: _hideConfirm,
                 onToggle: () =>
                     setState(() => _hideConfirm = !_hideConfirm),
@@ -174,7 +177,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                             ),
                           )
                         : Text(
-                            'Update Password',
+                            l.resetPasswordSubmit,
                             style: TextStyle(
                               fontSize: 15,
                               fontWeight: FontWeight.w600,

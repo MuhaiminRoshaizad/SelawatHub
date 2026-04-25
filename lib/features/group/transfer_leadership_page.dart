@@ -7,6 +7,7 @@ import 'package:selawathub/core/widgets/app_snackbar.dart';
 import 'package:selawathub/core/widgets/confirmation_dialog.dart';
 import 'package:selawathub/core/widgets/frosted_app_bar.dart';
 import 'package:selawathub/features/group/models/group_role.dart';
+import 'package:selawathub/l10n/generated/app_localizations.dart';
 
 // ─────────────────────────────────────────────────────────
 //  Transfer Leadership Page (single-select)
@@ -33,19 +34,20 @@ class _TransferLeadershipPageState extends State<TransferLeadershipPage> {
 
   void _confirmTransfer() {
     if (_selectedId == null) return;
-    final name = _selectedName;
+    final name = _selectedName!;
+    final l = AppL10n.of(context);
     showConfirmDialog(
       context: context,
-      title: 'Transfer leadership?',
-      message: 'Leadership will be transferred to $name. You will become a co-leader.',
-      actionLabel: 'Transfer',
+      title: l.transferConfirmTitle,
+      message: l.transferConfirmBody(name),
+      actionLabel: l.transferConfirmCta,
       isDestructive: false,
-      errorMessage: 'Failed to transfer leadership',
+      errorMessage: l.groupTransferFailed,
       onConfirm: () async {
         await GroupService.updateMemberRole(widget.groupId, _selectedId!, 'leader');
         if (!mounted) return;
         Navigator.of(context).pop();
-        showAppSnackBar(context, 'Leadership transferred to $name');
+        showAppSnackBar(context, l.transferSuccess(name));
       },
     );
   }
@@ -54,6 +56,7 @@ class _TransferLeadershipPageState extends State<TransferLeadershipPage> {
   Widget build(BuildContext context) {
     final dark = Theme.of(context).brightness == Brightness.dark;
     final tt = Theme.of(context).textTheme;
+    final l = AppL10n.of(context);
 
     return Scaffold(
       backgroundColor: dark ? C.dark1 : C.light1,
@@ -69,7 +72,7 @@ class _TransferLeadershipPageState extends State<TransferLeadershipPage> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: S.page),
                 child: Text(
-                  'Choose a member to become the new group leader.',
+                  l.transferIntro,
                   style: tt.bodyMedium?.copyWith(
                     color: dark ? C.onDark2 : C.onLight2,
                   ),
@@ -128,8 +131,8 @@ class _TransferLeadershipPageState extends State<TransferLeadershipPage> {
                     child: Center(
                       child: Text(
                         _selectedId == null
-                            ? 'Select a member'
-                            : 'Transfer to $_selectedName',
+                            ? l.transferSelectMember
+                            : l.transferToName(_selectedName!),
                         style: tt.bodyLarge?.copyWith(
                           fontWeight: FontWeight.w600,
                           color: _selectedId != null
@@ -152,7 +155,7 @@ class _TransferLeadershipPageState extends State<TransferLeadershipPage> {
             top: 0,
             left: 0,
             right: 0,
-            child: FrostedAppBar(title: 'Transfer Leadership'),
+            child: FrostedAppBar(title: l.groupTransferTitle),
           ),
         ],
       ),

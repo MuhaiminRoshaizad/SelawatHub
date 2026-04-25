@@ -1,6 +1,7 @@
 import 'package:custom_refresh_indicator/custom_refresh_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:selawathub/core/theme/colors.dart';
+import 'package:selawathub/l10n/generated/app_localizations.dart';
 
 /// App-wide pull-to-refresh with a text indicator.
 ///
@@ -35,6 +36,7 @@ class AppRefreshIndicator extends StatelessWidget {
     final dark = Theme.of(context).brightness == Brightness.dark;
     final accent = dark ? C.primarySoft : C.primary;
     final textColor = dark ? C.onDark2 : C.onLight2;
+    final l = AppL10n.of(context);
 
     return CustomRefreshIndicator(
       onRefresh: onRefresh,
@@ -57,11 +59,11 @@ class AppRefreshIndicator extends StatelessWidget {
 
             final String label;
             if (controller.state == IndicatorState.loading) {
-              label = 'Refreshing…';
+              label = l.refreshRefreshing;
             } else if (armed) {
-              label = 'Release to refresh';
+              label = l.refreshReleaseToRefresh;
             } else {
-              label = 'Pull to refresh';
+              label = l.refreshPullToRefresh;
             }
 
             final showSpinner = controller.state == IndicatorState.loading;

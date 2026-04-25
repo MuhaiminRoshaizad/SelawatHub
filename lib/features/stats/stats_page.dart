@@ -24,6 +24,7 @@ import 'package:selawathub/features/stats/widgets/streak_card.dart';
 import 'package:selawathub/features/stats/widgets/summary_card.dart';
 import 'package:selawathub/features/stats/widgets/top_dhikr_list.dart';
 import 'package:selawathub/features/stats/widgets/weekly_chart.dart';
+import 'package:selawathub/l10n/generated/app_localizations.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 class StatsPage extends StatefulWidget {
@@ -289,7 +290,7 @@ class _StatsPageState extends State<StatsPage> {
         if (mounted) {
           showAppSnackBar(
             context,
-            'Failed to update. Please try again.',
+            AppL10n.of(context).statsUpdateFailed,
             backgroundColor: C.error,
           );
         }
@@ -300,7 +301,7 @@ class _StatsPageState extends State<StatsPage> {
     if (mounted) {
       showAppSnackBar(
         context,
-        'Updated · ${dhikr.name} · $prev → $newCount',
+        AppL10n.of(context).statsUpdatedToast(dhikr.name, prev, newCount),
       );
       // Reload to recompute today's total, streak, and breakdown.
       StatsCache.invalidate();
@@ -313,6 +314,7 @@ class _StatsPageState extends State<StatsPage> {
     final ctrl = TextEditingController(text: _dailyGoal.toString());
     final dark = Theme.of(context).brightness == Brightness.dark;
     final tt = Theme.of(context).textTheme;
+    final l = AppL10n.of(context);
     showAppFormSheet(
       context: context,
       builder: (ctx) => Padding(
@@ -324,11 +326,11 @@ class _StatsPageState extends State<StatsPage> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Daily Goal',
+            Text(l.statsDailyGoalTitle,
                 style: tt.titleLarge?.copyWith(fontWeight: FontWeight.w600)),
             const SizedBox(height: S.s8),
             Text(
-              'Set your daily recitation target.',
+              l.statsDailyGoalHint,
               style: tt.bodySmall?.copyWith(
                 color: dark ? C.onDark2 : C.onLight2,
               ),
@@ -341,8 +343,8 @@ class _StatsPageState extends State<StatsPage> {
               autofocus: true,
               style: TextStyle(color: dark ? C.onDark1 : C.onLight1),
               decoration: InputDecoration(
-                hintText: 'e.g. 100',
-                suffixText: 'counts',
+                hintText: l.statsDailyGoalExample,
+                suffixText: l.statsDailyGoalSuffix,
                 suffixStyle: TextStyle(color: dark ? C.onDark3 : C.onLight3),
               ),
             ),
@@ -353,14 +355,14 @@ class _StatsPageState extends State<StatsPage> {
                 onTap: () {
                   final val = int.tryParse(ctrl.text.trim());
                   if (val == null || val <= 0) {
-                    showAppSnackBar(ctx, 'Enter a number greater than 0',
+                    showAppSnackBar(ctx, l.statsDailyGoalInvalid,
                         backgroundColor: C.error);
                     return;
                   }
                   SettingsService.dailyGoal = val;
                   setState(() => _dailyGoal = val);
                   Navigator.pop(ctx);
-                  showAppSnackBar(context, 'Daily goal set to $val');
+                  showAppSnackBar(context, l.statsDailyGoalSetToast(val));
                 },
                 child: Container(
                   padding: const EdgeInsets.symmetric(vertical: 14),
@@ -370,8 +372,8 @@ class _StatsPageState extends State<StatsPage> {
                   ),
                   child: Center(
                     child: Text(
-                      'Save',
-                      style: TextStyle(
+                      l.commonSave,
+                      style: const TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
                         color: C.white,
@@ -391,6 +393,7 @@ class _StatsPageState extends State<StatsPage> {
   Widget build(BuildContext context) {
     final dark = Theme.of(context).brightness == Brightness.dark;
     final tt = Theme.of(context).textTheme;
+    final l = AppL10n.of(context);
 
     // Resolve data for breakdown sections
     final day = _selectedHeatmapIdx != null
@@ -487,7 +490,7 @@ class _StatsPageState extends State<StatsPage> {
                         const SizedBox(width: S.s8),
                         Expanded(
                           child: Text(
-                            "Edit today's log",
+                            l.statsEditTodayLog,
                             style: TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w600,
@@ -496,7 +499,7 @@ class _StatsPageState extends State<StatsPage> {
                           ),
                         ),
                         Text(
-                          'Made a mistake?',
+                          l.statsMadeAMistake,
                           style: TextStyle(
                             fontSize: 11,
                             color: dark ? C.onDark3 : C.onLight3,
@@ -529,8 +532,8 @@ class _StatsPageState extends State<StatsPage> {
                     child: SummaryCard(
                       icon: CupertinoIcons.star_fill,
                       iconColor: C.primarySoft,
-                      label: 'Best Streak',
-                      value: _loading ? '14 days' : '$_bestStreak days',
+                      label: l.statsBestStreak,
+                      value: _loading ? l.statsBestStreakValue(14) : l.statsBestStreakValue(_bestStreak),
                       dark: dark,
                     ),
                   ),
@@ -539,7 +542,7 @@ class _StatsPageState extends State<StatsPage> {
                     child: SummaryCard(
                       icon: CupertinoIcons.calendar,
                       iconColor: C.goldSoft,
-                      label: 'Days Active',
+                      label: l.statsDaysActive,
                       value: _loading ? '30' : '$_daysActive',
                       dark: dark,
                     ),
@@ -561,7 +564,7 @@ class _StatsPageState extends State<StatsPage> {
                     child: SummaryCard(
                       icon: CupertinoIcons.heart_fill,
                       iconColor: C.gold,
-                      label: 'Total Selawat',
+                      label: l.statsTotalSelawat,
                       value: _loading ? '1,234' : fmtNum(_allTimeBreakdown.sel),
                       dark: dark,
                     ),
@@ -571,7 +574,7 @@ class _StatsPageState extends State<StatsPage> {
                     child: SummaryCard(
                       icon: CupertinoIcons.circle_grid_3x3_fill,
                       iconColor: C.primarySoft,
-                      label: 'Total Zikir',
+                      label: l.statsTotalZikir,
                       value: _loading ? '567' : fmtNum(_allTimeBreakdown.zik),
                       dark: dark,
                     ),
@@ -690,9 +693,9 @@ class _StatsPageState extends State<StatsPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Statistics', style: tt.headlineLarge),
+                    Text(l.statsTitle, style: tt.headlineLarge),
                     const SizedBox(height: S.s4),
-                    Text('Your selawat & zikir journey', style: tt.bodyMedium),
+                    Text(l.statsSubtitle, style: tt.bodyMedium),
                   ],
                 ),
               ),
@@ -713,6 +716,7 @@ class _EmptyStatsView extends StatelessWidget {
   Widget build(BuildContext context) {
     final dark = Theme.of(context).brightness == Brightness.dark;
     final tt = Theme.of(context).textTheme;
+    final l = AppL10n.of(context);
 
     return Column(
       children: [
@@ -724,7 +728,7 @@ class _EmptyStatsView extends StatelessWidget {
         FadeIn(
           delay: const Duration(milliseconds: 80),
           child: Text(
-            'No Activity Yet',
+            l.statsEmptyTitle,
             style: tt.headlineLarge,
           ),
         ),
@@ -732,7 +736,7 @@ class _EmptyStatsView extends StatelessWidget {
         FadeIn(
           delay: const Duration(milliseconds: 120),
           child: Text(
-            'Start counting selawat and zikir\nto see your statistics here',
+            l.statsEmptyBody,
             style: tt.bodyMedium?.copyWith(
               color: dark ? C.onDark2 : C.onLight2,
             ),
@@ -754,8 +758,8 @@ class _EmptyStatsView extends StatelessWidget {
                 ),
                 child: Center(
                   child: Text(
-                    'Go to Tasbih',
-                    style: TextStyle(
+                    l.statsEmptyCta,
+                    style: const TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
                       color: C.white,

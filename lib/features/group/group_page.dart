@@ -16,6 +16,7 @@ import 'package:selawathub/features/group/group_settings_page.dart';
 import 'package:selawathub/features/group/widgets/member_tile.dart';
 import 'package:selawathub/features/group/widgets/no_group_view.dart';
 import 'package:selawathub/features/group/widgets/yearly_chart.dart';
+import 'package:selawathub/l10n/generated/app_localizations.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 class GroupPage extends StatefulWidget {
@@ -80,6 +81,7 @@ class _GuestGroupView extends StatelessWidget {
   Widget build(BuildContext context) {
     final dark = Theme.of(context).brightness == Brightness.dark;
     final tt = Theme.of(context).textTheme;
+    final l = AppL10n.of(context);
     return SafeArea(
       bottom: false,
       child: Center(
@@ -95,12 +97,12 @@ class _GuestGroupView extends StatelessWidget {
               ),
               const SizedBox(height: S.s16),
               Text(
-                'Groups',
+                l.groupTitle,
                 style: tt.headlineSmall?.copyWith(fontWeight: FontWeight.w600),
               ),
               const SizedBox(height: S.s8),
               Text(
-                'Sign in to create or join a group\nand track dhikr together.',
+                l.groupSignInPrompt,
                 style: tt.bodyMedium?.copyWith(
                   color: dark ? C.onDark2 : C.onLight2,
                 ),
@@ -136,7 +138,8 @@ class _GroupViewState extends State<_GroupView> {
   bool _loading = true;
   int _weekTotal = 0;
   int _monthTotal = 0;
-  static const _periods = ['Today', 'This Week', 'This Month'];
+  List<String> _localizedPeriods(AppL10n l) =>
+      [l.commonToday, l.commonThisWeek, l.commonThisMonth];
   int _periodIdx = 0;
 
   List<Map<String, dynamic>> get _members {
@@ -199,7 +202,8 @@ class _GroupViewState extends State<_GroupView> {
   void _showGroupInfo(BuildContext context) {
     final dark = Theme.of(context).brightness == Brightness.dark;
     final tt = Theme.of(context).textTheme;
-    final groupName = widget.group['name'] as String? ?? 'Group';
+    final l = AppL10n.of(context);
+    final groupName = widget.group['name'] as String? ?? l.groupTitle;
     final description = widget.group['description'] as String? ?? '';
     final inviteCode = widget.group['invite_code'] as String? ?? '';
     final createdAt = widget.group['created_at'] as String?;
@@ -208,7 +212,7 @@ class _GroupViewState extends State<_GroupView> {
     if (createdAt != null) {
       try {
         final date = DateTime.parse(createdAt);
-        formattedDate = DateFormat('d MMM yyyy').format(date);
+        formattedDate = DateFormat('d MMM yyyy', Localizations.localeOf(context).languageCode).format(date);
       } catch (_) {}
     }
 
@@ -240,7 +244,7 @@ class _GroupViewState extends State<_GroupView> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Description',
+                      l.groupDescription,
                       style: tt.labelSmall?.copyWith(
                         color: dark ? C.onDark3 : C.onLight3,
                         fontWeight: FontWeight.w600,
@@ -248,7 +252,7 @@ class _GroupViewState extends State<_GroupView> {
                     ),
                     const SizedBox(height: S.s6),
                     Text(
-                      description.isEmpty ? 'No description' : description,
+                      description.isEmpty ? l.groupNoDescription : description,
                       style: tt.bodyMedium?.copyWith(
                         color: description.isEmpty
                             ? (dark ? C.onDark3 : C.onLight3)
@@ -267,14 +271,14 @@ class _GroupViewState extends State<_GroupView> {
                 children: [
                   _InfoChip(
                     icon: CupertinoIcons.person_2_fill,
-                    label: '${_members.length} members',
+                    label: l.groupMembers(_members.length),
                     dark: dark,
                   ),
                   const SizedBox(width: S.s8),
                   if (formattedDate.isNotEmpty)
                     _InfoChip(
                       icon: CupertinoIcons.calendar,
-                      label: 'Created $formattedDate',
+                      label: l.groupCreatedOn(formattedDate),
                       dark: dark,
                     ),
                 ],
@@ -286,7 +290,7 @@ class _GroupViewState extends State<_GroupView> {
               BounceTap(
                 onTap: () {
                   Clipboard.setData(ClipboardData(text: inviteCode));
-                  showAppSnackBar(ctx, 'Invite code copied!');
+                  showAppSnackBar(ctx, l.groupInviteCopied);
                 },
                 child: Container(
                   width: double.infinity,
@@ -312,7 +316,7 @@ class _GroupViewState extends State<_GroupView> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Invite Code',
+                            l.groupInviteCode,
                             style: tt.labelSmall?.copyWith(
                               color: dark ? C.onDark3 : C.onLight3,
                             ),
@@ -350,7 +354,9 @@ class _GroupViewState extends State<_GroupView> {
   Widget build(BuildContext context) {
     final dark = Theme.of(context).brightness == Brightness.dark;
     final tt = Theme.of(context).textTheme;
-    final groupName = widget.group['name'] as String? ?? 'Group';
+    final l = AppL10n.of(context);
+    final periods = _localizedPeriods(l);
+    final groupName = widget.group['name'] as String? ?? l.groupTitle;
     final inviteCode = widget.group['invite_code'] as String? ?? '';
     final dailyGoal = widget.group['daily_goal'] as int? ?? 0;
     final groupTotal = _groupTotal;
@@ -388,7 +394,7 @@ class _GroupViewState extends State<_GroupView> {
               child: Column(
                 children: [
                   Text(
-                    'GROUP TOTAL TODAY',
+                    l.groupTotalToday,
                     style: tt.labelSmall?.copyWith(
                       color: dark ? C.primarySoft : C.primary,
                       fontWeight: FontWeight.w700,
@@ -405,7 +411,7 @@ class _GroupViewState extends State<_GroupView> {
                     ),
                   ),
                   const SizedBox(height: S.s4),
-                  Text('selawat', style: tt.bodySmall),
+                  Text(l.groupSelawatLabel, style: tt.bodySmall),
 
                   // Daily goal progress
                   if (dailyGoal > 0) ...[
@@ -433,7 +439,7 @@ class _GroupViewState extends State<_GroupView> {
               children: [
                 Expanded(
                   child: _PeriodStatCard(
-                    label: 'This Week',
+                    label: l.commonThisWeek,
                     value: _weekTotal,
                     dark: dark,
                   ),
@@ -441,7 +447,7 @@ class _GroupViewState extends State<_GroupView> {
                 const SizedBox(width: S.s12),
                 Expanded(
                   child: _PeriodStatCard(
-                    label: 'This Month',
+                    label: l.commonThisMonth,
                     value: _monthTotal,
                     dark: dark,
                   ),
@@ -470,7 +476,7 @@ class _GroupViewState extends State<_GroupView> {
             child: BounceTap(
               onTap: () {
                 Clipboard.setData(ClipboardData(text: inviteCode));
-                showAppSnackBar(context, 'Invite code copied!');
+                showAppSnackBar(context, l.groupInviteCopied);
               },
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: S.s20, vertical: S.s16),
@@ -489,7 +495,7 @@ class _GroupViewState extends State<_GroupView> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Invite Code', style: tt.bodySmall),
+                        Text(l.groupInviteCode, style: tt.bodySmall),
                         const SizedBox(height: S.s2),
                         Text(
                           inviteCode,
@@ -524,7 +530,7 @@ class _GroupViewState extends State<_GroupView> {
             padding: const EdgeInsets.symmetric(horizontal: S.page),
             child: Row(
               children: [
-                Text('Members', style: tt.titleMedium),
+                Text(l.groupMembersTitle, style: tt.titleMedium),
                 const Spacer(),
                 Container(
                   padding: const EdgeInsets.all(2),
@@ -533,7 +539,7 @@ class _GroupViewState extends State<_GroupView> {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Row(
-                    children: List.generate(_periods.length, (i) {
+                    children: List.generate(periods.length, (i) {
                       final active = i == _periodIdx;
                       return GestureDetector(
                         onTap: () {
@@ -554,7 +560,7 @@ class _GroupViewState extends State<_GroupView> {
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: Text(
-                            _periods[i],
+                            periods[i],
                             style: TextStyle(
                               fontSize: 10,
                               fontWeight: active ? FontWeight.w700 : FontWeight.w500,
@@ -580,7 +586,7 @@ class _GroupViewState extends State<_GroupView> {
           final m = entry.value;
           final rank = i + 1;
           return MemberTile(
-            name: m['name'] as String? ?? 'Unknown',
+            name: m['name'] as String? ?? l.groupUnknownMember,
             count: m['today_count'] as int? ?? 0,
             rank: rank,
             role: _parseRole(m['role'] as String?),
@@ -616,7 +622,7 @@ class _GroupViewState extends State<_GroupView> {
                                   Text(groupName, style: tt.headlineLarge),
                                   const SizedBox(height: S.s4),
                                   Text(
-                                    '${_members.length} members',
+                                    l.groupMembers(_members.length),
                                     style: tt.bodyMedium,
                                   ),
                                 ],
@@ -641,7 +647,7 @@ class _GroupViewState extends State<_GroupView> {
                               final myRole = _parseRole(widget.group['my_role'] as String?);
                               final asGroupMembers = _members
                                   .map((m) => (
-                                    m['name'] as String? ?? 'Unknown',
+                                    m['name'] as String? ?? l.groupUnknownMember,
                                     m['today_count'] as int? ?? 0,
                                     m['is_me'] as bool? ?? false,
                                     _parseRole(m['role'] as String?),
@@ -761,6 +767,7 @@ class _GoalProgressBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tt = Theme.of(context).textTheme;
+    final l = AppL10n.of(context);
     final progress = (current / goal).clamp(0.0, 1.0);
     final pct = (progress * 100).toInt();
 
@@ -770,7 +777,7 @@ class _GoalProgressBar extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'Daily Goal',
+              l.groupDailyGoal,
               style: tt.bodySmall?.copyWith(
                 color: dark ? C.onDark3 : C.onLight3,
                 fontWeight: FontWeight.w500,
@@ -853,6 +860,7 @@ class _GroupViewSkeleton extends StatelessWidget {
   Widget build(BuildContext context) {
     final dark = Theme.of(context).brightness == Brightness.dark;
     final tt = Theme.of(context).textTheme;
+    final l = AppL10n.of(context);
 
     return Skeletonizer(
       enabled: true,
@@ -936,7 +944,7 @@ class _GroupViewSkeleton extends StatelessWidget {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('Invite Code', style: tt.bodySmall),
+                          Text(l.groupInviteCode, style: tt.bodySmall),
                           const SizedBox(height: S.s2),
                           Text(
                             'ABC123',
@@ -964,10 +972,10 @@ class _GroupViewSkeleton extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: S.page),
                 child: Row(
                   children: [
-                    Text('Members', style: tt.titleMedium),
+                    Text(l.groupMembersTitle, style: tt.titleMedium),
                     const Spacer(),
                     Text(
-                      'Today',
+                      l.commonToday,
                       style: TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.w600,
@@ -982,7 +990,7 @@ class _GroupViewSkeleton extends StatelessWidget {
               // Placeholder member tiles
               for (int i = 0; i < 4; i++)
                 MemberTile(
-                  name: 'Member Name',
+                  name: l.groupUnknownMember,
                   count: 100,
                   rank: i + 1,
                   role: i == 0 ? GroupRole.leader : GroupRole.member,
@@ -1006,9 +1014,9 @@ class _GroupViewSkeleton extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('My Group', style: tt.headlineLarge),
+                    Text(l.groupTitle, style: tt.headlineLarge),
                     const SizedBox(height: S.s4),
-                    Text('3 members', style: tt.bodyMedium),
+                    Text(l.groupMembers(3), style: tt.bodyMedium),
                   ],
                 ),
               ),

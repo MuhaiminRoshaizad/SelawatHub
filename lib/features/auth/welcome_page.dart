@@ -1,10 +1,13 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:selawathub/core/animations/bounce_tap.dart';
 import 'package:selawathub/core/animations/fade_in.dart';
 import 'package:selawathub/core/constants.dart';
 import 'package:selawathub/core/theme/colors.dart';
+import 'package:selawathub/core/widgets/language_picker_sheet.dart';
 import 'package:selawathub/features/auth/login_page.dart';
 import 'package:selawathub/app/app_shell.dart';
+import 'package:selawathub/l10n/generated/app_localizations.dart';
 
 class WelcomePage extends StatelessWidget {
   const WelcomePage({super.key});
@@ -13,6 +16,7 @@ class WelcomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final dark = Theme.of(context).brightness == Brightness.dark;
     final tt = Theme.of(context).textTheme;
+    final l = AppL10n.of(context);
 
     return Scaffold(
       body: SafeArea(
@@ -20,6 +24,23 @@ class WelcomePage extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: S.page),
           child: Column(
             children: [
+              // Top: language picker
+              Align(
+                alignment: Alignment.centerLeft,
+                child: GestureDetector(
+                  onTap: () => showLanguagePickerSheet(context),
+                  behavior: HitTestBehavior.opaque,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: S.s8, vertical: S.s12),
+                    child: Icon(
+                      CupertinoIcons.globe,
+                      size: 22,
+                      color: dark ? C.onDark2 : C.onLight2,
+                    ),
+                  ),
+                ),
+              ),
               const Spacer(flex: 3),
 
               // Icon
@@ -62,7 +83,7 @@ class WelcomePage extends StatelessWidget {
               FadeIn(
                 delay: const Duration(milliseconds: 200),
                 child: Text(
-                  'Count together, grow together',
+                  l.welcomeTagline,
                   style: tt.bodyLarge?.copyWith(
                     color: dark ? C.onDark2 : C.onLight2,
                   ),
@@ -91,7 +112,7 @@ class WelcomePage extends StatelessWidget {
                       ),
                       child: Center(
                         child: Text(
-                          'Sign In',
+                          l.welcomeSignIn,
                           style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w600,
@@ -127,7 +148,7 @@ class WelcomePage extends StatelessWidget {
                       ),
                       child: Center(
                         child: Text(
-                          'Create Account',
+                          l.welcomeCreateAccount,
                           style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w600,
@@ -153,7 +174,7 @@ class WelcomePage extends StatelessWidget {
                   child: Padding(
                     padding: const EdgeInsets.all(S.s8),
                     child: Text(
-                      'Continue as Guest',
+                      l.welcomeContinueGuest,
                       style: tt.bodySmall?.copyWith(
                         color: dark ? C.onDark3 : C.onLight3,
                         decoration: TextDecoration.underline,

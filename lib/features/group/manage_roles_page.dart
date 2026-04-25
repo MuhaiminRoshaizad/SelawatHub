@@ -6,6 +6,7 @@ import 'package:selawathub/core/theme/colors.dart';
 import 'package:selawathub/core/widgets/app_snackbar.dart';
 import 'package:selawathub/core/widgets/frosted_app_bar.dart';
 import 'package:selawathub/features/group/models/group_role.dart';
+import 'package:selawathub/l10n/generated/app_localizations.dart';
 
 // ─────────────────────────────────────────────────────────
 //  Manage Roles Page (leader only)
@@ -53,12 +54,12 @@ class _ManageRolesPageState extends State<ManageRolesPage> {
       }
       if (mounted) {
         Navigator.pop(context);
-        showAppSnackBar(context, 'Roles updated');
+        showAppSnackBar(context, AppL10n.of(context).manageRolesUpdated);
       }
     } catch (_) {
       if (mounted) {
         setState(() => _saving = false);
-        showAppSnackBar(context, 'Failed to update roles', backgroundColor: C.error);
+        showAppSnackBar(context, AppL10n.of(context).manageRolesFailed, backgroundColor: C.error);
       }
     }
   }
@@ -67,6 +68,7 @@ class _ManageRolesPageState extends State<ManageRolesPage> {
   Widget build(BuildContext context) {
     final dark = Theme.of(context).brightness == Brightness.dark;
     final tt = Theme.of(context).textTheme;
+    final l = AppL10n.of(context);
 
     return Scaffold(
       backgroundColor: dark ? C.dark1 : C.light1,
@@ -82,7 +84,7 @@ class _ManageRolesPageState extends State<ManageRolesPage> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: S.page),
                 child: Text(
-                  'Tap a member to toggle between co-leader and member.',
+                  l.manageRolesIntro,
                   style: tt.bodyMedium?.copyWith(
                     color: dark ? C.onDark2 : C.onLight2,
                   ),
@@ -142,7 +144,7 @@ class _ManageRolesPageState extends State<ManageRolesPage> {
                               child: CircularProgressIndicator(strokeWidth: 2, color: C.white),
                             )
                           : Text(
-                              'Save Changes',
+                              l.groupSaveChanges,
                               style: tt.bodyLarge?.copyWith(
                                 fontWeight: FontWeight.w600,
                                 color: C.white,
@@ -163,7 +165,7 @@ class _ManageRolesPageState extends State<ManageRolesPage> {
             top: 0,
             left: 0,
             right: 0,
-            child: FrostedAppBar(title: 'Manage Roles'),
+            child: FrostedAppBar(title: l.groupManageRolesTitle),
           ),
         ],
       ),
@@ -191,6 +193,7 @@ class _ManageRoleRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tt = Theme.of(context).textTheme;
+    final l = AppL10n.of(context);
     final isCoLeader = role == GroupRole.coLeader;
     return BounceTap(
       onTap: onTap,
@@ -266,7 +269,7 @@ class _ManageRoleRow extends StatelessWidget {
                   ),
                   const SizedBox(width: S.s4),
                   Text(
-                    isCoLeader ? 'Co-leader' : 'Member',
+                    isCoLeader ? l.groupRoleCoLeader : l.groupRoleMember,
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w600,

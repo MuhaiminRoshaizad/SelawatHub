@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:selawathub/app/app_shell.dart';
 import 'package:selawathub/core/services/auth_service.dart';
+import 'package:selawathub/core/services/locale_controller.dart';
 import 'package:selawathub/core/services/settings_service.dart';
 import 'package:selawathub/core/services/supabase_service.dart';
 import 'package:selawathub/core/theme/theme.dart';
@@ -10,6 +11,8 @@ import 'package:selawathub/features/auth/onboarding_page.dart';
 import 'package:selawathub/features/auth/reset_password_page.dart';
 import 'package:selawathub/features/auth/welcome_page.dart';
 import 'package:selawathub/core/widgets/app_snackbar.dart';
+import 'package:selawathub/l10n/generated/app_localizations.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SelawatHubApp extends StatefulWidget {
@@ -25,6 +28,7 @@ class SelawatHubApp extends StatefulWidget {
 
 class _SelawatHubAppState extends State<SelawatHubApp> {
   late final ValueNotifier<ThemeMode> _themeMode;
+  late final ValueNotifier<int> _localeMode;
   StreamSubscription<AuthState>? _authSub;
 
   static const _modeMap = [ThemeMode.system, ThemeMode.light, ThemeMode.dark];
@@ -35,6 +39,9 @@ class _SelawatHubAppState extends State<SelawatHubApp> {
     final saved = SettingsService.themeMode.clamp(0, 2);
     _themeMode = ValueNotifier<ThemeMode>(_modeMap[saved]);
     _themeMode.addListener(_persistTheme);
+
+    final savedLocale = SettingsService.localeMode.clamp(0, 2);
+    _localeMode = ValueNotifier<int>(savedLocale);
 
     // Listen to the supabase auth stream for deep-link events:
     //   - `passwordRecovery`: user clicked the password-reset email link.
@@ -98,6 +105,7 @@ class _SelawatHubAppState extends State<SelawatHubApp> {
     _authSub?.cancel();
     _themeMode.removeListener(_persistTheme);
     _themeMode.dispose();
+    _localeMode.dispose();
     super.dispose();
   }
 
@@ -105,27 +113,41 @@ class _SelawatHubAppState extends State<SelawatHubApp> {
   Widget build(BuildContext context) {
     return ThemeController(
       notifier: _themeMode,
-      child: ValueListenableBuilder<ThemeMode>(
-        valueListenable: _themeMode,
-        builder: (context, mode, child) => MaterialApp(
-          navigatorKey: SelawatHubApp.navKey,
-          title: 'SelawatHub',
-          debugShowCheckedModeBanner: false,
-          theme: AppTheme.light(),
-          darkTheme: AppTheme.dark(),
-          themeMode: mode,
-          themeAnimationDuration: const Duration(milliseconds: 400),
-          themeAnimationCurve: Curves.easeInOutCubic,
-          // Single decision at boot time: authed users go straight to the
-          // app, new/signed-out users see onboarding. Transitions between
-          // these two states are done imperatively via Navigator from the
-          // login/logout handlers.
-          home: SupabaseService.isAuthenticated
-              ? const AppShell()
-              : const OnboardingPage(),
-          routes: {
-            '/welcome': (_) => const WelcomePage(),
-          },
+      child: LocaleController(
+        notifier: _localeMode,
+        child: ValueListenableBuilder<ThemeMode>(
+          valueListenable: _themeMode,
+          builder: (context, mode, themeChild) => ValueListenableBuilder<int>(
+            valueListenable: _localeMode,
+            builder: (context, localeMode, localeChild) {
+              final device = WidgetsBinding.instance.platformDispatcher.locale;
+              final locale = resolveLocale(localeMode, device);
+              return MaterialApp(
+                navigatorKey: SelawatHubApp.navKey,
+                title: 'SelawatHub',
+                debugShowCheckedModeBanner: false,
+                theme: AppTheme.light(),
+                darkTheme: AppTheme.dark(),
+                themeMode: mode,
+                themeAnimationDuration: const Duration(milliseconds: 400),
+                themeAnimationCurve: Curves.easeInOutCubic,
+                locale: locale,
+                supportedLocales: AppL10n.supportedLocales,
+                localizationsDelegates: const [
+                  AppL10n.delegate,
+                  GlobalMaterialLocalizations.delegate,
+                  GlobalWidgetsLocalizations.delegate,
+                  GlobalCupertinoLocalizations.delegate,
+                ],
+                home: SupabaseService.isAuthenticated
+                    ? const AppShell()
+                    : const OnboardingPage(),
+                routes: {
+                  '/welcome': (_) => const WelcomePage(),
+                },
+              );
+            },
+          ),
         ),
       ),
     );

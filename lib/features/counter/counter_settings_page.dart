@@ -14,6 +14,7 @@ import 'package:selawathub/core/widgets/section_header.dart';
 import 'package:selawathub/features/counter/models/dhikr.dart';
 import 'package:selawathub/features/counter/widgets/digital_counter.dart';
 import 'package:selawathub/features/counter/widgets/minimal_counter.dart';
+import 'package:selawathub/l10n/generated/app_localizations.dart';
 
 const colorThemes = [
   ('Emerald', C.primarySoft),
@@ -108,6 +109,7 @@ class _CounterSettingsPageState extends State<CounterSettingsPage> {
   void _editTarget(Dhikr d) {
     final controller = TextEditingController(text: '${_targetFor(d)}');
     final dark = Theme.of(context).brightness == Brightness.dark;
+    final l = AppL10n.of(context);
 
     showAppFormSheet(
       context: context,
@@ -136,7 +138,7 @@ class _CounterSettingsPageState extends State<CounterSettingsPage> {
                 keyboardType: TextInputType.number,
                 inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                 decoration: InputDecoration(
-                  labelText: 'Target count',
+                  labelText: l.settingsTargetCountLabel,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -150,9 +152,9 @@ class _CounterSettingsPageState extends State<CounterSettingsPage> {
                   if (val != null && val > 0) {
                     setState(() => _customTargets[d.id] = val);
                     Navigator.pop(ctx);
-                    showAppSnackBar(context, '${d.name} target set to $val');
+                    showAppSnackBar(context, l.settingsTargetSetToast(d.name, val));
                   } else {
-                    showAppSnackBar(ctx, 'Enter a number greater than 0', backgroundColor: C.error);
+                    showAppSnackBar(ctx, l.settingsTargetInvalid, backgroundColor: C.error);
                   }
                 },
               ),
@@ -167,6 +169,7 @@ class _CounterSettingsPageState extends State<CounterSettingsPage> {
   Widget build(BuildContext context) {
     final dark = Theme.of(context).brightness == Brightness.dark;
     final tt = Theme.of(context).textTheme;
+    final l = AppL10n.of(context);
 
     return PopScope(
       canPop: false,
@@ -189,13 +192,13 @@ class _CounterSettingsPageState extends State<CounterSettingsPage> {
 
               // ── General ──
               if (!kIsWeb) ...[
-                SectionHeader(text: 'General', style: SectionHeaderStyle.title),
+                SectionHeader(text: l.settingsSectionGeneral, style: SectionHeaderStyle.title),
                 _MenuContainer(
                   dark: dark,
                   children: [
                     _SwitchRow(
                       icon: CupertinoIcons.bolt_fill,
-                      label: 'Haptic Feedback',
+                      label: l.settingsHapticFeedback,
                       value: _hapticEnabled,
                       onChanged: (v) => setState(() => _hapticEnabled = v),
                     ),
@@ -211,7 +214,7 @@ class _CounterSettingsPageState extends State<CounterSettingsPage> {
                         child: Row(
                           children: [
                             Text(
-                              'Intensity',
+                              l.settingsIntensity,
                               style: TextStyle(
                                 color: dark ? C.onDark1 : C.onLight1,
                               ),
@@ -220,7 +223,11 @@ class _CounterSettingsPageState extends State<CounterSettingsPage> {
                             _SegmentedControl<int>(
                               dark: dark,
                               value: _hapticIntensity,
-                              items: const {0: 'Light', 1: 'Medium', 2: 'Heavy'},
+                              items: {
+                                0: l.settingsIntensityLight,
+                                1: l.settingsIntensityMedium,
+                                2: l.settingsIntensityHeavy,
+                              },
                               onChanged: (v) =>
                                   setState(() => _hapticIntensity = v),
                             ),
@@ -235,7 +242,7 @@ class _CounterSettingsPageState extends State<CounterSettingsPage> {
                   child: Padding(
                     padding: const EdgeInsets.only(top: S.s6),
                     child: Text(
-                      'May not be available on all devices',
+                      l.settingsHapticHelp,
                       style: TextStyle(
                         fontSize: 11,
                         color: dark ? C.onDark3 : C.onLight3,
@@ -251,7 +258,7 @@ class _CounterSettingsPageState extends State<CounterSettingsPage> {
                   children: [
                     _SwitchRow(
                       icon: CupertinoIcons.speaker_2_fill,
-                      label: 'Tick Sound',
+                      label: l.settingsTickSound,
                       value: _soundEnabled,
                       onChanged: (v) => setState(() => _soundEnabled = v),
                     ),
@@ -291,7 +298,7 @@ class _CounterSettingsPageState extends State<CounterSettingsPage> {
                   child: Padding(
                     padding: const EdgeInsets.only(top: S.s6),
                     child: Text(
-                      'Plays a soft click on every tap. Useful when your phone\'s vibration is off.',
+                      l.settingsTickSoundHelp,
                       style: TextStyle(
                         fontSize: 11,
                         color: dark ? C.onDark3 : C.onLight3,
@@ -303,7 +310,7 @@ class _CounterSettingsPageState extends State<CounterSettingsPage> {
               ],
 
               // ── Appearance ──
-              SectionHeader(text: 'Appearance', style: SectionHeaderStyle.title),
+              SectionHeader(text: l.settingsSectionAppearance, style: SectionHeaderStyle.title),
               _MenuContainer(
                 dark: dark,
                 children: [
@@ -314,7 +321,7 @@ class _CounterSettingsPageState extends State<CounterSettingsPage> {
                     child: Row(
                       children: [
                         Text(
-                          'Counter Style',
+                          l.settingsCounterStyle,
                           style: TextStyle(
                             color: dark ? C.onDark1 : C.onLight1,
                           ),
@@ -323,7 +330,11 @@ class _CounterSettingsPageState extends State<CounterSettingsPage> {
                         _SegmentedControl<int>(
                           dark: dark,
                           value: _counterStyle,
-                          items: const {0: 'Bead', 1: 'Digital', 2: 'Minimal'},
+                          items: {
+                            0: l.settingsCounterStyleBead,
+                            1: l.settingsCounterStyleDigital,
+                            2: l.settingsCounterStyleMinimal,
+                          },
                           onChanged: (v) => setState(() => _counterStyle = v),
                         ),
                       ],
@@ -375,7 +386,7 @@ class _CounterSettingsPageState extends State<CounterSettingsPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Color Theme',
+                          l.settingsColorTheme,
                           style: TextStyle(
                             color: dark ? C.onDark1 : C.onLight1,
                           ),
@@ -416,15 +427,15 @@ class _CounterSettingsPageState extends State<CounterSettingsPage> {
 
               // ── Targets ──
               SectionHeader(
-                text: 'Targets',
-                subtitle: 'Customize the target count for each dhikr',
+                text: l.settingsTargetsTitle,
+                subtitle: l.settingsTargetsSub,
                 style: SectionHeaderStyle.title,
               ),
 
               Padding(
                 padding: const EdgeInsets.fromLTRB(S.page, S.s12, S.page, S.s8),
                 child: Text(
-                  'Selawat',
+                  l.manualCategorySelawat,
                   style: tt.labelLarge?.copyWith(
                     color: dark ? C.onDark2 : C.onLight2,
                   ),
@@ -440,7 +451,7 @@ class _CounterSettingsPageState extends State<CounterSettingsPage> {
               Padding(
                 padding: const EdgeInsets.fromLTRB(S.page, S.s4, S.page, S.s8),
                 child: Text(
-                  'Zikir',
+                  l.manualCategoryZikir,
                   style: tt.labelLarge?.copyWith(
                     color: dark ? C.onDark2 : C.onLight2,
                   ),
@@ -461,7 +472,7 @@ class _CounterSettingsPageState extends State<CounterSettingsPage> {
           Positioned(
             top: 0, left: 0, right: 0,
             child: FrostedAppBar(
-              title: 'Tasbih Settings',
+              title: l.settingsTitle,
               onBack: _pop,
             ),
           ),

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:selawathub/core/constants.dart';
 import 'package:selawathub/core/theme/colors.dart';
 import 'package:selawathub/features/stats/stats_utils.dart';
+import 'package:selawathub/l10n/generated/app_localizations.dart';
 
 /// Weekly chart data model.
 class WeekData {
@@ -92,7 +93,7 @@ class _WeeklyChartState extends State<WeeklyChart> {
         ),
         child: Center(
           child: Text(
-            'No weekly data yet',
+            AppL10n.of(context).statsWeeklyEmpty,
             style: tt.bodyMedium?.copyWith(
               color: dark ? C.onDark3 : C.onLight3,
             ),

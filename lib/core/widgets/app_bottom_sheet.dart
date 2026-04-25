@@ -78,13 +78,14 @@ void showAppBottomSheet({
   double maxSize = 0.92,
 }) {
   final dark = Theme.of(context).brightness == Brightness.dark;
-  final bottomInset = MediaQuery.of(context).padding.bottom;
 
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
-    builder: (sheetCtx) => DraggableScrollableSheet(
+    builder: (sheetCtx) {
+      final bottomInset = MediaQuery.of(sheetCtx).padding.bottom;
+      return DraggableScrollableSheet(
       initialChildSize: initialSize,
       minChildSize: minSize,
       maxChildSize: maxSize,
@@ -168,6 +169,7 @@ void showAppBottomSheet({
           ],
         ),
       ),
-    ),
+    );
+    },
   );
 }

@@ -5,6 +5,7 @@ import 'package:selawathub/core/animations/fade_in.dart';
 import 'package:selawathub/core/constants.dart';
 import 'package:selawathub/core/theme/colors.dart';
 import 'package:selawathub/core/widgets/frosted_bar.dart';
+import 'package:selawathub/l10n/generated/app_localizations.dart';
 
 // ─────────────────────────────────────────────────────────
 //  Sources & Credits Page
@@ -15,45 +16,39 @@ class SourcesPage extends StatelessWidget {
 
   static const _apiBase = 'https://dua-data-api.vercel.app/';
 
-  static const _sources = [
-    _SourceData(
-      name: 'Forty Nawawi Hadiths',
-      description:
-          '40 authentic hadiths compiled by Imam An-Nawawi, covering the '
-          'foundations of Islamic law, worship, and conduct.',
-      usedFor: 'Daily Hadith section',
-      endpoint: '/fortyNawawi',
-    ),
-    _SourceData(
-      name: 'Useful Duas Collection',
-      description:
-          '102 supplications sourced from the Quran & Sunnah, categorized '
-          'by topic for easy reference.',
-      usedFor: 'Daily Doa & Doa Collection sections',
-      endpoint: '/usefulDuas',
-    ),
-    _SourceData(
-      name: 'Daily Adkar',
-      description:
-          'Morning & evening remembrance (أذكار) to be recited daily as '
-          'part of a Muslim\'s spiritual routine.',
-      usedFor: 'Daily Adkar section',
-      endpoint: '/dailyAdkar',
-    ),
-    _SourceData(
-      name: 'Post-Salaah Zikr',
-      description:
-          'Remembrance and supplications to be recited after the five '
-          'daily prayers.',
-      usedFor: 'Post-Salaah section',
-      endpoint: '/postSalaah',
-    ),
-  ];
+  List<_SourceData> _buildSources(AppL10n l) => [
+        _SourceData(
+          name: l.hadithFortyNawawi,
+          description: l.hadithFortyNawawiDesc,
+          usedFor: l.hadithFortyNawawiUsed,
+          endpoint: '/fortyNawawi',
+        ),
+        _SourceData(
+          name: l.hadithDoaCollectionName,
+          description: l.hadithDoaCollectionDesc,
+          usedFor: l.hadithDoaUsed,
+          endpoint: '/usefulDuas',
+        ),
+        _SourceData(
+          name: l.hadithDailyAdkar,
+          description: l.hadithDailyAdkarDesc,
+          usedFor: l.hadithAdkarUsed,
+          endpoint: '/dailyAdkar',
+        ),
+        _SourceData(
+          name: l.hadithPostSalaahName,
+          description: l.hadithPostSalaahDesc,
+          usedFor: l.hadithPostSalaahUsed,
+          endpoint: '/postSalaah',
+        ),
+      ];
 
   @override
   Widget build(BuildContext context) {
     final dark = Theme.of(context).brightness == Brightness.dark;
     final tt = Theme.of(context).textTheme;
+    final l = AppL10n.of(context);
+    final sources = _buildSources(l);
 
     return Scaffold(
       backgroundColor: dark ? C.dark1 : C.light1,
@@ -101,7 +96,7 @@ class SourcesPage extends StatelessWidget {
                               ),
                               const SizedBox(width: S.s8),
                               Text(
-                                'Naikiyah Dua Data API',
+                                l.sourcesApiName,
                                 style: tt.bodyMedium?.copyWith(
                                   fontWeight: FontWeight.w600,
                                   color: dark ? C.primarySoft : C.primary,
@@ -149,8 +144,8 @@ class SourcesPage extends StatelessWidget {
               ),
 
               // ── Source cards ──
-              ...List.generate(_sources.length, (i) {
-                final src = _sources[i];
+              ...List.generate(sources.length, (i) {
+                final src = sources[i];
                 return FadeIn(
                   delay: Duration(milliseconds: 100 + i * 80),
                   child: Padding(
@@ -191,9 +186,7 @@ class SourcesPage extends StatelessWidget {
                         const SizedBox(width: S.s12),
                         Expanded(
                           child: Text(
-                            'All content is sourced from open Islamic API '
-                            'databases. We do not claim ownership of any '
-                            'religious content.',
+                            l.sourcesDisclaimer,
                             style: tt.bodySmall?.copyWith(
                               color: dark ? C.onDark2 : C.onLight2,
                               height: 1.5,
@@ -240,7 +233,7 @@ class SourcesPage extends StatelessWidget {
                       // Title
                       Expanded(
                         child: Text(
-                          'Sources & Credits',
+                          l.sourcesTitle,
                           style: tt.titleLarge
                               ?.copyWith(fontWeight: FontWeight.w600),
                         ),
@@ -336,7 +329,7 @@ class _SourceCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(6),
             ),
             child: Text(
-              'Used for: ${source.usedFor}',
+              AppL10n.of(context).sourcesUsedForLabel(source.usedFor),
               style: TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.w600,

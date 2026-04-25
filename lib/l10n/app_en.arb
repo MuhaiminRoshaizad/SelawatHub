@@ -1,0 +1,899 @@
+{
+  "@@locale": "en",
+  "appTitle": "SelawatHub",
+  "@appTitle": {
+    "description": "Application name"
+  },
+  "languageEnglish": "English",
+  "languageMalay": "Bahasa Melayu",
+  "languageSystem": "System default",
+  "languagePickerTitle": "Language",
+  "languagePickerSubtitle": "Choose your preferred language",
+  "languageCurrent": "Language",
+  "commonCancel": "Cancel",
+  "commonSave": "Save",
+  "commonDone": "Done",
+  "commonOk": "OK",
+  "commonRetry": "Retry",
+  "commonClose": "Close",
+  "commonContinue": "Continue",
+  "commonDelete": "Delete",
+  "commonEdit": "Edit",
+  "commonShare": "Share",
+  "commonCopy": "Copy",
+  "commonCopied": "Copied to clipboard",
+  "commonError": "Something went wrong",
+  "commonLoading": "Loading…",
+  "commonYes": "Yes",
+  "commonNo": "No",
+  "commonConfirm": "Confirm",
+  "commonRemove": "Remove",
+  "commonAdd": "Add",
+  "commonNext": "Next",
+  "commonBack": "Back",
+  "commonGetStarted": "Get Started",
+  "commonSkip": "Skip",
+  "commonSearch": "Search",
+  "commonRefresh": "Refresh",
+  "commonViewAll": "View all",
+  "commonSeeAll": "See all",
+  "commonReset": "Reset",
+  "commonCreate": "Create",
+  "commonJoin": "Join",
+  "commonLeave": "Leave",
+  "commonSettings": "Settings",
+  "tabTasbih": "Tasbih",
+  "tabGroup": "Group",
+  "tabStats": "Stats",
+  "tabDaily": "Daily",
+  "tabProfile": "Profile",
+  "welcomeTitle": "Welcome to SelawatHub",
+  "welcomeSubtitle": "Track your daily dhikr, build streaks, and stay connected with your community.",
+  "welcomeTagline": "Count together, grow together",
+  "welcomeSignIn": "Sign In",
+  "welcomeCreateAccount": "Create Account",
+  "welcomeContinueGuest": "Continue as Guest",
+  "welcomeGuestNote": "Guest data is stored locally only",
+  "onboardingTitle1": "Count Your Selawat",
+  "onboardingSubtitle1": "Track your daily selawat and zikir\nwith a beautiful tasbih counter",
+  "onboardingTitle2": "Track Your Progress",
+  "onboardingSubtitle2": "See your streaks, heatmaps, and\ndetailed statistics over time",
+  "onboardingTitle3": "Grow Together",
+  "onboardingSubtitle3": "Join groups, count together, and\nmotivate each other",
+  "loginTitle": "Welcome back",
+  "loginCreateTitle": "Create Account",
+  "loginSubtitleSignIn": "Continue your selawat journey",
+  "loginSubtitleSignUp": "Start your selawat journey",
+  "loginEmailLabel": "Email",
+  "loginEmailHint": "Enter your email",
+  "loginPasswordLabel": "Password",
+  "loginPasswordHint": "Enter your password",
+  "loginNameLabel": "Full Name",
+  "loginNameHint": "Enter your name",
+  "loginConfirmPasswordLabel": "Confirm Password",
+  "loginConfirmPasswordHint": "Re-enter your password",
+  "loginForgotPassword": "Forgot password?",
+  "loginSubmitSignIn": "Sign In",
+  "loginSubmitSignUp": "Create Account",
+  "loginNoAccount": "Don't have an account? ",
+  "loginHaveAccount": "Already have an account? ",
+  "loginSignUpLink": "Sign Up",
+  "loginSignInLink": "Sign In",
+  "loginAgreementPrefix": "I have read and agree to the ",
+  "loginAgreementAnd": " and ",
+  "loginAgreementSuffix": ".",
+  "loginAgreementTerms": "Terms of Service",
+  "loginAgreementPrivacy": "Privacy Policy",
+  "loginErrorFillFields": "Please fill in all fields",
+  "loginErrorNameRequired": "Please enter your name",
+  "loginErrorPasswordLength": "Password must be at least 6 characters",
+  "loginErrorPasswordMismatch": "Passwords do not match",
+  "loginErrorAgreeTerms": "Please agree to the Terms of Service and Privacy Policy",
+  "loginErrorEmailExists": "An account with this email already exists. Try signing in instead.",
+  "loginCheckEmailVerify": "Check your email to verify your account",
+  "loginGenericError": "Something went wrong. Please try again.",
+  "forgotPasswordTitle": "Reset Password",
+  "forgotPasswordBody": "Enter your email and we'll send you a link to reset your password.",
+  "forgotPasswordEmailHint": "Email address",
+  "forgotPasswordSubmit": "Send Reset Link",
+  "forgotPasswordEmailRequired": "Please enter your email",
+  "forgotPasswordSent": "Reset link sent! Check your email",
+  "resetPasswordTitle": "Set New Password",
+  "resetPasswordSubtitle": "Choose a strong password for your account",
+  "resetPasswordNewLabel": "New Password",
+  "resetPasswordNewHint": "Enter new password",
+  "resetPasswordConfirmLabel": "Confirm Password",
+  "resetPasswordConfirmHint": "Re-enter new password",
+  "resetPasswordSubmit": "Update Password",
+  "resetPasswordSuccess": "Password updated successfully",
+  "resetPasswordEmpty": "Please enter a new password",
+  "resetPasswordTooShort": "Password must be at least 6 characters",
+  "resetPasswordMismatch": "Passwords do not match",
+  "resetPasswordFailed": "Failed to update password",
+  "profileSectionAccount": "Account",
+  "profileSectionAccountInfo": "Account Info",
+  "profileSectionSettings": "Settings",
+  "profileSectionSupport": "Support",
+  "profileSectionPreferences": "Preferences",
+  "profileSectionAbout": "About",
+  "profileEditProfile": "Edit Profile",
+  "profileChangePassword": "Change Password",
+  "profileSignOut": "Sign Out",
+  "profileSignIn": "Sign In",
+  "profileTheme": "Dark mode",
+  "profileHapticFeedback": "Haptic feedback",
+  "profileNotifications": "Notifications",
+  "profileHelpAndFaq": "Help & FAQ",
+  "profileAboutApp": "About SelawatHub",
+  "profilePrivacyPolicy": "Privacy Policy",
+  "profileTermsOfService": "Terms of Service",
+  "profileEmailLabel": "Email",
+  "profileMemberSinceLabel": "Member Since",
+  "profileMemberSince": "Member since {date}",
+  "@profileMemberSince": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "profileGuestBadge": "Guest",
+  "profileGuestUpgrade": "Sign in to sync across devices",
+  "profileSetYourName": "Set your name",
+  "profileBioPlaceholder": "Tap the pencil to add a bio",
+  "profileTotalDhikr": "Total Dhikr",
+  "profileDayStreak": "Day Streak",
+  "profileDaysActive": "Days Active",
+  "profileSignOutConfirmTitle": "Sign out?",
+  "profileSignOutConfirmBody": "Are you sure you want to sign out of your account?",
+  "profileSignOutAction": "Sign Out",
+  "profileSignOutFailed": "Failed to sign out",
+  "profileSignOutSuccess": "Signed out successfully",
+  "profileVersion": "SelawatHub v{version}",
+  "@profileVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "changePasswordTitle": "Change Password",
+  "changePasswordCurrentLabel": "Current Password",
+  "changePasswordNewLabel": "New Password",
+  "changePasswordConfirmLabel": "Confirm Password",
+  "changePasswordForgotLink": "Forgot your current password?",
+  "changePasswordSending": "Sending...",
+  "changePasswordResetSent": "Reset link sent to {email}",
+  "@changePasswordResetSent": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "changePasswordEmailMissing": "Could not find your email",
+  "changePasswordResetFailed": "Failed to send reset email",
+  "changePasswordCurrentRequired": "Please enter your current password",
+  "changePasswordCurrentIncorrect": "Current password is incorrect",
+  "changePasswordSuccess": "Password changed successfully",
+  "changePasswordFailed": "Failed to change password",
+  "editProfileTitle": "Edit Profile",
+  "editProfileSave": "Done",
+  "editProfileCancel": "Cancel",
+  "editProfileNameLabel": "Full Name",
+  "editProfileNameHint": "Enter your name",
+  "editProfileBioLabel": "Bio",
+  "editProfileBioHint": "Write something about yourself...",
+  "editProfileEditPhoto": "Edit photo",
+  "editProfileTakePhoto": "Take Photo",
+  "editProfileChooseGallery": "Choose from Gallery",
+  "editProfileRemovePhoto": "Remove Photo",
+  "editProfilePhotoUpdated": "Photo updated",
+  "editProfilePhotoRemoved": "Photo removed",
+  "editProfilePhotoUploadFailed": "Failed to upload photo",
+  "editProfilePhotoTooLarge": "Image must be under 2 MB",
+  "editProfilePhotoBadType": "Only JPG, PNG, or WebP allowed",
+  "editProfileNameEmpty": "Name cannot be empty",
+  "editProfileSaved": "Profile updated",
+  "editProfileSaveFailed": "Failed to save profile",
+  "editProfileDiscardTitle": "Discard changes?",
+  "editProfileDiscardBody": "You have unsaved changes that will be lost.",
+  "editProfileKeepEditing": "Keep Editing",
+  "editProfileDiscard": "Discard",
+  "counterTitle": "Tasbih",
+  "counterTodayLabel": "Today",
+  "counterTotalLabel": "Total",
+  "counterTargetLabel": "Target",
+  "counterReachedTarget": "Target reached · MashaAllah",
+  "counterReset": "Reset count",
+  "counterResetConfirmTitle": "Reset to zero?",
+  "counterResetConfirmBody": "Today's count for this dhikr will be cleared.",
+  "counterChangeDhikr": "Change dhikr",
+  "counterAddManual": "Add manually",
+  "counterSettings": "Counter settings",
+  "statsTitle": "Statistics",
+  "statsTodayDhikr": "Today's Dhikr",
+  "statsWeeklyTotal": "This Week",
+  "statsMonthlyTotal": "This Month",
+  "statsAllTime": "All Time",
+  "statsCurrentStreak": "Current Streak",
+  "statsLongestStreak": "Longest Streak",
+  "statsTopDhikr": "Top dhikr",
+  "statsRangeWeek": "Week",
+  "statsRangeMonth": "Month",
+  "statsRangeYear": "Year",
+  "statsEmpty": "No dhikr yet · Start counting on the Tasbih tab",
+  "statsGoToTasbih": "Open Tasbih",
+  "groupTitle": "Groups",
+  "groupCreate": "Create group",
+  "groupJoin": "Join group",
+  "groupMembers": "{count, plural, one {1 member} other {{count} members}}",
+  "@groupMembers": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "groupLeaderboard": "Leaderboard",
+  "groupInviteCode": "Invite Code",
+  "groupCopyCode": "Copy code",
+  "groupNoGroupsTitle": "You're not in any group yet",
+  "groupNoGroupsBody": "Create one with friends or family, or join with an invite code.",
+  "hadithTitle": "Daily",
+  "hadithDailyHadith": "Hadith of the day",
+  "hadithDailyDua": "Dua of the day",
+  "hadithMorningAdhkar": "Morning adhkar",
+  "hadithEveningAdhkar": "Evening adhkar",
+  "hadithEnglishOnlyBadge": "Content available in English only",
+  "hadithReadMore": "Read more",
+  "hadithLoadFailed": "Couldn't load content. Pull to refresh.",
+  "settingsTickSound": "Tick Sound",
+  "settingsTickSoundOff": "Off",
+  "settingsTickSoundClick": "Click",
+  "settingsTickSoundWood": "Wood",
+  "settingsTickSoundSoft": "Soft tap",
+  "settingsHapticHint": "If your phone's vibration is off, turn on Tick Sound for audio feedback.",
+  "guestNotice": "Guest mode · sign in to sync your data",
+  "aboutTitle": "About",
+  "aboutVersion": "v{version}",
+  "@aboutVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "aboutDescription": "SelawatHub is your companion for daily selawat and zikir. Count your dhikr with a beautiful digital tasbih, track your streaks and progress over time, set personal daily goals, and grow together with your community through group features.",
+  "aboutFeature1": "Digital tasbih with multiple dhikr types",
+  "aboutFeature2": "Manual count entry & custom dhikr",
+  "aboutFeature3": "Personal statistics & streak tracking",
+  "aboutFeature4": "Configurable daily goals",
+  "aboutFeature5": "Group dhikr with leaderboards",
+  "aboutFeature6": "Daily hadith collection",
+  "aboutFeature7": "Guest mode — no account required",
+  "aboutMadeBy": "Made by MuhaiminRoshaizad",
+  "faqSectionTasbih": "Tasbih & Counter",
+  "faqSectionManual": "Manual Entry & Corrections",
+  "faqSectionStats": "Stats & Goals",
+  "faqSectionGroups": "Groups",
+  "faqSectionAccount": "Account & Security",
+  "faqSectionData": "Data & Preferences",
+  "faqQ_tasbih_count_q": "How do I count selawat or zikir?",
+  "faqQ_tasbih_count_a": "Go to the Tasbih tab and tap the counter area to count. You can switch between different selawat and zikir types by tapping the dhikr name at the top. There are three counter styles available — Digital, Bead, and Minimal — which you can switch in the counter settings.",
+  "faqQ_tasbih_change_q": "How do I change the dhikr type?",
+  "faqQ_tasbih_change_a": "On the Tasbih tab, tap the dhikr name displayed at the top of the counter. A selector sheet will appear where you can choose from various selawat and zikir types.",
+  "faqQ_tasbih_target_q": "Can I set a target count for my dhikr?",
+  "faqQ_tasbih_target_a": "Yes! Go to the counter settings (⋮ menu on the Tasbih tab) and set your desired target count. The counter will track your progress toward that target. The target must be a whole number greater than zero.",
+  "faqQ_tasbih_haptic_q": "The vibration/haptic is not working on my phone.",
+  "faqQ_tasbih_haptic_a": "Some phones disable vibration system-wide (e.g. \"Vibration & haptics\" toggle in your phone's Sound settings). The app cannot override that — but you can enable Tick Sound as an alternative.\n\nGo to Counter settings (⋮ menu → Counter settings) and turn on Tick Sound. Choose from three styles: Click, Wood, or Soft tap. The sound plays through the media channel and works even when your phone's vibration is off.\n\nOn iOS, Tick Sound respects the ringer/silent switch — so it stays silent in the mosque when your phone is on silent.",
+  "faqQ_tasbih_more_q": "What is the ⋮ button at the top of the counter?",
+  "faqQ_tasbih_more_a": "The ⋮ (more) button opens an action menu with three options:\n\n• Add manual count — log dhikr you completed on a physical tasbih\n• Edit today's log — fix a mistake in any of today's counts\n• Counter settings — bead style, haptics, target counts, and the daily goal\n\nLong-press the ⋮ to jump straight to today's log.",
+  "faqQ_manual_physical_q": "I use a physical tasbih. Can I still log my counts?",
+  "faqQ_manual_physical_a": "Yes. Open the ⋮ menu on the Tasbih tab and choose \"Add manual count\". Pick the dhikr, enter how many you completed, and tap Save. The amount is added to today's total — exactly as if you had tapped the counter that many times.\n\nYou can use this multiple times a day. Each save is added on top of what is already counted.",
+  "faqQ_manual_custom_q": "My selawat / zikir is not in the built-in list. Can I add my own?",
+  "faqQ_manual_custom_a": "Yes — but only if you are signed in. In the manual count sheet, tap \"Add custom\" and enter the name of your selawat or zikir, then choose whether it is a selawat or zikir. Your custom entry is saved to your account and shows up alongside the built-in list every time you open the manual count sheet.\n\nGuest users cannot create custom dhikr because the data needs to be saved to your account.",
+  "faqQ_manual_fix_q": "I entered the wrong number. How do I fix it?",
+  "faqQ_manual_fix_a": "There are three ways to correct a manual count:\n\n• Undo (immediate) — right after you save a manual count, a toast appears at the top with an UNDO button. Tap it within 6 seconds to reverse the change.\n• Subtract mode — open the manual count sheet again, switch the toggle to \"Subtract\", and enter the amount you want to remove. The total is clamped at 0 so you can't go negative.\n• Edit today's log — open the ⋮ menu and pick \"Edit today's log\". Tap any row to set its exact total for today. This is the easiest fix if you missed the undo toast.\n\nThe stats page also has an \"Edit today's log\" shortcut card under the streak.",
+  "faqQ_manual_diff_q": "How is \"Add manual count\" different from tapping the counter?",
+  "faqQ_manual_diff_a": "They are functionally the same — both add to your today's total for the chosen dhikr. The counter tap is a 1-by-1 increment for use during live dhikr. Manual count is for batches you completed away from the app (on a physical tasbih, in your head, etc.) and lets you choose any positive number in one go.",
+  "faqQ_stats_goal_q": "How do I set or change my daily goal?",
+  "faqQ_stats_goal_a": "Go to the Stats tab and tap the progress bar or the edit icon next to your daily goal. You can set any goal greater than zero. This goal is used to track your daily progress and streak.",
+  "faqQ_stats_streak_q": "How are streaks calculated?",
+  "faqQ_stats_streak_a": "A streak counts consecutive days where you meet your daily goal.\n\nThe streak fire works like this: if you had a 12-day streak and today is day 13, the fire shows as off (dim) until you hit your goal for today. Once you reach the goal, the fire turns on and your streak becomes 13.\n\nThis means the streak number only increases after you earn it — not just by opening the app. Missing a day resets the streak to zero.",
+  "faqQ_groups_join_q": "How do I join a group?",
+  "faqQ_groups_join_a": "Go to the Group tab and enter the invite code shared by your group leader. Tap \"Join Group\" to join. You can only be in one group at a time.",
+  "faqQ_groups_create_q": "How do I create a group?",
+  "faqQ_groups_create_a": "Go to the Group tab and tap \"Create New Group\". Enter a group name and optional description. You'll become the group admin and receive an invite code to share with others.",
+  "faqQ_groups_admin_q": "What can a group admin do?",
+  "faqQ_groups_admin_a": "Group admins can edit the group name, description, and daily goal. They can also promote members to admin, demote admins, and remove members from the group.",
+  "faqQ_account_guest_q": "Can I use the app without an account?",
+  "faqQ_account_guest_a": "Yes! You can use SelawatHub as a guest. Guest users can count dhikr and view statistics stored locally on their device. However, group features and cloud sync require a registered account. Guest data may be lost if the app is uninstalled.",
+  "faqQ_account_changepw_q": "How do I change my password?",
+  "faqQ_account_changepw_a": "Go to Profile > Change Password. You'll need to verify your current password first, then enter and confirm your new password (minimum 6 characters). If you've forgotten your current password, tap \"Forgot your current password?\" to receive a reset link via email.",
+  "faqQ_account_forgotpw_q": "I forgot my password. How do I reset it?",
+  "faqQ_account_forgotpw_a": "On the sign-in page, tap \"Forgot password?\" and enter your email address. You'll receive an email with a link to reset your password. If you're already logged in, you can also trigger a reset from Profile > Change Password.",
+  "faqQ_data_cloud_q": "Is my data saved to the cloud?",
+  "faqQ_data_cloud_a": "If you have an account, your dhikr counts, profile, and group data are synced to the cloud. Preferences like theme, haptic feedback, tick sound, and daily goal are stored locally on your device. Guest data is stored locally only.",
+  "faqQ_data_picture_q": "How do I change my profile picture?",
+  "faqQ_data_picture_a": "Go to Profile > Edit Profile and tap the camera icon or your current photo. You can upload a new image from your device. To remove your photo, tap the remove option in the photo picker.",
+  "faqQ_data_theme_q": "How do I switch between dark and light mode?",
+  "faqQ_data_theme_a": "Go to Profile and toggle the theme switch in the Preferences section. Your theme preference is saved locally and persists across sessions.",
+  "privacyTitle": "Privacy Policy",
+  "legalLastUpdated": "Last updated: {date}",
+  "@legalLastUpdated": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "privacyIntroTitle": "Introduction",
+  "privacyIntroBody": "SelawatHub (\"we\", \"our\", or \"us\") is a mobile application developed by an individual developer based in Malaysia, designed to help Muslims count selawat and zikir, track their devotional progress, and participate in group dhikr activities. We are committed to protecting your privacy and handling your personal data transparently.\n\nThis Privacy Policy explains what information we collect, how we use it, and your rights regarding your data. It is prepared in line with the Malaysian Personal Data Protection Act 2010, as amended by the Personal Data Protection (Amendment) Act 2024.",
+  "privacy1Title": "1. Information We Collect",
+  "privacy1Body": "Account Information\nWhen you create an account, we collect your email address and a display name you choose. Your password is securely hashed and stored by our authentication provider (Supabase) — we never have access to your plaintext password.\n\nProfile Information\nYou may optionally provide a bio and upload a profile picture. Profile pictures are stored in secure cloud storage and are visible to members of groups you join.\n\nUsage Data\nWe collect data about your selawat and zikir counts, including the type of dhikr, count totals, and timestamps. This data is used to generate your personal statistics, streaks, and progress tracking. Counts may originate either from tapping the in-app counter or from manual entries you make (for dhikr completed using a physical tasbih).\n\nUser-Generated Content\nIf you create custom selawat or zikir entries, the names you provide are stored against your account. These names are visible only to you and are never shown to other users or group members.\n\nGroup Data\nIf you create or join a group, we store group membership information, your role within the group, and your dhikr contributions that are shared with other group members.\n\nGuest Usage\nIf you use SelawatHub as a guest without creating an account, your dhikr counts and preferences are stored locally on your device only. No personal data is transmitted to our servers in guest mode. Note that custom dhikr creation is not available in guest mode.\n\nSensitive Personal Data\nWe do not collect sensitive personal data as defined under the Personal Data Protection Act 2010 (such as physical or mental health, political opinions, religious beliefs beyond what is inherent in your use of the app, or biometric data).",
+  "privacy2Title": "2. How We Use Your Information",
+  "privacy2Body": "We use the information we collect to:\n\n• Provide core app functionality — counting selawat/zikir, tracking progress, and displaying statistics\n• Enable group features — allowing you to join groups, share progress, and view group leaderboards\n• Authenticate your identity and secure your account\n• Send password reset emails when requested\n• Store and display your profile information to other group members\n• Calculate streaks, daily goals, and weekly/monthly/yearly statistics\n• Improve the app experience based on usage patterns",
+  "privacy3Title": "3. Data Storage & Security",
+  "privacy3Body": "Your data is stored on Supabase, a secure cloud platform with industry-standard security practices including:\n\n• Encrypted data transmission (HTTPS/TLS)\n• Row Level Security (RLS) policies ensuring users can only access their own data\n• Secure password hashing using bcrypt\n• Profile pictures stored in access-controlled cloud storage\n\nLocal data (guest mode counts, app preferences such as theme selection, haptic feedback settings, and daily goals) is stored on your device using SharedPreferences and is not transmitted to our servers.",
+  "privacy4Title": "4. Data Sharing & International Transfers",
+  "privacy4Body": "We do not sell, trade, or rent your personal information to third parties. Your data may be shared in the following limited circumstances:\n\n• Group Members — Your display name, profile picture, and dhikr counts are visible to members of groups you join\n• Service Providers — We use Supabase for authentication, database, and storage services. Supabase processes data on our behalf under strict data processing agreements\n• Legal Requirements — We may disclose information if required by law or to protect our rights and safety\n\nInternational Transfers\nSupabase may store and process data in jurisdictions outside Malaysia. Such transfers are made only to jurisdictions providing a level of data protection equivalent to that required by the Malaysian Personal Data Protection Act 2010 (as amended), and are subject to Supabase's contractual security and privacy commitments.",
+  "privacy5Title": "5. Your Rights",
+  "privacy5Body": "Under the Personal Data Protection Act 2010 (as amended by the Personal Data Protection (Amendment) Act 2024), you have the right to:\n\n• Access — View your personal data through the app's profile and statistics pages, or request a copy by contacting us\n• Correction — Edit your display name, bio, profile picture, and dhikr counts at any time. You may also request correction of any other inaccurate data by contacting us\n• Deletion — Request deletion of your account and associated data by contacting us\n• Withdrawal of Consent — Withdraw your consent to data processing at any time by deleting your account; note that doing so will end your ability to use account-bound features\n• Data Portability — Request a copy of your personal data (account, counts, custom dhikr, group membership) in a structured, commonly used electronic format, and request that we transmit it directly to another data controller where technically feasible\n• Password — Change your password or request a password reset at any time\n• Lodge a Complaint — You may lodge a complaint with the Personal Data Protection Department of Malaysia (Jabatan Perlindungan Data Peribadi, JPDP) if you believe your rights have been infringed",
+  "privacy6Title": "6. Data Breach Notification",
+  "privacy6Body": "In the event of a personal data breach that is likely to result in significant harm to you, we will notify both the Personal Data Protection Commissioner and affected users without undue delay and, where feasible, within seventy-two (72) hours of becoming aware of the breach, in accordance with the Personal Data Protection (Amendment) Act 2024.",
+  "privacy7Title": "7. Data Retention",
+  "privacy7Body": "We retain your personal data for as long as your account is active. If you delete your account, your personal data is removed within a reasonable period, except where we are required to retain certain records to comply with applicable law or to resolve disputes. Local guest-mode data persists on your device until you uninstall the app or clear app storage.",
+  "privacy8Title": "8. Children's Privacy",
+  "privacy8Body": "SelawatHub does not knowingly collect personal information from children under the age of 13. If you believe a child has provided us with personal data, please contact us so we can take appropriate action.",
+  "privacy9Title": "9. Changes to This Policy",
+  "privacy9Body": "We may update this Privacy Policy from time to time. Changes will be reflected in the \"Last updated\" date at the top of this page. Continued use of the app after changes constitutes acceptance of the updated policy.",
+  "privacy10Title": "10. Contact Us",
+  "privacy10Body": "If you have questions about this Privacy Policy or wish to exercise your data rights under the Personal Data Protection Act 2010 (as amended), please contact us at:\n\nEmail: aminmuhaimin192@gmail.com\n\nSelawatHub is operated by an individual developer in Malaysia. No Data Protection Officer has been appointed because the processing volume falls below the thresholds set out in the Personal Data Protection (Amendment) Act 2024. The developer acts as the data controller for the purposes of this Policy.",
+  "termsTitle": "Terms of Service",
+  "termsIntroTitle": "Introduction",
+  "termsIntroBody": "Welcome to SelawatHub. By downloading, installing, or using this application, you agree to be bound by these Terms of Service (\"Terms\"). If you do not agree to these Terms, please do not use the app.",
+  "terms1Title": "1. Description of Service",
+  "terms1Body": "SelawatHub is a mobile application that provides:\n\n• A digital tasbih (counter) for selawat and zikir with customisable dhikr types and target counts\n• Manual count entry for dhikr completed using a physical tasbih, including add and subtract modes\n• User-defined custom selawat and zikir entries (registered users only)\n• Correction tools — undo, subtract, and \"Edit today's log\" — to fix mistaken entries\n• Personal statistics tracking including daily, weekly, monthly, and yearly progress with streaks and configurable daily goals\n• Group features allowing users to create or join groups, share dhikr progress, and view collective statistics\n• A curated collection of daily hadith\n• Profile management with customisable display name, bio, and profile picture\n• Guest mode for using basic features without an account",
+  "terms2Title": "2. User Accounts",
+  "terms2Body": "Account Creation\nYou may create an account using your email address and a password of at least 6 characters. You must provide a display name during registration. You are responsible for maintaining the confidentiality of your login credentials.\n\nGuest Mode\nYou may use SelawatHub without creating an account. Guest users can access the counter and view statistics stored locally on their device. Guest data is not synced to the cloud and may be lost if the app is uninstalled.\n\nAccount Security\nYou are responsible for all activity that occurs under your account. If you suspect unauthorised access, change your password immediately through the app's profile settings or use the password reset feature.",
+  "terms3Title": "3. Acceptable Use",
+  "terms3Body": "You agree to use SelawatHub only for its intended purpose of facilitating Islamic devotional practices. You must not:\n\n• Use the app for any unlawful or prohibited purpose\n• Upload inappropriate, offensive, or non-Islamic content as your profile picture, bio, or custom dhikr names\n• Attempt to interfere with the app's functionality, security, or infrastructure\n• Create multiple accounts for the purpose of manipulating group statistics or leaderboards\n• Submit false or inflated dhikr counts to manipulate leaderboards or streaks\n• Share group invite codes publicly without the group administrator's consent\n• Harass, intimidate, or harm other users through group interactions\n• Attempt to access other users' data or accounts",
+  "terms4Title": "4. Groups",
+  "terms4Body": "Group Creation & Management\nAny registered user may create a group. The group creator becomes the group admin with the ability to manage members, update group settings, set daily goals, and remove members.\n\nMembership\nUsers may join a group using an invite code. Each user may belong to one group at a time. Your dhikr counts contributed while in a group are visible to all group members.\n\nLeaving or Removal\nYou may leave a group at any time. Group admins may remove members at their discretion. If a group admin leaves, administrative privileges are transferred to another member.",
+  "terms5Title": "5. User Content",
+  "terms5Body": "You retain ownership of content you provide (display name, bio, profile picture, custom dhikr names, and dhikr counts you log). By submitting content, you grant SelawatHub a non-exclusive, royalty-free licence to store, process, and display that content within the app for the sole purpose of providing the service (e.g., showing your profile picture to group members or rendering your custom dhikr in your own list).\n\nCustom Dhikr\nCustom selawat and zikir names you create are visible only to you and are not displayed to other users or group members. You are responsible for ensuring that any name you save is accurate, respectful, and does not violate the Acceptable Use rules in Section 3.\n\nManual Counts\nYou are solely responsible for the accuracy of counts you enter manually. You may correct mistaken entries at any time using the in-app undo, subtract, or \"Edit today's log\" tools.\n\nWe reserve the right to remove content that violates these Terms or is deemed inappropriate.",
+  "terms6Title": "6. Intellectual Property",
+  "terms6Body": "The SelawatHub app, including its design, code, graphics, and content (excluding user-generated content), is the intellectual property of SelawatHub and is protected by applicable copyright and intellectual property laws. You may not copy, modify, distribute, or reverse-engineer any part of the app.",
+  "terms7Title": "7. Disclaimer of Warranties",
+  "terms7Body": "SelawatHub is provided \"as is\" and \"as available\" without warranties of any kind, whether express or implied. We do not guarantee that:\n\n• The app will be available at all times without interruption\n• The app will be free from errors or defects\n• Data will never be lost (please note guest data is stored locally and may be lost upon app uninstallation)\n• The statistical calculations will be perfectly accurate",
+  "terms8Title": "8. Limitation of Liability",
+  "terms8Body": "To the maximum extent permitted by law, SelawatHub and its developers shall not be liable for any indirect, incidental, special, or consequential damages arising from your use of or inability to use the app. This includes but is not limited to loss of data, loss of streaks, or interruption of service.",
+  "terms9Title": "9. Termination",
+  "terms9Body": "We reserve the right to suspend or terminate your account if you violate these Terms. You may delete your account at any time by contacting us. Upon termination, your right to use the app ceases and your data may be deleted in accordance with our Privacy Policy.",
+  "terms10Title": "10. Changes to Terms",
+  "terms10Body": "We may update these Terms from time to time. Changes will be reflected in the \"Last updated\" date at the top. Your continued use of the app after modifications constitutes acceptance of the revised Terms.",
+  "terms11Title": "11. Governing Law",
+  "terms11Body": "These Terms shall be governed by and construed in accordance with the laws of Malaysia, including the Personal Data Protection Act 2010 (as amended by the Personal Data Protection (Amendment) Act 2024) and the Consumer Protection Act 1999. Any disputes arising from these Terms shall be subject to the exclusive jurisdiction of the courts of Malaysia.",
+  "terms12Title": "12. Contact Us",
+  "terms12Body": "If you have questions about these Terms of Service, please contact us at:\n\nEmail: aminmuhaimin192@gmail.com",
+  "counterHapticHint": "Haptics not buzzing? Check your phone's vibration settings — or enable Tick Sound below.",
+  "counterSettingsAction": "Settings",
+  "counterCantSubtractBelowZero": "Can't subtract below 0",
+  "counterFailedToSave": "Failed to save. Please try again.",
+  "counterFailedToUpdate": "Failed to update. Please try again.",
+  "counterManualToastAdded": "Added {amount} · {name} · Today: {total}",
+  "@counterManualToastAdded": {
+    "placeholders": {
+      "amount": {
+        "type": "int"
+      },
+      "name": {
+        "type": "String"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "counterManualToastRemoved": "Removed {amount} · {name} · Today: {total}",
+  "@counterManualToastRemoved": {
+    "placeholders": {
+      "amount": {
+        "type": "int"
+      },
+      "name": {
+        "type": "String"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "counterUndo": "Undo",
+  "counterUpdatedToast": "Updated · {name} · {prev} → {next}",
+  "@counterUpdatedToast": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "prev": {
+        "type": "int"
+      },
+      "next": {
+        "type": "int"
+      }
+    }
+  },
+  "counterResetSessionTitle": "Reset Session?",
+  "counterResetSessionContent": "This will clear your current session count.",
+  "counterResetConfirm": "Reset",
+  "counterResetToast": "Counter reset · {name}",
+  "@counterResetToast": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "counterRounds": "Rounds",
+  "counterTotal": "Total",
+  "counterResetLabel": "Reset",
+  "counterOfTarget": "of {target}",
+  "@counterOfTarget": {
+    "placeholders": {
+      "target": {
+        "type": "int"
+      }
+    }
+  },
+  "counterMenuManual": "Add manual count",
+  "counterMenuManualSub": "Log counts from a physical tasbih",
+  "counterMenuTodayLog": "Edit today's log",
+  "counterMenuTodayLogSub": "Fix a wrong number from earlier today",
+  "counterMenuSettings": "Counter settings",
+  "counterMenuSettingsSub": "Bead style, haptics, and daily goal",
+  "todayLogTitle": "Today's log",
+  "todayLogTapHint": "Tap a row to set the exact count",
+  "todayLogEmpty": "Nothing counted today yet.",
+  "todayLogEditCount": "Edit count",
+  "dhikrSelectorTitle": "Choose Dhikr",
+  "dhikrTabSelawat": "Selawat",
+  "dhikrTabZikir": "Zikir",
+  "manualSaveCustomFailed": "Couldn't save custom {category}. Try again.",
+  "@manualSaveCustomFailed": {
+    "placeholders": {
+      "category": {
+        "type": "String"
+      }
+    }
+  },
+  "manualAddedCustomToast": "Added \"{name}\" to your {category} list",
+  "@manualAddedCustomToast": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "category": {
+        "type": "String"
+      }
+    }
+  },
+  "manualSubtractTitle": "Subtract manually",
+  "manualAddTitle": "Add manually",
+  "manualSubtractCta": "Subtract {amount}",
+  "@manualSubtractCta": {
+    "placeholders": {
+      "amount": {
+        "type": "int"
+      }
+    }
+  },
+  "manualAddCta": "Add {amount}",
+  "@manualAddCta": {
+    "placeholders": {
+      "amount": {
+        "type": "int"
+      }
+    }
+  },
+  "manualEnterAmount": "Enter an amount",
+  "manualWhatReciting": "What are you reciting?",
+  "manualAddYourOwn": "Add your own Selawat/Zikir",
+  "manualSaveAndContinue": "Save & continue",
+  "manualNameHintExample": "e.g. Selawat Munjiyat",
+  "manualSegmentSubtract": "Subtract",
+  "manualSegmentAdd": "Add",
+  "manualCategorySelawat": "Selawat",
+  "manualCategoryZikir": "Zikir",
+  "settingsTitle": "Tasbih Settings",
+  "settingsSectionGeneral": "General",
+  "settingsSectionAppearance": "Appearance",
+  "settingsHapticFeedback": "Haptic Feedback",
+  "settingsIntensity": "Intensity",
+  "settingsIntensityLight": "Light",
+  "settingsIntensityMedium": "Medium",
+  "settingsIntensityHeavy": "Heavy",
+  "settingsHapticHelp": "May not be available on all devices",
+  "settingsTickSoundHelp": "Plays a soft click on every tap. Useful when your phone's vibration is off.",
+  "settingsCounterStyle": "Counter Style",
+  "settingsCounterStyleBead": "Bead",
+  "settingsCounterStyleDigital": "Digital",
+  "settingsCounterStyleMinimal": "Minimal",
+  "settingsColorTheme": "Color Theme",
+  "settingsColorEmerald": "Emerald",
+  "settingsColorGold": "Gold",
+  "settingsColorOcean": "Ocean",
+  "settingsColorRose": "Rose",
+  "settingsColorLavender": "Lavender",
+  "settingsColorIvory": "Ivory",
+  "settingsTargetsTitle": "Targets",
+  "settingsTargetsSub": "Customize the target count for each dhikr",
+  "settingsTargetCountLabel": "Target count",
+  "settingsTargetSetToast": "{name} target set to {value}",
+  "@settingsTargetSetToast": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "value": {
+        "type": "int"
+      }
+    }
+  },
+  "settingsTargetInvalid": "Enter a number greater than 0",
+  "commonOr": "or",
+  "commonSomethingWentWrong": "Something went wrong",
+  "commonToday": "Today",
+  "commonThisWeek": "This Week",
+  "commonThisMonth": "This Month",
+  "refreshPullToRefresh": "Pull to refresh",
+  "refreshReleaseToRefresh": "Release to refresh",
+  "refreshRefreshing": "Refreshing…",
+  "statsSubtitle": "Your selawat & zikir journey",
+  "statsDailyGoalTitle": "Daily Goal",
+  "statsDailyGoalHint": "Set your daily recitation target.",
+  "statsDailyGoalExample": "e.g. 100",
+  "statsDailyGoalSuffix": "counts",
+  "statsDailyGoalInvalid": "Enter a number greater than 0",
+  "statsEditTodayLog": "Edit today's log",
+  "statsMadeAMistake": "Made a mistake?",
+  "statsBestStreak": "Best Streak",
+  "statsDaysActive": "Days Active",
+  "statsCategoryBreakdown": "Category Breakdown",
+  "statsNoActivityOnDay": "No activity on this day",
+  "statsHeatmapActivity": "Activity",
+  "statsHeatmapTapDeselect": "Tap again to deselect",
+  "statsHeatmapTapFilter": "Tap a day to filter stats below",
+  "statsHeatmapLess": "Less",
+  "statsHeatmapMore": "More",
+  "statsTopMostRecited": "Most Recited",
+  "statsTopSubtitle": "Your top selawat & zikir",
+  "statsStreakNoStreak": "No Streak",
+  "statsStreakStartGoal": "Hit {goal} today to start your streak",
+  "@statsStreakStartGoal": {
+    "placeholders": {
+      "goal": {
+        "type": "String"
+      }
+    }
+  },
+  "statsStreakStartReciting": "Start reciting today!",
+  "statsStreakDays": "{days} Day Streak",
+  "@statsStreakDays": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "statsStreakKeepGoal": "Hit {goal} today to keep it alive",
+  "@statsStreakKeepGoal": {
+    "placeholders": {
+      "goal": {
+        "type": "String"
+      }
+    }
+  },
+  "statsStreakKeepRecite": "Recite today to keep it alive",
+  "statsStreakKeepGoing": "Keep it going!",
+  "statsStreakOnFire": "You're on fire!",
+  "statsStreakLegendary": "Legendary status!",
+  "statsWeeklyEmpty": "No weekly data yet",
+  "statsYearlySummary": "Yearly Summary",
+  "groupSignInPrompt": "Sign in to create or join a group\nand track dhikr together.",
+  "groupDescription": "Description",
+  "groupNoDescription": "No description",
+  "groupMembersCount": "{count, plural, =1{1 member} other{{count} members}}",
+  "@groupMembersCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "groupCreatedOn": "Created {date}",
+  "@groupCreatedOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "groupTotalToday": "GROUP TOTAL TODAY",
+  "groupSelawatLabel": "selawat",
+  "groupMembersHeader": "Members",
+  "groupMyGroup": "My Group",
+  "groupSettingsEditName": "Edit Group Name",
+  "groupSettingsEditNameHint": "Choose a name that represents your group.",
+  "groupSettingsNamePlaceholder": "Enter group name",
+  "groupSettingsNameUpdated": "Group name updated",
+  "groupSettingsNameFailed": "Failed to update name",
+  "groupSettingsEditDesc": "Edit Description",
+  "groupSettingsDescHint": "Describe what your group is about.",
+  "groupSettingsDescPlaceholder": "Enter group description",
+  "groupSettingsDescUpdated": "Description updated",
+  "groupSettingsDescFailed": "Failed to update description",
+  "groupSettingsSetGoal": "Set Daily Goal",
+  "groupSettingsGoalHint": "Set a daily selawat target for your group.",
+  "groupSettingsGoalExample": "e.g. 10000",
+  "groupSettingsGoalUpdated": "Group daily goal set to {value}",
+  "@groupSettingsGoalUpdated": {
+    "placeholders": {
+      "value": {
+        "type": "int"
+      }
+    }
+  },
+  "groupSettingsGoalFailed": "Failed to update goal",
+  "groupSettingsMuteNotifications": "Mute Notifications",
+  "groupSettingsManageRoles": "Manage Roles",
+  "groupSettingsTransferLeadership": "Transfer Leadership",
+  "transferConfirmTitle": "Transfer leadership?",
+  "transferConfirmBody": "Leadership will be transferred to {name}. You will become a co-leader.",
+  "@transferConfirmBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "transferConfirmCta": "Transfer",
+  "transferSuccess": "Leadership transferred to {name}",
+  "@transferSuccess": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "transferIntro": "Choose a member to become the new group leader.",
+  "transferSelectMember": "Select a member",
+  "transferToName": "Transfer to {name}",
+  "@transferToName": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "manageRolesIntro": "Tap a member to toggle between co-leader and member.",
+  "manageRolesUpdated": "Roles updated",
+  "manageRolesFailed": "Failed to update roles",
+  "removeMemberConfirmTitle": "{count, plural, =1{Remove 1 member?} other{Remove {count} members?}}",
+  "@removeMemberConfirmTitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "removeMemberConfirmBody": "The following will be removed:\n{names}",
+  "@removeMemberConfirmBody": {
+    "placeholders": {
+      "names": {
+        "type": "String"
+      }
+    }
+  },
+  "removeMemberFailed": "Failed to remove members",
+  "removeMemberSuccess": "{count, plural, =1{1 member removed} other{{count} members removed}}",
+  "@removeMemberSuccess": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "removeMemberIntro": "Select members to remove from the group.",
+  "removeMemberSelectCta": "Select members",
+  "noGroupEnterCode": "Please enter an invite code",
+  "noGroupInvalidCode": "Invalid invite code",
+  "noGroupJoinedTitle": "You've joined the group!",
+  "noGroupWelcomeTo": "Welcome to {name}",
+  "@noGroupWelcomeTo": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "noGroupCreateTitle": "Create New Group",
+  "noGroupNameHint": "Enter group name",
+  "noGroupDescHint": "Add a description (optional)",
+  "noGroupNameRequired": "Please enter a group name",
+  "noGroupCreated": "Group created",
+  "noGroupCreateFailed": "Failed to create group",
+  "noGroupJoinTitle": "Join a Group",
+  "noGroupJoinSubtitle": "Count selawat together with\nyour family, friends, or community",
+  "noGroupCodePlaceholder": "ENTER CODE",
+  "noGroupJoinCta": "Join Group",
+  "noGroupJoinFailed": "Failed to join group",
+  "hadithDailyAdkar": "Daily Dhikr",
+  "hadithDailyAdkarSubtitle": "Morning & evening remembrance",
+  "hadithDailyAdkarDesc": "Morning & evening remembrance (أذكار) to be recited daily as part of a Muslim's spiritual routine.",
+  "hadithPostSalaah": "Post-Salaah",
+  "hadithPostSalaahName": "Post-Salaah Zikr",
+  "hadithPostSalaahSubtitle": "Remembrance after prayer",
+  "hadithPostSalaahDesc": "Remembrance and supplications to be recited after the five daily prayers.",
+  "hadithDoaCollection": "Doa Collection",
+  "hadithDoaCollectionName": "Useful Duas Collection",
+  "hadithDoaCollectionSubtitle": "Browse supplications by category",
+  "hadithDoaCollectionDesc": "102 supplications sourced from the Quran & Sunnah, categorized by topic for easy reference.",
+  "hadithFortyNawawi": "Forty Nawawi Hadiths",
+  "hadithFortyNawawiDesc": "40 authentic hadiths compiled by Imam An-Nawawi, covering the foundations of Islamic law, worship, and conduct.",
+  "hadithFortyNawawiUsed": "Daily Hadith section",
+  "hadithDoaUsed": "Daily Doa & Doa Collection sections",
+  "hadithAdkarUsed": "Daily Dhikr section",
+  "hadithPostSalaahUsed": "Post-Salaah section",
+  "sourcesTitle": "Sources & Credits",
+  "sourcesApiName": "Naikiyah Dua Data API",
+  "sourcesDisclaimer": "All content is sourced from open Islamic API databases. We do not claim ownership of any religious content.",
+  "doaCategoryCount": "{count, plural, =1{1 doa} other{{count} doa}}",
+  "@doaCategoryCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "hadithErrorTitle": "Unable to load",
+  "hadithErrorBody": "Check your connection and try again",
+  "statsTotalSelawat": "Total Selawat",
+  "statsTotalZikir": "Total Zikir",
+  "statsEmptyTitle": "No Activity Yet",
+  "statsEmptyBody": "Start counting selawat and zikir\nto see your statistics here",
+  "statsEmptyCta": "Go to Tasbih",
+  "statsUpdateFailed": "Failed to update. Please try again.",
+  "statsUpdatedToast": "Updated · {name} · {prev} → {next}",
+  "@statsUpdatedToast": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "prev": {
+        "type": "int"
+      },
+      "next": {
+        "type": "int"
+      }
+    }
+  },
+  "statsDailyGoalSetToast": "Daily goal set to {value}",
+  "@statsDailyGoalSetToast": {
+    "placeholders": {
+      "value": {
+        "type": "int"
+      }
+    }
+  },
+  "sourcesUsedForLabel": "Used for: {section}",
+  "@sourcesUsedForLabel": {
+    "placeholders": {
+      "section": {
+        "type": "String"
+      }
+    }
+  },
+  "statsTopOnDate": "On {date}",
+  "@statsTopOnDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "groupCreatedOnLabel": "Created on {date}",
+  "@groupCreatedOnLabel": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "hadithDailyTitle": "Daily",
+  "hadithDailySubtitle": "Your spiritual companion",
+  "hadithSourceInfoTitle": "Source Info",
+  "hadithSourceLabel": "Source",
+  "hadithDescriptionLabel": "Description",
+  "hadithDoaShortDesc": "102 supplications from Quran & Sunnah, categorized by topic.",
+  "groupInviteCopied": "Invite code copied!",
+  "groupGroupFallback": "Group",
+  "groupUnknownMember": "Unknown",
+  "groupDailyGoalLabel": "Daily Goal",
+  "groupNoneValue": "None",
+  "groupShareInviteText": "Join my group on SelawatHub! Use invite code: {code}",
+  "@groupShareInviteText": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "groupSettingsTitle": "Group Settings",
+  "groupSettingsSectionGeneral": "GENERAL",
+  "groupSettingsSectionInvite": "INVITE",
+  "groupSettingsSectionNotifications": "NOTIFICATIONS",
+  "groupSettingsSectionRoles": "ROLES & PERMISSIONS",
+  "groupSettingsSectionManage": "MANAGE",
+  "groupSettingsCopyInvite": "Copy Invite Code",
+  "groupSettingsShareInvite": "Share Invite Link",
+  "groupSettingsRemoveMember": "Remove Member",
+  "groupSettingsLeaveGroup": "Leave Group",
+  "groupSettingsDeleteGroup": "Delete Group",
+  "groupRoleLeader": "Leader",
+  "groupRoleCoLeader": "Co-leader",
+  "groupRoleMember": "Member",
+  "groupRoleLeaderDesc": "Full group control. Edit name, manage roles, remove any member, transfer leadership, delete group.",
+  "groupRoleCoLeaderDesc": "Can remove regular members and manage invites. Auto-promoted to leader if leader leaves.",
+  "groupRoleMemberDesc": "Can participate in group selawat counting and view group progress.",
+  "groupNoCoLeaderTitle": "No co-leader assigned",
+  "groupNoCoLeaderBody": "You must promote a member to co-leader or transfer leadership before leaving the group.",
+  "groupLeaveTitle": "Leave group?",
+  "groupLeaveLeaderBody": "Leadership will be automatically transferred to the next co-leader or oldest member.",
+  "groupLeaveBody": "You will no longer see this group's progress or contribute to the count.",
+  "groupLeaveCta": "Leave",
+  "groupLeaveFailed": "Failed to leave group",
+  "groupLeaveSuccess": "You left the group",
+  "groupDeleteTitle": "Delete group?",
+  "groupDeleteBody": "This will permanently delete the group for all members. This action cannot be undone.",
+  "groupDeleteCta": "Delete",
+  "groupDeleteFailed": "Failed to delete group",
+  "groupDeleteSuccess": "Group deleted",
+  "groupRemoveMemberTitle": "Remove Member",
+  "groupRemoveCta": "Remove",
+  "groupTransferTitle": "Transfer Leadership",
+  "groupTransferFailed": "Failed to transfer leadership",
+  "groupManageRolesTitle": "Manage Roles",
+  "groupSaveChanges": "Save Changes",
+  "groupYearlyTotal": "Total: {value} selawat",
+  "@groupYearlyTotal": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "groupSettingsBan": "Ban from Group",
+  "removeMemberCtaCount": "{count, plural, =1{Remove 1 member} other{Remove {count} members}}",
+  "@removeMemberCtaCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "statsBestStreakValue": "{count, plural, =1{1 day} other{{count} days}}",
+  "@statsBestStreakValue": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "groupNeedCoLeaderTitle": "No co-leader assigned",
+  "groupNeedCoLeaderBody": "You must promote a member to co-leader or transfer leadership before leaving the group.",
+  "groupSettingsDescNone": "None",
+  "groupMembersTitle": "Members",
+  "groupDailyGoal": "Daily Goal"
+}

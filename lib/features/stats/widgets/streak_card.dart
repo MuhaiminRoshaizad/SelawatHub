@@ -3,6 +3,7 @@ import 'package:selawathub/core/animations/fire_emoji.dart';
 import 'package:selawathub/core/constants.dart';
 import 'package:selawathub/core/theme/colors.dart';
 import 'package:selawathub/features/stats/stats_utils.dart';
+import 'package:selawathub/l10n/generated/app_localizations.dart';
 
 class StreakCard extends StatelessWidget {
   const StreakCard({
@@ -25,6 +26,7 @@ class StreakCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppL10n.of(context);
     // When today's goal isn't met yet we still show the existing streak
     // count (TikTok-style — it isn't lost until the day rolls over) but the
     // fire is shown as "off" until the user qualifies today.
@@ -34,27 +36,27 @@ class StreakCard extends StatelessWidget {
     final String tierLabel;
     final String subtitle;
     if (streakDays == 0) {
-      tierLabel = 'No Streak';
+      tierLabel = l.statsStreakNoStreak;
       subtitle = dailyGoal > 0
-          ? 'Hit ${fmtNum(dailyGoal)} today to start your streak'
-          : 'Start reciting today!';
+          ? l.statsStreakStartGoal(fmtNum(dailyGoal))
+          : l.statsStreakStartReciting;
     } else if (!streakActive) {
-      tierLabel = '$streakDays Day Streak';
+      tierLabel = l.statsStreakDays(streakDays);
       subtitle = dailyGoal > 0
-          ? 'Hit ${fmtNum(dailyGoal)} today to keep it alive'
-          : 'Recite today to keep it alive';
+          ? l.statsStreakKeepGoal(fmtNum(dailyGoal))
+          : l.statsStreakKeepRecite;
     } else {
       tierLabel = switch (liveTier) {
-        StreakTier.dead => '$streakDays Day Streak',
-        StreakTier.burning => '$streakDays Day Streak',
-        StreakTier.blazing => '$streakDays Day Streak 🔥',
-        StreakTier.legendary => '$streakDays Day Streak ⚡',
+        StreakTier.dead => l.statsStreakDays(streakDays),
+        StreakTier.burning => l.statsStreakDays(streakDays),
+        StreakTier.blazing => '${l.statsStreakDays(streakDays)} 🔥',
+        StreakTier.legendary => '${l.statsStreakDays(streakDays)} ⚡',
       };
       subtitle = switch (liveTier) {
-        StreakTier.dead => 'Keep it going!',
-        StreakTier.burning => 'Keep it going!',
-        StreakTier.blazing => 'You\'re on fire!',
-        StreakTier.legendary => 'Legendary status!',
+        StreakTier.dead => l.statsStreakKeepGoing,
+        StreakTier.burning => l.statsStreakKeepGoing,
+        StreakTier.blazing => l.statsStreakOnFire,
+        StreakTier.legendary => l.statsStreakLegendary,
       };
     }
 
@@ -109,7 +111,7 @@ class StreakCard extends StatelessWidget {
                 Row(
                   children: [
                     Text(
-                      'Today',
+                      l.commonToday,
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w500,

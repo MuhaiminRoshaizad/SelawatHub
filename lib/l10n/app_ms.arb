@@ -1,0 +1,896 @@
+{
+  "@@locale": "ms",
+  "appTitle": "SelawatHub",
+  "languageEnglish": "English",
+  "languageMalay": "Bahasa Melayu",
+  "languageSystem": "Ikut sistem",
+  "languagePickerTitle": "Bahasa",
+  "languagePickerSubtitle": "Pilih bahasa pilihan anda",
+  "languageCurrent": "Bahasa",
+  "commonCancel": "Batal",
+  "commonSave": "Simpan",
+  "commonDone": "Selesai",
+  "commonOk": "OK",
+  "commonRetry": "Cuba lagi",
+  "commonClose": "Tutup",
+  "commonContinue": "Teruskan",
+  "commonDelete": "Padam",
+  "commonEdit": "Sunting",
+  "commonShare": "Kongsi",
+  "commonCopy": "Salin",
+  "commonCopied": "Disalin ke papan klip",
+  "commonError": "Ada masalah berlaku",
+  "commonLoading": "Memuatkan…",
+  "commonYes": "Ya",
+  "commonNo": "Tidak",
+  "commonConfirm": "Sahkan",
+  "commonRemove": "Buang",
+  "commonAdd": "Tambah",
+  "commonNext": "Seterusnya",
+  "commonBack": "Kembali",
+  "commonGetStarted": "Mula",
+  "commonSkip": "Langkau",
+  "commonSearch": "Cari",
+  "commonRefresh": "Muat semula",
+  "commonViewAll": "Lihat semua",
+  "commonSeeAll": "Lihat semua",
+  "commonReset": "Set semula",
+  "commonCreate": "Cipta",
+  "commonJoin": "Sertai",
+  "commonLeave": "Tinggalkan",
+  "commonSettings": "Tetapan",
+  "tabTasbih": "Tasbih",
+  "tabGroup": "Kumpulan",
+  "tabStats": "Statistik",
+  "tabDaily": "Harian",
+  "tabProfile": "Profil",
+  "welcomeTitle": "Selamat datang ke SelawatHub",
+  "welcomeSubtitle": "Catat zikir harian, bina streak, dan kekal terhubung dengan komuniti anda.",
+  "welcomeTagline": "Mengira bersama, berkembang bersama",
+  "welcomeSignIn": "Log masuk",
+  "welcomeCreateAccount": "Cipta akaun",
+  "welcomeContinueGuest": "Teruskan sebagai tetamu",
+  "welcomeGuestNote": "Data tetamu disimpan di peranti sahaja",
+  "onboardingTitle1": "Kira selawat anda",
+  "onboardingSubtitle1": "Catat selawat dan zikir harian anda\ndengan tasbih digital yang cantik",
+  "onboardingTitle2": "Pantau perkembangan anda",
+  "onboardingSubtitle2": "Lihat streak, peta haba, dan\nstatistik terperinci dari masa ke masa",
+  "onboardingTitle3": "Berkembang bersama",
+  "onboardingSubtitle3": "Sertai kumpulan, kira bersama, dan\nsaling memberi motivasi",
+  "loginTitle": "Selamat kembali",
+  "loginCreateTitle": "Cipta akaun",
+  "loginSubtitleSignIn": "Sambung perjalanan selawat anda",
+  "loginSubtitleSignUp": "Mulakan perjalanan selawat anda",
+  "loginEmailLabel": "E-mel",
+  "loginEmailHint": "Masukkan e-mel anda",
+  "loginPasswordLabel": "Kata laluan",
+  "loginPasswordHint": "Masukkan kata laluan anda",
+  "loginNameLabel": "Nama penuh",
+  "loginNameHint": "Masukkan nama anda",
+  "loginConfirmPasswordLabel": "Sahkan kata laluan",
+  "loginConfirmPasswordHint": "Masukkan semula kata laluan anda",
+  "loginForgotPassword": "Lupa kata laluan?",
+  "loginSubmitSignIn": "Log masuk",
+  "loginSubmitSignUp": "Cipta akaun",
+  "loginNoAccount": "Belum ada akaun? ",
+  "loginHaveAccount": "Sudah ada akaun? ",
+  "loginSignUpLink": "Daftar",
+  "loginSignInLink": "Log masuk",
+  "loginAgreementPrefix": "Saya telah membaca dan bersetuju dengan ",
+  "loginAgreementAnd": " dan ",
+  "loginAgreementSuffix": ".",
+  "loginAgreementTerms": "Terma Perkhidmatan",
+  "loginAgreementPrivacy": "Dasar Privasi",
+  "loginErrorFillFields": "Sila isi semua medan",
+  "loginErrorNameRequired": "Sila masukkan nama anda",
+  "loginErrorPasswordLength": "Kata laluan mesti sekurang-kurangnya 6 aksara",
+  "loginErrorPasswordMismatch": "Kata laluan tidak sepadan",
+  "loginErrorAgreeTerms": "Sila bersetuju dengan Terma Perkhidmatan dan Dasar Privasi",
+  "loginErrorEmailExists": "Akaun dengan e-mel ini sudah wujud. Cuba log masuk sebaliknya.",
+  "loginCheckEmailVerify": "Semak e-mel anda untuk mengesahkan akaun",
+  "loginGenericError": "Ada masalah berlaku. Sila cuba lagi.",
+  "forgotPasswordTitle": "Set semula kata laluan",
+  "forgotPasswordBody": "Masukkan e-mel anda, kami akan hantar pautan untuk set semula kata laluan.",
+  "forgotPasswordEmailHint": "Alamat e-mel",
+  "forgotPasswordSubmit": "Hantar pautan set semula",
+  "forgotPasswordEmailRequired": "Sila masukkan e-mel anda",
+  "forgotPasswordSent": "Pautan dihantar! Semak e-mel anda",
+  "resetPasswordTitle": "Tetapkan kata laluan baharu",
+  "resetPasswordSubtitle": "Pilih kata laluan kuat untuk akaun anda",
+  "resetPasswordNewLabel": "Kata laluan baharu",
+  "resetPasswordNewHint": "Masukkan kata laluan baharu",
+  "resetPasswordConfirmLabel": "Sahkan kata laluan",
+  "resetPasswordConfirmHint": "Masukkan semula kata laluan baharu",
+  "resetPasswordSubmit": "Kemas kini kata laluan",
+  "resetPasswordSuccess": "Kata laluan berjaya dikemas kini",
+  "resetPasswordEmpty": "Sila masukkan kata laluan baharu",
+  "resetPasswordTooShort": "Kata laluan mesti sekurang-kurangnya 6 aksara",
+  "resetPasswordMismatch": "Kata laluan tidak sepadan",
+  "resetPasswordFailed": "Gagal mengemas kini kata laluan",
+  "profileSectionAccount": "Akaun",
+  "profileSectionAccountInfo": "Maklumat akaun",
+  "profileSectionSettings": "Tetapan",
+  "profileSectionSupport": "Sokongan",
+  "profileSectionPreferences": "Keutamaan",
+  "profileSectionAbout": "Tentang",
+  "profileEditProfile": "Sunting profil",
+  "profileChangePassword": "Tukar kata laluan",
+  "profileSignOut": "Log keluar",
+  "profileSignIn": "Log masuk",
+  "profileTheme": "Mod gelap",
+  "profileHapticFeedback": "Maklum balas haptik",
+  "profileNotifications": "Notifikasi",
+  "profileHelpAndFaq": "Bantuan & Soalan Lazim",
+  "profileAboutApp": "Tentang SelawatHub",
+  "profilePrivacyPolicy": "Dasar Privasi",
+  "profileTermsOfService": "Terma Perkhidmatan",
+  "profileEmailLabel": "E-mel",
+  "profileMemberSinceLabel": "Ahli sejak",
+  "profileMemberSince": "Ahli sejak {date}",
+  "@profileMemberSince": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "profileGuestBadge": "Tetamu",
+  "profileGuestUpgrade": "Log masuk untuk segerak antara peranti",
+  "profileSetYourName": "Tetapkan nama anda",
+  "profileBioPlaceholder": "Ketik pensel untuk tambah bio",
+  "profileTotalDhikr": "Jumlah zikir",
+  "profileDayStreak": "Streak harian",
+  "profileDaysActive": "Hari aktif",
+  "profileSignOutConfirmTitle": "Log keluar?",
+  "profileSignOutConfirmBody": "Adakah anda pasti mahu log keluar dari akaun anda?",
+  "profileSignOutAction": "Log keluar",
+  "profileSignOutFailed": "Gagal log keluar",
+  "profileSignOutSuccess": "Berjaya log keluar",
+  "profileVersion": "SelawatHub v{version}",
+  "@profileVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "changePasswordTitle": "Tukar kata laluan",
+  "changePasswordCurrentLabel": "Kata laluan semasa",
+  "changePasswordNewLabel": "Kata laluan baharu",
+  "changePasswordConfirmLabel": "Sahkan kata laluan",
+  "changePasswordForgotLink": "Lupa kata laluan semasa?",
+  "changePasswordSending": "Menghantar...",
+  "changePasswordResetSent": "Pautan set semula dihantar ke {email}",
+  "@changePasswordResetSent": {
+    "placeholders": {
+      "email": {
+        "type": "String"
+      }
+    }
+  },
+  "changePasswordEmailMissing": "E-mel anda tidak dijumpai",
+  "changePasswordResetFailed": "Gagal menghantar e-mel set semula",
+  "changePasswordCurrentRequired": "Sila masukkan kata laluan semasa",
+  "changePasswordCurrentIncorrect": "Kata laluan semasa tidak tepat",
+  "changePasswordSuccess": "Kata laluan berjaya ditukar",
+  "changePasswordFailed": "Gagal menukar kata laluan",
+  "editProfileTitle": "Sunting profil",
+  "editProfileSave": "Selesai",
+  "editProfileCancel": "Batal",
+  "editProfileNameLabel": "Nama penuh",
+  "editProfileNameHint": "Masukkan nama anda",
+  "editProfileBioLabel": "Bio",
+  "editProfileBioHint": "Tulis sesuatu tentang diri anda...",
+  "editProfileEditPhoto": "Sunting gambar",
+  "editProfileTakePhoto": "Ambil gambar",
+  "editProfileChooseGallery": "Pilih dari galeri",
+  "editProfileRemovePhoto": "Buang gambar",
+  "editProfilePhotoUpdated": "Gambar dikemas kini",
+  "editProfilePhotoRemoved": "Gambar dibuang",
+  "editProfilePhotoUploadFailed": "Gagal memuat naik gambar",
+  "editProfilePhotoTooLarge": "Saiz gambar mesti kurang dari 2 MB",
+  "editProfilePhotoBadType": "Hanya JPG, PNG, atau WebP dibenarkan",
+  "editProfileNameEmpty": "Nama tidak boleh kosong",
+  "editProfileSaved": "Profil dikemas kini",
+  "editProfileSaveFailed": "Gagal menyimpan profil",
+  "editProfileDiscardTitle": "Buang perubahan?",
+  "editProfileDiscardBody": "Anda ada perubahan yang belum disimpan dan akan hilang.",
+  "editProfileKeepEditing": "Sambung sunting",
+  "editProfileDiscard": "Buang",
+  "counterTitle": "Tasbih",
+  "counterTodayLabel": "Hari ini",
+  "counterTotalLabel": "Jumlah",
+  "counterTargetLabel": "Sasaran",
+  "counterReachedTarget": "Sasaran tercapai · MashaAllah",
+  "counterReset": "Set semula kiraan",
+  "counterResetConfirmTitle": "Set semula ke sifar?",
+  "counterResetConfirmBody": "Kiraan zikir ini untuk hari ini akan dipadamkan.",
+  "counterChangeDhikr": "Tukar zikir",
+  "counterAddManual": "Tambah manual",
+  "counterSettings": "Tetapan tasbih",
+  "statsTitle": "Statistik",
+  "statsTodayDhikr": "Zikir hari ini",
+  "statsWeeklyTotal": "Minggu ini",
+  "statsMonthlyTotal": "Bulan ini",
+  "statsAllTime": "Sepanjang masa",
+  "statsCurrentStreak": "Streak semasa",
+  "statsLongestStreak": "Streak terpanjang",
+  "statsTopDhikr": "Zikir teratas",
+  "statsRangeWeek": "Minggu",
+  "statsRangeMonth": "Bulan",
+  "statsRangeYear": "Tahun",
+  "statsEmpty": "Belum ada zikir · Mula mengira di tab Tasbih",
+  "statsGoToTasbih": "Buka Tasbih",
+  "groupTitle": "Kumpulan",
+  "groupCreate": "Cipta kumpulan",
+  "groupJoin": "Sertai kumpulan",
+  "groupMembers": "{count, plural, one {1 ahli} other {{count} ahli}}",
+  "@groupMembers": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "groupLeaderboard": "Leaderboard",
+  "groupInviteCode": "Kod Jemputan",
+  "groupCopyCode": "Salin kod",
+  "groupNoGroupsTitle": "Anda belum berada dalam mana-mana kumpulan",
+  "groupNoGroupsBody": "Cipta satu dengan rakan atau keluarga, atau sertai dengan kod jemputan.",
+  "hadithTitle": "Harian",
+  "hadithDailyHadith": "Hadis hari ini",
+  "hadithDailyDua": "Doa hari ini",
+  "hadithMorningAdhkar": "Zikir pagi",
+  "hadithEveningAdhkar": "Zikir petang",
+  "hadithEnglishOnlyBadge": "Kandungan tersedia dalam bahasa Inggeris sahaja",
+  "hadithReadMore": "Baca lagi",
+  "hadithLoadFailed": "Tidak dapat memuat kandungan. Tarik untuk muat semula.",
+  "settingsTickSound": "Tick Sound",
+  "settingsTickSoundOff": "Mati",
+  "settingsTickSoundClick": "Klik",
+  "settingsTickSoundWood": "Kayu",
+  "settingsTickSoundSoft": "Ketik halus",
+  "settingsHapticHint": "Jika getaran telefon dimatikan, hidupkan Bunyi Ketik untuk maklum balas audio.",
+  "guestNotice": "Mod tetamu · log masuk untuk segerak data anda",
+  "aboutTitle": "Tentang",
+  "aboutVersion": "v{version}",
+  "@aboutVersion": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "aboutDescription": "SelawatHub ialah teman anda untuk selawat dan zikir harian. Kira zikir anda dengan tasbih digital yang cantik, pantau siri dan perkembangan dari masa ke masa, tetapkan matlamat harian peribadi, dan berkembang bersama komuniti melalui ciri kumpulan.",
+  "aboutFeature1": "Tasbih digital dengan pelbagai jenis zikir",
+  "aboutFeature2": "Kemasukan kiraan manual & zikir tersuai",
+  "aboutFeature3": "Statistik peribadi & penjejakan streak",
+  "aboutFeature4": "Matlamat harian boleh ditetapkan",
+  "aboutFeature5": "Zikir berkumpulan dengan leaderboard",
+  "aboutFeature6": "Koleksi hadis harian",
+  "aboutFeature7": "Mod tetamu — tanpa perlu akaun",
+  "aboutMadeBy": "Dibuat oleh MuhaiminRoshaizad",
+  "faqSectionTasbih": "Tasbih & Pengira",
+  "faqSectionManual": "Manual Entry & Corrections",
+  "faqSectionStats": "Statistik & Matlamat",
+  "faqSectionGroups": "Kumpulan",
+  "faqSectionAccount": "Akaun & Keselamatan",
+  "faqSectionData": "Data & Keutamaan",
+  "faqQ_tasbih_count_q": "Bagaimana saya mengira selawat atau zikir?",
+  "faqQ_tasbih_count_a": "Pergi ke tab Tasbih dan ketik kawasan pengira untuk mengira. Anda boleh tukar antara jenis selawat dan zikir dengan mengetik nama zikir di bahagian atas. Terdapat tiga gaya pengira — Digital, Bead, dan Minimal — yang boleh ditukar dalam tetapan pengira.",
+  "faqQ_tasbih_change_q": "Bagaimana saya menukar jenis zikir?",
+  "faqQ_tasbih_change_a": "Pada tab Tasbih, ketik nama zikir yang dipaparkan di atas pengira. Lembaran pemilih akan muncul, di mana anda boleh memilih dari pelbagai jenis selawat dan zikir.",
+  "faqQ_tasbih_target_q": "Bolehkah saya menetapkan sasaran kiraan untuk zikir?",
+  "faqQ_tasbih_target_a": "Boleh! Pergi ke tetapan pengira (menu ⋮ pada tab Tasbih) dan tetapkan sasaran kiraan yang anda mahukan. Pengira akan menjejak perkembangan anda ke arah sasaran tersebut. Sasaran mesti nombor bulat lebih besar dari sifar.",
+  "faqQ_tasbih_haptic_q": "Getaran/haptik tidak berfungsi pada telefon saya.",
+  "faqQ_tasbih_haptic_a": "Sesetengah telefon mematikan getaran secara menyeluruh (cth: tetapan \"Getaran & haptik\" dalam tetapan Bunyi telefon). Aplikasi tidak boleh mengatasinya — tetapi anda boleh hidupkan Bunyi Ketik sebagai alternatif.\n\nPergi ke Tetapan pengira (menu ⋮ → Tetapan pengira) dan hidupkan Bunyi Ketik. Pilih dari tiga gaya: Klik, Kayu, atau Ketik halus. Bunyi dimainkan melalui saluran media dan berfungsi walaupun getaran telefon dimatikan.\n\nPada iOS, Bunyi Ketik menghormati suis dering/senyap — jadi ia kekal senyap di masjid apabila telefon anda dalam mod senyap.",
+  "faqQ_tasbih_more_q": "Apakah butang ⋮ di atas pengira?",
+  "faqQ_tasbih_more_a": "Butang ⋮ (lagi) membuka menu tindakan dengan tiga pilihan:\n\n• Tambah kiraan manual — catat zikir yang anda selesai pada tasbih fizikal\n• Sunting log hari ini — betulkan kesilapan dalam mana-mana kiraan hari ini\n• Tetapan pengira — gaya bead, haptik, sasaran kiraan, dan matlamat harian\n\nTekan lama ⋮ untuk terus pergi ke log hari ini.",
+  "faqQ_manual_physical_q": "Saya guna tasbih fizikal. Bolehkah saya tetap mencatat kiraan saya?",
+  "faqQ_manual_physical_a": "Boleh. Buka menu ⋮ pada tab Tasbih dan pilih \"Tambah kiraan manual\". Pilih zikir, masukkan berapa banyak yang anda selesai, dan ketik Simpan. Jumlah itu ditambah pada jumlah hari ini — sama seperti anda mengetik pengira sebanyak itu.\n\nAnda boleh guna ini beberapa kali sehari. Setiap simpan ditambah atas kiraan sedia ada.",
+  "faqQ_manual_custom_q": "Selawat / zikir saya tiada dalam senarai terbina dalam. Bolehkah saya tambah sendiri?",
+  "faqQ_manual_custom_a": "Boleh — tetapi hanya jika anda log masuk. Dalam lembaran kiraan manual, ketik \"Tambah tersuai\" dan masukkan nama selawat atau zikir anda, kemudian pilih sama ada ia selawat atau zikir. Entri tersuai anda disimpan ke akaun anda dan muncul bersama senarai terbina dalam setiap kali anda buka lembaran kiraan manual.\n\nPengguna tetamu tidak boleh mencipta zikir tersuai kerana data perlu disimpan ke akaun anda.",
+  "faqQ_manual_fix_q": "Saya masukkan nombor yang salah. Bagaimana saya betulkan?",
+  "faqQ_manual_fix_a": "Terdapat tiga cara untuk membetulkan kiraan manual:\n\n• Undo (segera) — sebaik sahaja anda menyimpan kiraan manual, satu toast muncul di atas dengan butang UNDO. Ketiknya dalam 6 saat untuk mengundur perubahan.\n• Mod tolak — buka lembaran kiraan manual semula, tukar toggle ke \"Tolak\", dan masukkan jumlah yang anda mahu tolak. Jumlah dihadkan pada 0 jadi tidak boleh negatif.\n• Sunting log hari ini — buka menu ⋮ dan pilih \"Sunting log hari ini\". Ketik mana-mana baris untuk menetapkan jumlah tepatnya untuk hari ini. Ini cara paling mudah jika anda terlepas toast undo.\n\nHalaman statistik juga ada kad pintasan \"Sunting log hari ini\" di bawah streak.",
+  "faqQ_manual_diff_q": "Apa beza \"Tambah kiraan manual\" berbanding mengetik pengira?",
+  "faqQ_manual_diff_a": "Kedua-duanya sama dari segi fungsi — kedua-dua menambah pada jumlah hari ini untuk zikir yang dipilih. Ketikan pengira ialah penambahan 1-demi-1 untuk digunakan semasa berzikir secara langsung. Kiraan manual untuk kelompok yang anda selesai di luar aplikasi (pada tasbih fizikal, dalam hati, dll.) dan membolehkan anda pilih sebarang nombor positif sekaligus.",
+  "faqQ_stats_goal_q": "Bagaimana saya tetapkan atau ubah matlamat harian?",
+  "faqQ_stats_goal_a": "Pergi ke tab Statistik dan ketik bar kemajuan atau ikon sunting di sebelah matlamat harian anda. Anda boleh tetapkan apa-apa matlamat lebih besar dari sifar. Matlamat ini digunakan untuk menjejak kemajuan harian dan streak anda.",
+  "faqQ_stats_streak_q": "Bagaimana streak dikira?",
+  "faqQ_stats_streak_a": "Streak mengira hari berturut-turut di mana anda mencapai matlamat harian.\n\nApi streak berfungsi begini: jika anda ada streak 12 hari dan hari ini ialah hari ke-13, api dipaparkan padam (malap) sehingga anda capai matlamat hari ini. Sebaik anda mencapai matlamat, api menyala dan streak anda menjadi 13.\n\nIni bermakna nombor streak hanya bertambah selepas anda usahakan — bukan sekadar membuka aplikasi. Terlepas satu hari akan set semula streak ke sifar.",
+  "faqQ_groups_join_q": "Bagaimana saya menyertai kumpulan?",
+  "faqQ_groups_join_a": "Pergi ke tab Kumpulan dan masukkan kod jemputan yang dikongsi oleh ketua kumpulan anda. Ketik \"Sertai kumpulan\" untuk menyertai. Anda hanya boleh berada dalam satu kumpulan pada satu masa.",
+  "faqQ_groups_create_q": "Bagaimana saya mencipta kumpulan?",
+  "faqQ_groups_create_a": "Pergi ke tab Kumpulan dan ketik \"Cipta kumpulan baharu\". Masukkan nama kumpulan dan keterangan pilihan. Anda akan menjadi admin kumpulan dan menerima kod jemputan untuk dikongsi dengan orang lain.",
+  "faqQ_groups_admin_q": "Apa yang admin kumpulan boleh lakukan?",
+  "faqQ_groups_admin_a": "Admin kumpulan boleh menyunting nama kumpulan, keterangan, dan matlamat harian. Mereka juga boleh menaikkan ahli ke admin, menurunkan admin, dan mengeluarkan ahli dari kumpulan.",
+  "faqQ_account_guest_q": "Bolehkah saya guna aplikasi tanpa akaun?",
+  "faqQ_account_guest_a": "Boleh! Anda boleh guna SelawatHub sebagai tetamu. Pengguna tetamu boleh mengira zikir dan melihat statistik yang disimpan secara setempat pada peranti mereka. Walau bagaimanapun, ciri kumpulan dan segerak awan memerlukan akaun berdaftar. Data tetamu boleh hilang jika aplikasi dinyahpasang.",
+  "faqQ_account_changepw_q": "Bagaimana saya tukar kata laluan?",
+  "faqQ_account_changepw_a": "Pergi ke Profil > Tukar kata laluan. Anda perlu sahkan kata laluan semasa dahulu, kemudian masukkan dan sahkan kata laluan baharu anda (minimum 6 aksara). Jika anda terlupa kata laluan semasa, ketik \"Lupa kata laluan semasa?\" untuk menerima pautan set semula melalui e-mel.",
+  "faqQ_account_forgotpw_q": "Saya terlupa kata laluan. Bagaimana saya set semula?",
+  "faqQ_account_forgotpw_a": "Pada halaman log masuk, ketik \"Lupa kata laluan?\" dan masukkan alamat e-mel anda. Anda akan menerima e-mel dengan pautan untuk set semula kata laluan. Jika anda sudah log masuk, anda juga boleh memulakan set semula dari Profil > Tukar kata laluan.",
+  "faqQ_data_cloud_q": "Adakah data saya disimpan ke awan?",
+  "faqQ_data_cloud_a": "Jika anda ada akaun, kiraan zikir, profil, dan data kumpulan disegerakkan ke awan. Keutamaan seperti tema, maklum balas haptik, bunyi ketik, dan matlamat harian disimpan secara setempat pada peranti anda. Data tetamu disimpan secara setempat sahaja.",
+  "faqQ_data_picture_q": "Bagaimana saya tukar gambar profil?",
+  "faqQ_data_picture_a": "Pergi ke Profil > Sunting profil dan ketik ikon kamera atau gambar semasa anda. Anda boleh muat naik gambar baharu dari peranti anda. Untuk membuang gambar, ketik pilihan buang dalam pemilih gambar.",
+  "faqQ_data_theme_q": "Bagaimana saya tukar antara mod gelap dan cerah?",
+  "faqQ_data_theme_a": "Pergi ke Profil dan toggle suis tema dalam bahagian Keutamaan. Keutamaan tema anda disimpan secara setempat dan berkekalan merentasi sesi.",
+  "privacyTitle": "Dasar Privasi",
+  "legalLastUpdated": "Kemaskini terakhir: {date}",
+  "@legalLastUpdated": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "privacyIntroTitle": "Pengenalan",
+  "privacyIntroBody": "SelawatHub (\"kami\") ialah aplikasi mudah alih yang dibangunkan oleh seorang pembangun individu di Malaysia, direka untuk membantu umat Islam mengira selawat dan zikir, menjejak kemajuan ibadah mereka, dan menyertai aktiviti zikir berkumpulan. Kami komited melindungi privasi anda dan mengendalikan data peribadi anda secara telus.\n\nDasar Privasi ini menerangkan maklumat yang kami kumpul, bagaimana kami gunakannya, dan hak anda berkaitan data anda. Ia disediakan selaras dengan Akta Perlindungan Data Peribadi Malaysia 2010, seperti yang dipinda oleh Akta Perlindungan Data Peribadi (Pindaan) 2024.",
+  "privacy1Title": "1. Maklumat yang Kami Kumpul",
+  "privacy1Body": "Maklumat Akaun\nApabila anda mencipta akaun, kami mengumpul alamat e-mel dan nama paparan yang anda pilih. Kata laluan anda di-hash dan disimpan secara selamat oleh pembekal pengesahan kami (Supabase) — kami tidak pernah ada akses kepada kata laluan teks biasa anda.\n\nMaklumat Profil\nAnda boleh sediakan bio dan muat naik gambar profil. Gambar profil disimpan dalam storan awan selamat dan boleh dilihat oleh ahli kumpulan yang anda sertai.\n\nData Penggunaan\nKami mengumpul data tentang kiraan selawat dan zikir anda, termasuk jenis zikir, jumlah kiraan, dan cap waktu. Data ini digunakan untuk menjana statistik peribadi, siri, dan penjejakan kemajuan anda. Kiraan boleh berasal dari mengetik pengira dalam aplikasi atau dari kemasukan manual yang anda buat (untuk zikir yang diselesaikan menggunakan tasbih fizikal).\n\nKandungan Dijana Pengguna\nJika anda mencipta entri selawat atau zikir tersuai, nama yang anda berikan disimpan terhadap akaun anda. Nama ini hanya boleh dilihat oleh anda dan tidak pernah ditunjukkan kepada pengguna lain atau ahli kumpulan.\n\nData Kumpulan\nJika anda mencipta atau menyertai kumpulan, kami menyimpan maklumat keahlian kumpulan, peranan anda dalam kumpulan, dan sumbangan zikir anda yang dikongsi dengan ahli kumpulan lain.\n\nPenggunaan Tetamu\nJika anda guna SelawatHub sebagai tetamu tanpa mencipta akaun, kiraan zikir dan keutamaan anda disimpan secara setempat pada peranti anda sahaja. Tiada data peribadi dihantar ke pelayan kami dalam mod tetamu. Perhatikan ciptaan zikir tersuai tidak tersedia dalam mod tetamu.\n\nData Peribadi Sensitif\nKami tidak mengumpul data peribadi sensitif seperti yang ditakrifkan di bawah Akta Perlindungan Data Peribadi 2010 (seperti kesihatan fizikal atau mental, pandangan politik, kepercayaan agama selain dari yang sememangnya wujud dalam penggunaan aplikasi, atau data biometrik).",
+  "privacy2Title": "2. Bagaimana Kami Gunakan Maklumat Anda",
+  "privacy2Body": "Kami menggunakan maklumat yang kami kumpul untuk:\n\n• Menyediakan fungsi teras aplikasi — mengira selawat/zikir, menjejak kemajuan, dan memaparkan statistik\n• Mendayakan ciri kumpulan — membolehkan anda menyertai kumpulan, berkongsi kemajuan, dan melihat leaderboard kumpulan\n• Mengesahkan identiti anda dan melindungi akaun anda\n• Menghantar e-mel set semula kata laluan apabila diminta\n• Menyimpan dan memaparkan maklumat profil anda kepada ahli kumpulan lain\n• Mengira streak, matlamat harian, dan statistik mingguan/bulanan/tahunan\n• Memperbaiki pengalaman aplikasi berdasarkan corak penggunaan",
+  "privacy3Title": "3. Penyimpanan & Keselamatan Data",
+  "privacy3Body": "Data anda disimpan di Supabase, platform awan selamat dengan amalan keselamatan piawai industri termasuk:\n\n• Transmisi data tersulit (HTTPS/TLS)\n• Polisi Row Level Security (RLS) memastikan pengguna hanya boleh akses data mereka sendiri\n• Hashing kata laluan selamat menggunakan bcrypt\n• Gambar profil disimpan dalam storan awan terkawal akses\n\nData setempat (kiraan mod tetamu, keutamaan aplikasi seperti pilihan tema, tetapan maklum balas haptik, dan matlamat harian) disimpan pada peranti anda menggunakan SharedPreferences dan tidak dihantar ke pelayan kami.",
+  "privacy4Title": "4. Perkongsian Data & Pemindahan Antarabangsa",
+  "privacy4Body": "Kami tidak menjual, menukar, atau menyewa maklumat peribadi anda kepada pihak ketiga. Data anda boleh dikongsi dalam keadaan terhad berikut:\n\n• Ahli Kumpulan — Nama paparan, gambar profil, dan kiraan zikir anda boleh dilihat oleh ahli kumpulan yang anda sertai\n• Pembekal Perkhidmatan — Kami guna Supabase untuk perkhidmatan pengesahan, pangkalan data, dan storan. Supabase memproses data bagi pihak kami di bawah perjanjian pemprosesan data yang ketat\n• Keperluan Undang-Undang — Kami mungkin mendedahkan maklumat jika dikehendaki oleh undang-undang atau untuk melindungi hak dan keselamatan kami\n\nPemindahan Antarabangsa\nSupabase mungkin menyimpan dan memproses data dalam bidang kuasa di luar Malaysia. Pemindahan sedemikian dibuat hanya kepada bidang kuasa yang menyediakan tahap perlindungan data yang setara dengan yang dikehendaki oleh Akta Perlindungan Data Peribadi Malaysia 2010 (seperti yang dipinda), dan tertakluk kepada komitmen keselamatan dan privasi kontraktual Supabase.",
+  "privacy5Title": "5. Hak Anda",
+  "privacy5Body": "Di bawah Akta Perlindungan Data Peribadi 2010 (seperti yang dipinda oleh Akta Perlindungan Data Peribadi (Pindaan) 2024), anda berhak untuk:\n\n• Akses — Melihat data peribadi anda melalui halaman profil dan statistik aplikasi, atau memohon salinan dengan menghubungi kami\n• Pembetulan — Menyunting nama paparan, bio, gambar profil, dan kiraan zikir pada bila-bila masa. Anda juga boleh memohon pembetulan data tidak tepat lain dengan menghubungi kami\n• Pemadaman — Memohon pemadaman akaun dan data berkaitan dengan menghubungi kami\n• Penarikan Persetujuan — Menarik balik persetujuan pemprosesan data pada bila-bila masa dengan memadam akaun anda; perhatikan ini akan menamatkan keupayaan anda menggunakan ciri terikat akaun\n• Mudah Alih Data — Memohon salinan data peribadi anda (akaun, kiraan, zikir tersuai, keahlian kumpulan) dalam format elektronik berstruktur dan biasa digunakan, dan memohon kami memindahkannya terus ke pengawal data lain di mana boleh dilaksanakan secara teknikal\n• Kata Laluan — Menukar kata laluan atau memohon set semula kata laluan pada bila-bila masa\n• Membuat Aduan — Anda boleh membuat aduan dengan Jabatan Perlindungan Data Peribadi Malaysia (JPDP) jika anda percaya hak anda telah dilanggar",
+  "privacy6Title": "6. Notifikasi Pelanggaran Data",
+  "privacy6Body": "Sekiranya berlaku pelanggaran data peribadi yang berkemungkinan menyebabkan kemudaratan besar kepada anda, kami akan memaklumkan kedua-dua Pesuruhjaya Perlindungan Data Peribadi dan pengguna terjejas tanpa kelewatan dan, di mana boleh dilaksanakan, dalam tempoh tujuh puluh dua (72) jam sejak mengetahui pelanggaran tersebut, selaras dengan Akta Perlindungan Data Peribadi (Pindaan) 2024.",
+  "privacy7Title": "7. Pengekalan Data",
+  "privacy7Body": "Kami mengekalkan data peribadi anda selama akaun anda aktif. Jika anda memadam akaun anda, data peribadi anda dibuang dalam tempoh yang munasabah, kecuali jika kami dikehendaki mengekalkan rekod tertentu untuk mematuhi undang-undang yang berkenaan atau menyelesaikan pertikaian. Data mod tetamu setempat berkekalan pada peranti anda sehingga anda menyahpasang aplikasi atau membersihkan storan aplikasi.",
+  "privacy8Title": "8. Privasi Kanak-Kanak",
+  "privacy8Body": "SelawatHub tidak secara sengaja mengumpul maklumat peribadi dari kanak-kanak di bawah umur 13 tahun. Jika anda percaya seorang kanak-kanak telah memberikan kami data peribadi, sila hubungi kami supaya kami boleh mengambil tindakan yang sewajarnya.",
+  "privacy9Title": "9. Perubahan kepada Dasar Ini",
+  "privacy9Body": "Kami mungkin mengemas kini Dasar Privasi ini dari semasa ke semasa. Perubahan akan ditunjukkan dalam tarikh \"Kemaskini terakhir\" di atas halaman ini. Penggunaan berterusan aplikasi selepas perubahan dianggap sebagai penerimaan dasar yang dikemas kini.",
+  "privacy10Title": "10. Hubungi Kami",
+  "privacy10Body": "Jika anda ada soalan tentang Dasar Privasi ini atau ingin menggunakan hak data anda di bawah Akta Perlindungan Data Peribadi 2010 (seperti yang dipinda), sila hubungi kami di:\n\nE-mel: aminmuhaimin192@gmail.com\n\nSelawatHub dikendalikan oleh seorang pembangun individu di Malaysia. Tiada Pegawai Perlindungan Data telah dilantik kerana jumlah pemprosesan jatuh di bawah ambang yang ditetapkan dalam Akta Perlindungan Data Peribadi (Pindaan) 2024. Pembangun bertindak sebagai pengawal data bagi tujuan Dasar ini.",
+  "termsTitle": "Terma Perkhidmatan",
+  "termsIntroTitle": "Pengenalan",
+  "termsIntroBody": "Selamat datang ke SelawatHub. Dengan memuat turun, memasang, atau menggunakan aplikasi ini, anda bersetuju untuk terikat dengan Terma Perkhidmatan (\"Terma\") ini. Jika anda tidak bersetuju dengan Terma ini, sila jangan gunakan aplikasi.",
+  "terms1Title": "1. Penerangan Perkhidmatan",
+  "terms1Body": "SelawatHub ialah aplikasi mudah alih yang menyediakan:\n\n• Tasbih digital (pengira) untuk selawat dan zikir dengan jenis zikir boleh disesuaikan dan sasaran kiraan\n• Kemasukan kiraan manual untuk zikir yang diselesaikan menggunakan tasbih fizikal, termasuk mod tambah dan tolak\n• Entri selawat dan zikir tersuai ditakrif pengguna (pengguna berdaftar sahaja)\n• Alat pembetulan — undo, tolak, dan \"Sunting log hari ini\" — untuk membetulkan entri tersilap\n• Penjejakan statistik peribadi termasuk kemajuan harian, mingguan, bulanan, dan tahunan dengan streak dan matlamat harian boleh ditetapkan\n• Ciri kumpulan membolehkan pengguna mencipta atau menyertai kumpulan, berkongsi kemajuan zikir, dan melihat statistik kolektif\n• Koleksi hadis harian yang dipilih khas\n• Pengurusan profil dengan nama paparan, bio, dan gambar profil yang boleh disesuaikan\n• Mod tetamu untuk menggunakan ciri asas tanpa akaun",
+  "terms2Title": "2. Akaun Pengguna",
+  "terms2Body": "Penciptaan Akaun\nAnda boleh mencipta akaun menggunakan alamat e-mel dan kata laluan sekurang-kurangnya 6 aksara. Anda mesti menyediakan nama paparan semasa pendaftaran. Anda bertanggungjawab menjaga kerahsiaan kelayakan log masuk anda.\n\nMod Tetamu\nAnda boleh guna SelawatHub tanpa mencipta akaun. Pengguna tetamu boleh akses pengira dan melihat statistik yang disimpan secara setempat pada peranti mereka. Data tetamu tidak disegerakkan ke awan dan boleh hilang jika aplikasi dinyahpasang.\n\nKeselamatan Akaun\nAnda bertanggungjawab terhadap semua aktiviti yang berlaku di bawah akaun anda. Jika anda mengesyaki akses tanpa kebenaran, tukar kata laluan anda segera melalui tetapan profil aplikasi atau guna ciri set semula kata laluan.",
+  "terms3Title": "3. Penggunaan Yang Boleh Diterima",
+  "terms3Body": "Anda bersetuju untuk menggunakan SelawatHub hanya untuk tujuan yang dikehendaki iaitu memudahkan amalan ibadah Islam. Anda tidak boleh:\n\n• Menggunakan aplikasi untuk apa-apa tujuan yang tidak sah atau dilarang\n• Memuat naik kandungan tidak sesuai, menyinggung, atau bukan Islam sebagai gambar profil, bio, atau nama zikir tersuai anda\n• Cuba mengganggu fungsi, keselamatan, atau infrastruktur aplikasi\n• Mencipta beberapa akaun untuk tujuan memanipulasi statistik atau leaderboard kumpulan\n• Menghantar kiraan zikir palsu atau berlebihan untuk memanipulasi leaderboard atau streak\n• Berkongsi kod jemputan kumpulan secara terbuka tanpa persetujuan admin kumpulan\n• Mengganggu, menakutkan, atau mencederakan pengguna lain melalui interaksi kumpulan\n• Cuba mengakses data atau akaun pengguna lain",
+  "terms4Title": "4. Kumpulan",
+  "terms4Body": "Penciptaan & Pengurusan Kumpulan\nMana-mana pengguna berdaftar boleh mencipta kumpulan. Pencipta kumpulan menjadi admin kumpulan dengan keupayaan menguruskan ahli, mengemas kini tetapan kumpulan, menetapkan matlamat harian, dan mengeluarkan ahli.\n\nKeahlian\nPengguna boleh menyertai kumpulan menggunakan kod jemputan. Setiap pengguna hanya boleh menjadi ahli satu kumpulan pada satu masa. Kiraan zikir anda yang disumbangkan semasa dalam kumpulan boleh dilihat oleh semua ahli kumpulan.\n\nKeluar atau Pengeluaran\nAnda boleh keluar dari kumpulan pada bila-bila masa. Admin kumpulan boleh mengeluarkan ahli mengikut budi bicara mereka. Jika admin kumpulan keluar, keistimewaan pentadbiran dipindahkan kepada ahli lain.",
+  "terms5Title": "5. Kandungan Pengguna",
+  "terms5Body": "Anda mengekalkan pemilikan kandungan yang anda berikan (nama paparan, bio, gambar profil, nama zikir tersuai, dan kiraan zikir yang anda catat). Dengan menghantar kandungan, anda memberi SelawatHub lesen tidak eksklusif, bebas royalti untuk menyimpan, memproses, dan memaparkan kandungan tersebut dalam aplikasi untuk tujuan tunggal menyediakan perkhidmatan (cth., menunjukkan gambar profil anda kepada ahli kumpulan atau memaparkan zikir tersuai anda dalam senarai anda sendiri).\n\nZikir Tersuai\nNama selawat dan zikir tersuai yang anda cipta hanya boleh dilihat oleh anda dan tidak dipaparkan kepada pengguna lain atau ahli kumpulan. Anda bertanggungjawab memastikan apa-apa nama yang anda simpan adalah tepat, hormat, dan tidak melanggar peraturan Penggunaan Yang Boleh Diterima dalam Seksyen 3.\n\nKiraan Manual\nAnda bertanggungjawab sepenuhnya terhadap ketepatan kiraan yang anda masukkan secara manual. Anda boleh membetulkan entri tersilap pada bila-bila masa menggunakan alat undo, tolak, atau \"Sunting log hari ini\" dalam aplikasi.\n\nKami berhak mengeluarkan kandungan yang melanggar Terma ini atau dianggap tidak sesuai.",
+  "terms6Title": "6. Harta Intelek",
+  "terms6Body": "Aplikasi SelawatHub, termasuk reka bentuk, kod, grafik, dan kandungan (tidak termasuk kandungan dijana pengguna), ialah harta intelek SelawatHub dan dilindungi oleh undang-undang hak cipta dan harta intelek yang berkenaan. Anda tidak boleh menyalin, mengubah suai, mengedar, atau membuat kejuruteraan terbalik mana-mana bahagian aplikasi.",
+  "terms7Title": "7. Penafian Waranti",
+  "terms7Body": "SelawatHub disediakan \"seadanya\" dan \"seperti tersedia\" tanpa sebarang waranti, sama ada nyata atau tersirat. Kami tidak menjamin bahawa:\n\n• Aplikasi akan tersedia setiap masa tanpa gangguan\n• Aplikasi akan bebas dari ralat atau kecacatan\n• Data tidak akan hilang (sila ambil perhatian data tetamu disimpan secara setempat dan boleh hilang apabila aplikasi dinyahpasang)\n• Pengiraan statistik akan tepat sepenuhnya",
+  "terms8Title": "8. Had Liabiliti",
+  "terms8Body": "Sehingga maksimum yang dibenarkan oleh undang-undang, SelawatHub dan pembangunnya tidak akan bertanggungjawab terhadap apa-apa kerosakan tidak langsung, sampingan, khas, atau berbangkit yang timbul dari penggunaan atau ketidakupayaan anda menggunakan aplikasi. Ini termasuk tetapi tidak terhad kepada kehilangan data, kehilangan streak, atau gangguan perkhidmatan.",
+  "terms9Title": "9. Penamatan",
+  "terms9Body": "Kami berhak menggantung atau menamatkan akaun anda jika anda melanggar Terma ini. Anda boleh memadam akaun anda pada bila-bila masa dengan menghubungi kami. Apabila penamatan, hak anda untuk menggunakan aplikasi terhenti dan data anda mungkin dipadam selaras dengan Dasar Privasi kami.",
+  "terms10Title": "10. Perubahan kepada Terma",
+  "terms10Body": "Kami mungkin mengemas kini Terma ini dari semasa ke semasa. Perubahan akan ditunjukkan dalam tarikh \"Kemaskini terakhir\" di atas. Penggunaan berterusan aplikasi anda selepas pengubahsuaian dianggap sebagai penerimaan Terma yang disemak.",
+  "terms11Title": "11. Undang-Undang Mengawal",
+  "terms11Body": "Terma ini hendaklah dikawal dan ditafsirkan selaras dengan undang-undang Malaysia, termasuk Akta Perlindungan Data Peribadi 2010 (seperti yang dipinda oleh Akta Perlindungan Data Peribadi (Pindaan) 2024) dan Akta Perlindungan Pengguna 1999. Apa-apa pertikaian yang timbul dari Terma ini hendaklah tertakluk kepada bidang kuasa eksklusif mahkamah Malaysia.",
+  "terms12Title": "12. Hubungi Kami",
+  "terms12Body": "Jika anda ada soalan tentang Terma Perkhidmatan ini, sila hubungi kami di:\n\nE-mel: aminmuhaimin192@gmail.com",
+  "counterHapticHint": "Haptik tak berbunyi? Semak tetapan getaran telefon anda — atau hidupkan Tick Sound di bawah.",
+  "counterSettingsAction": "Tetapan",
+  "counterCantSubtractBelowZero": "Tidak boleh tolak ke bawah 0",
+  "counterFailedToSave": "Gagal menyimpan. Sila cuba lagi.",
+  "counterFailedToUpdate": "Gagal mengemas kini. Sila cuba lagi.",
+  "counterManualToastAdded": "Tambah {amount} · {name} · Hari ini: {total}",
+  "@counterManualToastAdded": {
+    "placeholders": {
+      "amount": {
+        "type": "int"
+      },
+      "name": {
+        "type": "String"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "counterManualToastRemoved": "Tolak {amount} · {name} · Hari ini: {total}",
+  "@counterManualToastRemoved": {
+    "placeholders": {
+      "amount": {
+        "type": "int"
+      },
+      "name": {
+        "type": "String"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "counterUndo": "Undo",
+  "counterUpdatedToast": "Dikemas kini · {name} · {prev} → {next}",
+  "@counterUpdatedToast": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "prev": {
+        "type": "int"
+      },
+      "next": {
+        "type": "int"
+      }
+    }
+  },
+  "counterResetSessionTitle": "Reset sesi?",
+  "counterResetSessionContent": "Ini akan membersihkan kiraan sesi semasa anda.",
+  "counterResetConfirm": "Reset",
+  "counterResetToast": "Pengira direset · {name}",
+  "@counterResetToast": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "counterRounds": "Pusingan",
+  "counterTotal": "Jumlah",
+  "counterResetLabel": "Reset",
+  "counterOfTarget": "daripada {target}",
+  "@counterOfTarget": {
+    "placeholders": {
+      "target": {
+        "type": "int"
+      }
+    }
+  },
+  "counterMenuManual": "Tambah kiraan manual",
+  "counterMenuManualSub": "Catat kiraan dari tasbih fizikal",
+  "counterMenuTodayLog": "Sunting log hari ini",
+  "counterMenuTodayLogSub": "Betulkan nombor salah dari hari ini",
+  "counterMenuSettings": "Tetapan pengira",
+  "counterMenuSettingsSub": "Gaya bead, haptik, dan matlamat harian",
+  "todayLogTitle": "Log hari ini",
+  "todayLogTapHint": "Ketik baris untuk tetapkan kiraan tepat",
+  "todayLogEmpty": "Belum ada kiraan untuk hari ini.",
+  "todayLogEditCount": "Sunting kiraan",
+  "dhikrSelectorTitle": "Pilih Zikir",
+  "dhikrTabSelawat": "Selawat",
+  "dhikrTabZikir": "Zikir",
+  "manualSaveCustomFailed": "Tidak dapat simpan {category} tersuai. Cuba lagi.",
+  "@manualSaveCustomFailed": {
+    "placeholders": {
+      "category": {
+        "type": "String"
+      }
+    }
+  },
+  "manualAddedCustomToast": "Tambah \"{name}\" ke senarai {category} anda",
+  "@manualAddedCustomToast": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "category": {
+        "type": "String"
+      }
+    }
+  },
+  "manualSubtractTitle": "Tolak secara manual",
+  "manualAddTitle": "Tambah secara manual",
+  "manualSubtractCta": "Tolak {amount}",
+  "@manualSubtractCta": {
+    "placeholders": {
+      "amount": {
+        "type": "int"
+      }
+    }
+  },
+  "manualAddCta": "Tambah {amount}",
+  "@manualAddCta": {
+    "placeholders": {
+      "amount": {
+        "type": "int"
+      }
+    }
+  },
+  "manualEnterAmount": "Masukkan jumlah",
+  "manualWhatReciting": "Apa yang anda baca?",
+  "manualAddYourOwn": "Tambah Selawat/Zikir anda sendiri",
+  "manualSaveAndContinue": "Simpan & teruskan",
+  "manualNameHintExample": "cth. Selawat Munjiyat",
+  "manualSegmentSubtract": "Tolak",
+  "manualSegmentAdd": "Tambah",
+  "manualCategorySelawat": "Selawat",
+  "manualCategoryZikir": "Zikir",
+  "settingsTitle": "Tetapan Tasbih",
+  "settingsSectionGeneral": "Umum",
+  "settingsSectionAppearance": "Penampilan",
+  "settingsHapticFeedback": "Haptik",
+  "settingsIntensity": "Keamatan",
+  "settingsIntensityLight": "Lembut",
+  "settingsIntensityMedium": "Sederhana",
+  "settingsIntensityHeavy": "Berat",
+  "settingsHapticHelp": "Mungkin tidak tersedia pada semua peranti",
+  "settingsTickSoundHelp": "Memainkan klik halus pada setiap ketikan. Berguna apabila getaran telefon anda dimatikan.",
+  "settingsCounterStyle": "Gaya Pengira",
+  "settingsCounterStyleBead": "Bead",
+  "settingsCounterStyleDigital": "Digital",
+  "settingsCounterStyleMinimal": "Minimal",
+  "settingsColorTheme": "Tema Warna",
+  "settingsColorEmerald": "Emerald",
+  "settingsColorGold": "Gold",
+  "settingsColorOcean": "Ocean",
+  "settingsColorRose": "Rose",
+  "settingsColorLavender": "Lavender",
+  "settingsColorIvory": "Ivory",
+  "settingsTargetsTitle": "Sasaran",
+  "settingsTargetsSub": "Sesuaikan sasaran kiraan untuk setiap zikir",
+  "settingsTargetCountLabel": "Sasaran kiraan",
+  "settingsTargetSetToast": "Sasaran {name} ditetapkan kepada {value}",
+  "@settingsTargetSetToast": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "value": {
+        "type": "int"
+      }
+    }
+  },
+  "settingsTargetInvalid": "Masukkan nombor lebih besar dari 0",
+  "commonOr": "atau",
+  "commonSomethingWentWrong": "Sesuatu telah berlaku",
+  "commonToday": "Hari ini",
+  "commonThisWeek": "Minggu ini",
+  "commonThisMonth": "Bulan ini",
+  "refreshPullToRefresh": "Tarik untuk muat semula",
+  "refreshReleaseToRefresh": "Lepas untuk muat semula",
+  "refreshRefreshing": "Memuat semula…",
+  "statsSubtitle": "Perjalanan selawat & zikir anda",
+  "statsDailyGoalTitle": "Matlamat Harian",
+  "statsDailyGoalHint": "Tetapkan sasaran bacaan harian anda.",
+  "statsDailyGoalExample": "cth. 100",
+  "statsDailyGoalSuffix": "kiraan",
+  "statsDailyGoalInvalid": "Masukkan nombor lebih besar dari 0",
+  "statsEditTodayLog": "Sunting log hari ini",
+  "statsMadeAMistake": "Buat silap?",
+  "statsBestStreak": "Streak Terbaik",
+  "statsDaysActive": "Hari Aktif",
+  "statsCategoryBreakdown": "Pecahan Kategori",
+  "statsNoActivityOnDay": "Tiada aktiviti pada hari ini",
+  "statsHeatmapActivity": "Aktiviti",
+  "statsHeatmapTapDeselect": "Ketik lagi untuk batal pilih",
+  "statsHeatmapTapFilter": "Ketik hari untuk tapis statistik di bawah",
+  "statsHeatmapLess": "Kurang",
+  "statsHeatmapMore": "Lebih",
+  "statsTopMostRecited": "Paling Banyak Dibaca",
+  "statsTopSubtitle": "Selawat & zikir teratas anda",
+  "statsStreakNoStreak": "Tiada Streak",
+  "statsStreakStartGoal": "Capai {goal} hari ini untuk mulakan streak",
+  "@statsStreakStartGoal": {
+    "placeholders": {
+      "goal": {
+        "type": "String"
+      }
+    }
+  },
+  "statsStreakStartReciting": "Mula membaca hari ini!",
+  "statsStreakDays": "Streak {days} Hari",
+  "@statsStreakDays": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "statsStreakKeepGoal": "Capai {goal} hari ini untuk kekalkan",
+  "@statsStreakKeepGoal": {
+    "placeholders": {
+      "goal": {
+        "type": "String"
+      }
+    }
+  },
+  "statsStreakKeepRecite": "Baca hari ini untuk kekalkan",
+  "statsStreakKeepGoing": "Teruskan!",
+  "statsStreakOnFire": "Anda hebat!",
+  "statsStreakLegendary": "Status legenda!",
+  "statsWeeklyEmpty": "Belum ada data mingguan",
+  "statsYearlySummary": "Ringkasan Tahunan",
+  "groupSignInPrompt": "Log masuk untuk cipta atau sertai kumpulan\ndan jejak zikir bersama.",
+  "groupDescription": "Penerangan",
+  "groupNoDescription": "Tiada penerangan",
+  "groupMembersCount": "{count, plural, =1{1 ahli} other{{count} ahli}}",
+  "@groupMembersCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "groupCreatedOn": "Dicipta {date}",
+  "@groupCreatedOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "groupTotalToday": "JUMLAH KUMPULAN HARI INI",
+  "groupSelawatLabel": "selawat",
+  "groupMembersHeader": "Ahli",
+  "groupMyGroup": "Kumpulan Saya",
+  "groupSettingsEditName": "Sunting Nama Kumpulan",
+  "groupSettingsEditNameHint": "Pilih nama yang mewakili kumpulan anda.",
+  "groupSettingsNamePlaceholder": "Masukkan nama kumpulan",
+  "groupSettingsNameUpdated": "Nama kumpulan dikemas kini",
+  "groupSettingsNameFailed": "Gagal mengemas kini nama",
+  "groupSettingsEditDesc": "Sunting Penerangan",
+  "groupSettingsDescHint": "Terangkan tentang kumpulan anda.",
+  "groupSettingsDescPlaceholder": "Masukkan penerangan kumpulan",
+  "groupSettingsDescUpdated": "Penerangan dikemas kini",
+  "groupSettingsDescFailed": "Gagal mengemas kini penerangan",
+  "groupSettingsSetGoal": "Tetapkan Matlamat Harian",
+  "groupSettingsGoalHint": "Tetapkan sasaran selawat harian untuk kumpulan anda.",
+  "groupSettingsGoalExample": "cth. 10000",
+  "groupSettingsGoalUpdated": "Matlamat harian kumpulan ditetapkan kepada {value}",
+  "@groupSettingsGoalUpdated": {
+    "placeholders": {
+      "value": {
+        "type": "int"
+      }
+    }
+  },
+  "groupSettingsGoalFailed": "Gagal mengemas kini matlamat",
+  "groupSettingsMuteNotifications": "Senyapkan Notifikasi",
+  "groupSettingsManageRoles": "Urus Peranan",
+  "groupSettingsTransferLeadership": "Pindah Kepimpinan",
+  "transferConfirmTitle": "Pindah kepimpinan?",
+  "transferConfirmBody": "Kepimpinan akan dipindahkan kepada {name}. Anda akan menjadi penolong ketua.",
+  "@transferConfirmBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "transferConfirmCta": "Pindah",
+  "transferSuccess": "Kepimpinan dipindahkan kepada {name}",
+  "@transferSuccess": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "transferIntro": "Pilih ahli untuk menjadi ketua kumpulan baharu.",
+  "transferSelectMember": "Pilih ahli",
+  "transferToName": "Pindah kepada {name}",
+  "@transferToName": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "manageRolesIntro": "Ketik ahli untuk tukar antara penolong ketua dan ahli.",
+  "manageRolesUpdated": "Peranan dikemas kini",
+  "manageRolesFailed": "Gagal mengemas kini peranan",
+  "removeMemberConfirmTitle": "{count, plural, =1{Buang 1 ahli?} other{Buang {count} ahli?}}",
+  "@removeMemberConfirmTitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "removeMemberConfirmBody": "Berikut akan dibuang:\n{names}",
+  "@removeMemberConfirmBody": {
+    "placeholders": {
+      "names": {
+        "type": "String"
+      }
+    }
+  },
+  "removeMemberFailed": "Gagal membuang ahli",
+  "removeMemberSuccess": "{count, plural, =1{1 ahli dibuang} other{{count} ahli dibuang}}",
+  "@removeMemberSuccess": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "removeMemberIntro": "Pilih ahli untuk dibuang dari kumpulan.",
+  "removeMemberSelectCta": "Pilih ahli",
+  "noGroupEnterCode": "Sila masukkan kod jemputan",
+  "noGroupInvalidCode": "Kod jemputan tidak sah",
+  "noGroupJoinedTitle": "Anda telah menyertai kumpulan!",
+  "noGroupWelcomeTo": "Selamat datang ke {name}",
+  "@noGroupWelcomeTo": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "noGroupCreateTitle": "Cipta Kumpulan Baharu",
+  "noGroupNameHint": "Masukkan nama kumpulan",
+  "noGroupDescHint": "Tambah penerangan (pilihan)",
+  "noGroupNameRequired": "Sila masukkan nama kumpulan",
+  "noGroupCreated": "Kumpulan dicipta",
+  "noGroupCreateFailed": "Gagal mencipta kumpulan",
+  "noGroupJoinTitle": "Sertai Kumpulan",
+  "noGroupJoinSubtitle": "Kira selawat bersama\nkeluarga, kawan, atau komuniti",
+  "noGroupCodePlaceholder": "MASUKKAN KOD",
+  "noGroupJoinCta": "Sertai Kumpulan",
+  "noGroupJoinFailed": "Gagal menyertai kumpulan",
+  "hadithDailyAdkar": "Zikir Harian",
+  "hadithDailyAdkarSubtitle": "Zikir pagi & petang",
+  "hadithDailyAdkarDesc": "Zikir pagi & petang (أذكار) untuk dibaca setiap hari sebagai sebahagian rutin spiritual seorang Muslim.",
+  "hadithPostSalaah": "Selepas Solat",
+  "hadithPostSalaahName": "Zikir Selepas Solat",
+  "hadithPostSalaahSubtitle": "Zikir selepas solat",
+  "hadithPostSalaahDesc": "Zikir dan doa untuk dibaca selepas solat lima waktu.",
+  "hadithDoaCollection": "Koleksi Doa",
+  "hadithDoaCollectionName": "Koleksi Doa Berguna",
+  "hadithDoaCollectionSubtitle": "Layari doa mengikut kategori",
+  "hadithDoaCollectionDesc": "102 doa dari al-Quran & Sunnah, dikategorikan mengikut topik untuk rujukan mudah.",
+  "hadithFortyNawawi": "Empat Puluh Hadis Nawawi",
+  "hadithFortyNawawiDesc": "40 hadis sahih yang disusun oleh Imam An-Nawawi, merangkumi asas hukum Islam, ibadah, dan akhlak.",
+  "hadithFortyNawawiUsed": "Bahagian Hadis Harian",
+  "hadithDoaUsed": "Bahagian Doa Harian & Koleksi Doa",
+  "hadithAdkarUsed": "Bahagian Zikir Harian",
+  "hadithPostSalaahUsed": "Bahagian Selepas Solat",
+  "sourcesTitle": "Sumber & Kredit",
+  "sourcesApiName": "Naikiyah Dua Data API",
+  "sourcesDisclaimer": "Semua kandungan diperoleh dari pangkalan data API Islam terbuka. Kami tidak menuntut hak milik atas mana-mana kandungan keagamaan.",
+  "doaCategoryCount": "{count, plural, =1{1 doa} other{{count} doa}}",
+  "@doaCategoryCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "hadithErrorTitle": "Tidak dapat dimuatkan",
+  "hadithErrorBody": "Semak sambungan anda dan cuba lagi",
+  "statsTotalSelawat": "Jumlah Selawat",
+  "statsTotalZikir": "Jumlah Zikir",
+  "statsEmptyTitle": "Belum Ada Aktiviti",
+  "statsEmptyBody": "Mula kira selawat dan zikir\nuntuk melihat statistik di sini",
+  "statsEmptyCta": "Pergi ke Tasbih",
+  "statsUpdateFailed": "Gagal mengemas kini. Sila cuba lagi.",
+  "statsUpdatedToast": "Dikemas kini · {name} · {prev} → {next}",
+  "@statsUpdatedToast": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "prev": {
+        "type": "int"
+      },
+      "next": {
+        "type": "int"
+      }
+    }
+  },
+  "statsDailyGoalSetToast": "Matlamat harian ditetapkan kepada {value}",
+  "@statsDailyGoalSetToast": {
+    "placeholders": {
+      "value": {
+        "type": "int"
+      }
+    }
+  },
+  "sourcesUsedForLabel": "Digunakan untuk: {section}",
+  "@sourcesUsedForLabel": {
+    "placeholders": {
+      "section": {
+        "type": "String"
+      }
+    }
+  },
+  "statsTopOnDate": "Pada {date}",
+  "@statsTopOnDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "groupCreatedOnLabel": "Dicipta pada {date}",
+  "@groupCreatedOnLabel": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "hadithDailyTitle": "Harian",
+  "hadithDailySubtitle": "Teman spiritual anda",
+  "hadithSourceInfoTitle": "Maklumat Sumber",
+  "hadithSourceLabel": "Sumber",
+  "hadithDescriptionLabel": "Penerangan",
+  "hadithDoaShortDesc": "102 doa dari al-Quran & Sunnah, dikategorikan mengikut topik.",
+  "groupInviteCopied": "Kod jemputan disalin!",
+  "groupGroupFallback": "Kumpulan",
+  "groupUnknownMember": "Tidak diketahui",
+  "groupDailyGoalLabel": "Matlamat Harian",
+  "groupNoneValue": "Tiada",
+  "groupShareInviteText": "Sertai kumpulan saya di SelawatHub! Gunakan kod jemputan: {code}",
+  "@groupShareInviteText": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "groupSettingsTitle": "Tetapan Kumpulan",
+  "groupSettingsSectionGeneral": "UMUM",
+  "groupSettingsSectionInvite": "JEMPUTAN",
+  "groupSettingsSectionNotifications": "NOTIFIKASI",
+  "groupSettingsSectionRoles": "PERANAN & KEBENARAN",
+  "groupSettingsSectionManage": "URUS",
+  "groupSettingsCopyInvite": "Salin Kod Jemputan",
+  "groupSettingsShareInvite": "Kongsi Pautan Jemputan",
+  "groupSettingsRemoveMember": "Buang Ahli",
+  "groupSettingsLeaveGroup": "Tinggalkan Kumpulan",
+  "groupSettingsDeleteGroup": "Padam Kumpulan",
+  "groupRoleLeader": "Ketua",
+  "groupRoleCoLeader": "Penolong Ketua",
+  "groupRoleMember": "Ahli",
+  "groupRoleLeaderDesc": "Kawalan penuh kumpulan. Sunting nama, urus peranan, buang ahli, pindah kepimpinan, padam kumpulan.",
+  "groupRoleCoLeaderDesc": "Boleh buang ahli biasa dan urus jemputan. Dinaikkan secara automatik kepada ketua jika ketua meninggalkan kumpulan.",
+  "groupRoleMemberDesc": "Boleh menyertai kiraan selawat kumpulan dan melihat kemajuan kumpulan.",
+  "groupNoCoLeaderTitle": "Tiada penolong ketua dilantik",
+  "groupNoCoLeaderBody": "Anda mesti naikkan ahli kepada penolong ketua atau pindah kepimpinan sebelum meninggalkan kumpulan.",
+  "groupLeaveTitle": "Tinggalkan kumpulan?",
+  "groupLeaveLeaderBody": "Kepimpinan akan dipindahkan secara automatik kepada penolong ketua seterusnya atau ahli paling lama.",
+  "groupLeaveBody": "Anda tidak lagi akan melihat kemajuan kumpulan ini atau menyumbang kepada kiraan.",
+  "groupLeaveCta": "Tinggalkan",
+  "groupLeaveFailed": "Gagal meninggalkan kumpulan",
+  "groupLeaveSuccess": "Anda telah meninggalkan kumpulan",
+  "groupDeleteTitle": "Padam kumpulan?",
+  "groupDeleteBody": "Ini akan memadamkan kumpulan secara kekal untuk semua ahli. Tindakan ini tidak boleh dibatalkan.",
+  "groupDeleteCta": "Padam",
+  "groupDeleteFailed": "Gagal memadam kumpulan",
+  "groupDeleteSuccess": "Kumpulan dipadam",
+  "groupRemoveMemberTitle": "Buang Ahli",
+  "groupRemoveCta": "Buang",
+  "groupTransferTitle": "Pindah Kepimpinan",
+  "groupTransferFailed": "Gagal memindah kepimpinan",
+  "groupManageRolesTitle": "Urus Peranan",
+  "groupSaveChanges": "Simpan Perubahan",
+  "groupYearlyTotal": "Jumlah: {value} selawat",
+  "@groupYearlyTotal": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "groupSettingsBan": "Sekat dari Kumpulan",
+  "removeMemberCtaCount": "{count, plural, =1{Buang 1 ahli} other{Buang {count} ahli}}",
+  "@removeMemberCtaCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "statsBestStreakValue": "{count} hari",
+  "@statsBestStreakValue": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "groupNeedCoLeaderTitle": "Tiada penolong ketua",
+  "groupNeedCoLeaderBody": "Anda perlu naikkan ahli sebagai penolong ketua atau pindahkan kepimpinan sebelum keluar dari kumpulan.",
+  "groupSettingsDescNone": "Tiada",
+  "groupMembersTitle": "Ahli",
+  "groupDailyGoal": "Sasaran Harian"
+}

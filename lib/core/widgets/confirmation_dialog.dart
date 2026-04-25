@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:selawathub/core/theme/colors.dart';
 import 'package:selawathub/core/widgets/app_snackbar.dart';
+import 'package:selawathub/l10n/generated/app_localizations.dart';
 
 /// Shows a confirmation dialog with loading state on the action button.
 ///
@@ -16,6 +17,7 @@ Future<void> showConfirmDialog({
   String? errorMessage,
 }) async {
   final dark = Theme.of(context).brightness == Brightness.dark;
+  final l = AppL10n.of(context);
   bool loading = false;
 
   await showDialog<void>(
@@ -40,7 +42,7 @@ Future<void> showConfirmDialog({
           TextButton(
             onPressed: loading ? null : () => Navigator.of(ctx).pop(),
             child: Text(
-              'Cancel',
+              l.commonCancel,
               style: TextStyle(
                 color: loading
                     ? (dark ? C.onDark3 : C.onLight3)
@@ -61,7 +63,7 @@ Future<void> showConfirmDialog({
                       if (ctx.mounted) {
                         showAppSnackBar(
                           ctx,
-                          errorMessage ?? 'Something went wrong',
+                          errorMessage ?? l.commonSomethingWentWrong,
                           backgroundColor: C.error,
                         );
                       }

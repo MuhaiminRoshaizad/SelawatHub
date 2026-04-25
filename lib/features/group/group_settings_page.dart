@@ -18,6 +18,7 @@ import 'package:selawathub/features/group/manage_roles_page.dart';
 import 'package:selawathub/features/group/models/group_role.dart';
 import 'package:selawathub/features/group/remove_member_page.dart';
 import 'package:selawathub/features/group/transfer_leadership_page.dart';
+import 'package:selawathub/l10n/generated/app_localizations.dart';
 
 export 'package:selawathub/features/group/models/group_role.dart';
 
@@ -72,12 +73,13 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
 
   void _copyInviteCode() {
     Clipboard.setData(ClipboardData(text: widget.inviteCode));
-    showAppSnackBar(context, 'Invite code copied!');
+    showAppSnackBar(context, AppL10n.of(context).groupInviteCopied);
   }
 
   void _editGroupName() {
     final dark = Theme.of(context).brightness == Brightness.dark;
     final tt = Theme.of(context).textTheme;
+    final l = AppL10n.of(context);
     final controller = TextEditingController(text: _groupName);
     bool saving = false;
     showAppFormSheet(
@@ -95,12 +97,12 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Edit Group Name',
+                    l.groupSettingsEditName,
                     style: tt.titleLarge?.copyWith(fontWeight: FontWeight.w600),
                   ),
                   const SizedBox(height: S.s4),
                   Text(
-                    'Choose a name that represents your group.',
+                    l.groupSettingsEditNameHint,
                     style: tt.bodySmall?.copyWith(
                       color: dark ? C.onDark3 : C.onLight3,
                     ),
@@ -113,7 +115,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                     style: TextStyle(color: dark ? C.onDark1 : C.onLight1),
                     decoration: appInputDecoration(
                       context: ctx,
-                      hintText: 'Enter group name',
+                      hintText: l.groupSettingsNamePlaceholder,
                       showCounter: true,
                     ),
                   ),
@@ -130,11 +132,11 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                         setState(() => _groupName = name);
                         if (ctx.mounted) {
                           Navigator.of(ctx).pop();
-                          showAppSnackBar(ctx, 'Group name updated');
+                          showAppSnackBar(ctx, l.groupSettingsNameUpdated);
                         }
                       } catch (_) {
                         setSheetState(() => saving = false);
-                        if (ctx.mounted) showAppSnackBar(ctx, 'Failed to update name', backgroundColor: C.error);
+                        if (ctx.mounted) showAppSnackBar(ctx, l.groupSettingsNameFailed, backgroundColor: C.error);
                       }
                     },
                   ),
@@ -150,6 +152,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
   void _editDescription() {
     final dark = Theme.of(context).brightness == Brightness.dark;
     final tt = Theme.of(context).textTheme;
+    final l = AppL10n.of(context);
     final controller = TextEditingController(text: _groupDescription);
     bool saving = false;
     showAppFormSheet(
@@ -167,12 +170,12 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Edit Description',
+                    l.groupSettingsEditDesc,
                     style: tt.titleLarge?.copyWith(fontWeight: FontWeight.w600),
                   ),
                   const SizedBox(height: S.s4),
                   Text(
-                    'Describe what your group is about.',
+                    l.groupSettingsDescHint,
                     style: tt.bodySmall?.copyWith(
                       color: dark ? C.onDark3 : C.onLight3,
                     ),
@@ -187,7 +190,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                     style: TextStyle(color: dark ? C.onDark1 : C.onLight1),
                     decoration: appInputDecoration(
                       context: ctx,
-                      hintText: 'Enter group description',
+                      hintText: l.groupSettingsDescPlaceholder,
                       showCounter: true,
                     ),
                   ),
@@ -203,11 +206,11 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                         setState(() => _groupDescription = desc);
                         if (ctx.mounted) {
                           Navigator.of(ctx).pop();
-                          showAppSnackBar(ctx, 'Description updated');
+                          showAppSnackBar(ctx, l.groupSettingsDescUpdated);
                         }
                       } catch (_) {
                         setSheetState(() => saving = false);
-                        if (ctx.mounted) showAppSnackBar(ctx, 'Failed to update description', backgroundColor: C.error);
+                        if (ctx.mounted) showAppSnackBar(ctx, l.groupSettingsDescFailed, backgroundColor: C.error);
                       }
                     },
                   ),
@@ -223,6 +226,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
   void _editDailyGoal() {
     final dark = Theme.of(context).brightness == Brightness.dark;
     final tt = Theme.of(context).textTheme;
+    final l = AppL10n.of(context);
     final controller = TextEditingController(text: _dailyGoal.toString());
     bool saving = false;
     showAppFormSheet(
@@ -240,12 +244,12 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Set Daily Goal',
+                    l.groupSettingsSetGoal,
                     style: tt.titleLarge?.copyWith(fontWeight: FontWeight.w600),
                   ),
                   const SizedBox(height: S.s4),
                   Text(
-                    'Set a daily selawat target for your group.',
+                    l.groupSettingsGoalHint,
                     style: tt.bodySmall?.copyWith(
                       color: dark ? C.onDark3 : C.onLight3,
                     ),
@@ -259,7 +263,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                     style: TextStyle(color: dark ? C.onDark1 : C.onLight1),
                     decoration: appInputDecoration(
                       context: ctx,
-                      hintText: 'e.g. 10000',
+                      hintText: l.groupSettingsGoalExample,
                     ).copyWith(
                       suffixText: 'selawat',
                       suffixStyle:
@@ -279,11 +283,11 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                         setState(() => _dailyGoal = val);
                         if (ctx.mounted) {
                           Navigator.of(ctx).pop();
-                          showAppSnackBar(ctx, 'Group daily goal set to $val');
+                          showAppSnackBar(ctx, l.groupSettingsGoalUpdated(val));
                         }
                       } catch (_) {
                         setSheetState(() => saving = false);
-                        if (ctx.mounted) showAppSnackBar(ctx, 'Failed to update goal', backgroundColor: C.error);
+                        if (ctx.mounted) showAppSnackBar(ctx, l.groupSettingsGoalFailed, backgroundColor: C.error);
                       }
                     },
                   ),
@@ -334,27 +338,28 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
 
   void _showNeedCoLeaderDialog() {
     final dark = Theme.of(context).brightness == Brightness.dark;
+    final l = AppL10n.of(context);
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: dark ? C.dark3 : C.light2,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Text(
-          'No co-leader assigned',
+          l.groupNeedCoLeaderTitle,
           style: TextStyle(
             fontWeight: FontWeight.w600,
             color: dark ? C.onDark1 : C.onLight1,
           ),
         ),
         content: Text(
-          'You must promote a member to co-leader or transfer leadership before leaving the group.',
+          l.groupNeedCoLeaderBody,
           style: TextStyle(color: dark ? C.onDark2 : C.onLight2),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
             child: Text(
-              'Cancel',
+              l.commonCancel,
               style: TextStyle(color: dark ? C.primarySoft : C.primary),
             ),
           ),
@@ -364,7 +369,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
               _openManageRoles();
             },
             child: Text(
-              'Manage Roles',
+              l.groupSettingsManageRoles,
               style: TextStyle(
                 color: dark ? C.primarySoft : C.primary,
                 fontWeight: FontWeight.w600,
@@ -381,18 +386,17 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
       _showNeedCoLeaderDialog();
       return;
     }
+    final l = AppL10n.of(context);
     showConfirmDialog(
       context: context,
-      title: 'Leave group?',
-      message: _isLeader
-          ? 'Leadership will be automatically transferred to the next co-leader or oldest member.'
-          : 'You will no longer see this group\'s progress or contribute to the count.',
-      actionLabel: 'Leave',
-      errorMessage: 'Failed to leave group',
+      title: l.groupLeaveTitle,
+      message: _isLeader ? l.groupLeaveLeaderBody : l.groupLeaveBody,
+      actionLabel: l.groupLeaveCta,
+      errorMessage: l.groupLeaveFailed,
       onConfirm: () async {
         await GroupService.leaveGroup(widget.groupId);
         if (!mounted) return;
-        showAppSnackBar(context, 'You left the group');
+        showAppSnackBar(context, l.groupLeaveSuccess);
         Navigator.of(context).pop();
         widget.onLeave();
       },
@@ -400,16 +404,17 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
   }
 
   void _confirmDelete() {
+    final l = AppL10n.of(context);
     showConfirmDialog(
       context: context,
-      title: 'Delete group?',
-      message: 'This will permanently delete the group for all members. This action cannot be undone.',
-      actionLabel: 'Delete',
-      errorMessage: 'Failed to delete group',
+      title: l.groupDeleteTitle,
+      message: l.groupDeleteBody,
+      actionLabel: l.groupDeleteCta,
+      errorMessage: l.groupDeleteFailed,
       onConfirm: () async {
         await GroupService.leaveGroup(widget.groupId);
         if (!mounted) return;
-        showAppSnackBar(context, 'Group deleted');
+        showAppSnackBar(context, l.groupDeleteSuccess);
         Navigator.of(context).pop();
         widget.onLeave();
       },
@@ -421,6 +426,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
     final dark = Theme.of(context).brightness == Brightness.dark;
     final tt = Theme.of(context).textTheme;
     final accent = dark ? C.primarySoft : C.primary;
+    final l = AppL10n.of(context);
 
     return Scaffold(
       backgroundColor: dark ? C.dark1 : C.light1,
@@ -473,7 +479,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                         ),
                         const SizedBox(height: S.s4),
                         Text(
-                          '${widget.memberCount} members',
+                          l.groupMembersCount(widget.memberCount),
                           style: tt.bodySmall,
                         ),
                       ],
@@ -485,7 +491,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
               const SizedBox(height: S.s24),
 
               // ── General section ──
-              SectionHeader(text: 'GENERAL'),
+              SectionHeader(text: l.groupSettingsSectionGeneral),
               const SizedBox(height: S.s8),
 
               FadeIn(
@@ -502,7 +508,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                         if (_isLeader)
                           MenuRow(compact: true,
                             icon: CupertinoIcons.pencil,
-                            label: 'Edit Group Name',
+                            label: l.groupSettingsEditName,
                             onTap: _editGroupName,
                           ),
                         if (_isLeader)
@@ -514,9 +520,9 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                         if (_isLeader)
                           MenuRow(compact: true,
                             icon: CupertinoIcons.text_alignleft,
-                            label: 'Edit Description',
+                            label: l.groupSettingsEditDesc,
                             trailingWidget: Text(
-                              _groupDescription.isEmpty ? 'None' : _groupDescription,
+                              _groupDescription.isEmpty ? l.groupSettingsDescNone : _groupDescription,
                               style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w500,
@@ -536,7 +542,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                         if (_canManage)
                           MenuRow(compact: true,
                             icon: CupertinoIcons.flag,
-                            label: 'Set Daily Goal',
+                            label: l.groupSettingsSetGoal,
                             trailingWidget: Text(
                               _fmtGoal(_dailyGoal),
                               style: TextStyle(
@@ -555,7 +561,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                           ),
                         MenuRow(compact: true,
                           icon: CupertinoIcons.doc_on_clipboard,
-                          label: 'Copy Invite Code',
+                          label: l.groupSettingsCopyInvite,
                           trailingWidget: Text(
                             widget.inviteCode,
                             style: TextStyle(
@@ -574,11 +580,11 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                         ),
                         MenuRow(compact: true,
                           icon: CupertinoIcons.share,
-                          label: 'Share Invite Link',
+                          label: l.groupSettingsShareInvite,
                           onTap: () {
                             SharePlus.instance.share(
                               ShareParams(
-                                text: 'Join my group on SelawatHub! Use invite code: ${widget.inviteCode}',
+                                text: l.groupShareInviteText(widget.inviteCode),
                               ),
                             );
                           },
@@ -592,7 +598,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
               const SizedBox(height: S.s24),
 
               // ── Notifications section ──
-              SectionHeader(text: 'NOTIFICATIONS'),
+              SectionHeader(text: l.groupSettingsSectionNotifications),
               const SizedBox(height: S.s8),
 
               FadeIn(
@@ -621,7 +627,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                       ),
                       const SizedBox(width: S.s12),
                       Expanded(
-                        child: Text('Mute Notifications',
+                        child: Text(l.groupSettingsMuteNotifications,
                             style: tt.titleSmall),
                       ),
                       Switch.adaptive(
@@ -639,7 +645,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
               const SizedBox(height: S.s24),
 
               // ── Roles & Permissions section ──
-              SectionHeader(text: 'ROLES & PERMISSIONS'),
+              SectionHeader(text: l.groupSettingsSectionRoles),
               const SizedBox(height: S.s8),
 
               FadeIn(
@@ -655,9 +661,8 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                       children: [
                         _RoleInfoRow(
                           emoji: '👑',
-                          roleName: 'Leader',
-                          description:
-                              'Full group control. Edit name, manage roles, remove any member, transfer leadership, delete group.',
+                          roleName: l.groupRoleLeader,
+                          description: l.groupRoleLeaderDesc,
                         ),
                         Divider(
                           height: 1,
@@ -667,9 +672,8 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                         ),
                         _RoleInfoRow(
                           emoji: '⭐',
-                          roleName: 'Co-leader',
-                          description:
-                              'Can remove regular members and manage invites. Auto-promoted to leader if leader leaves.',
+                          roleName: l.groupRoleCoLeader,
+                          description: l.groupRoleCoLeaderDesc,
                         ),
                         Divider(
                           height: 1,
@@ -679,9 +683,8 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                         ),
                         _RoleInfoRow(
                           emoji: '👤',
-                          roleName: 'Member',
-                          description:
-                              'Can participate in group selawat counting and view group progress.',
+                          roleName: l.groupRoleMember,
+                          description: l.groupRoleMemberDesc,
                         ),
                       ],
                     ),
@@ -693,7 +696,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
               if (_canManage) ...[
                 const SizedBox(height: S.s24),
 
-                SectionHeader(text: 'MANAGE'),
+                SectionHeader(text: l.groupSettingsSectionManage),
                 const SizedBox(height: S.s8),
 
                 FadeIn(
@@ -711,7 +714,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                           if (_isLeader) ...[
                             MenuRow(compact: true,
                               icon: CupertinoIcons.person_2,
-                              label: 'Manage Roles',
+                              label: l.groupSettingsManageRoles,
                               onTap: _openManageRoles,
                             ),
                             Divider(
@@ -723,7 +726,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                           ],
                           MenuRow(compact: true,
                             icon: CupertinoIcons.person_badge_minus,
-                            label: 'Remove Member',
+                            label: l.groupSettingsRemoveMember,
                             onTap: _openRemoveMember,
                           ),
                           if (_isLeader) ...[
@@ -735,7 +738,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                             ),
                             MenuRow(compact: true,
                               icon: CupertinoIcons.arrow_right_arrow_left,
-                              label: 'Transfer Leadership',
+                              label: l.groupSettingsTransferLeadership,
                               onTap: _openTransferLeadership,
                             ),
                           ],
@@ -762,7 +765,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                       children: [
                         MenuRow(compact: true,
                           icon: CupertinoIcons.arrow_left_square,
-                          label: 'Leave Group',
+                          label: l.groupSettingsLeaveGroup,
                           isDestructive: true,
                           onTap: _confirmLeave,
                         ),
@@ -775,7 +778,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
                           ),
                           MenuRow(compact: true,
                             icon: CupertinoIcons.trash,
-                            label: 'Delete Group',
+                            label: l.groupSettingsDeleteGroup,
                             isDestructive: true,
                             onTap: _confirmDelete,
                           ),
@@ -797,7 +800,7 @@ class _GroupSettingsPageState extends State<GroupSettingsPage> {
             top: 0,
             left: 0,
             right: 0,
-            child: FrostedAppBar(title: 'Group Settings'),
+            child: FrostedAppBar(title: l.groupSettingsTitle),
           ),
         ],
       ),

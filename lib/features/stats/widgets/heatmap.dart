@@ -3,6 +3,7 @@ import 'package:selawathub/core/constants.dart';
 import 'package:selawathub/core/theme/colors.dart';
 import 'package:selawathub/features/stats/models/day_data.dart';
 import 'package:selawathub/features/stats/stats_utils.dart';
+import 'package:selawathub/l10n/generated/app_localizations.dart';
 
 class StatsHeatmap extends StatefulWidget {
   const StatsHeatmap({
@@ -54,6 +55,7 @@ class _StatsHeatmapState extends State<StatsHeatmap> {
     final dark = widget.dark;
     final tt = widget.tt;
     final selectedIdx = widget.selectedIdx;
+    final l = AppL10n.of(context);
 
     final now = DateTime.now();
     final startDate = now.subtract(
@@ -98,12 +100,12 @@ class _StatsHeatmapState extends State<StatsHeatmap> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Activity', style: tt.titleMedium),
+                    Text(l.statsHeatmapActivity, style: tt.titleMedium),
                     const SizedBox(height: S.s4),
                     Text(
                       selectedIdx != null
-                          ? 'Tap again to deselect'
-                          : 'Tap a day to filter stats below',
+                          ? l.statsHeatmapTapDeselect
+                          : l.statsHeatmapTapFilter,
                       style: tt.bodySmall,
                     ),
                   ],
@@ -259,7 +261,7 @@ class _StatsHeatmapState extends State<StatsHeatmap> {
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               Text(
-                'Less',
+                l.statsHeatmapLess,
                 style: TextStyle(
                   fontSize: 10,
                   color: dark ? C.onDark3 : C.onLight3,
@@ -279,7 +281,7 @@ class _StatsHeatmapState extends State<StatsHeatmap> {
               }),
               const SizedBox(width: S.s6),
               Text(
-                'More',
+                l.statsHeatmapMore,
                 style: TextStyle(
                   fontSize: 10,
                   color: dark ? C.onDark3 : C.onLight3,

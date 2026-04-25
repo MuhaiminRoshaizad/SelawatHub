@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:selawathub/core/constants.dart';
 import 'package:selawathub/core/services/group_service.dart';
 import 'package:selawathub/core/theme/colors.dart';
+import 'package:selawathub/l10n/generated/app_localizations.dart';
 
 class YearlyChart extends StatefulWidget {
   const YearlyChart({super.key, required this.groupId});
@@ -62,6 +63,7 @@ class _YearlyChartState extends State<YearlyChart> {
   Widget build(BuildContext context) {
     final dark = Theme.of(context).brightness == Brightness.dark;
     final tt = Theme.of(context).textTheme;
+    final l = AppL10n.of(context);
     final currentYear = DateTime.now().year;
     final canGoBack = _selectedYear > 2024;
     final canGoForward = _selectedYear < currentYear;
@@ -80,7 +82,7 @@ class _YearlyChartState extends State<YearlyChart> {
             children: [
               Expanded(
                 child: Text(
-                  'Yearly Summary',
+                  l.statsYearlySummary,
                   style: tt.titleSmall?.copyWith(fontWeight: FontWeight.w600),
                 ),
               ),
@@ -256,7 +258,7 @@ class _YearlyChartState extends State<YearlyChart> {
           const SizedBox(height: S.s16),
           Center(
             child: Text(
-              'Total: ${_fmtNum(_data.fold(0, (a, b) => a + b))} selawat',
+              l.groupYearlyTotal(_fmtNum(_data.fold(0, (a, b) => a + b))),
               style: tt.bodySmall?.copyWith(
                 color: dark ? C.onDark3 : C.onLight3,
                 fontWeight: FontWeight.w500,

@@ -16,6 +16,7 @@ import 'package:selawathub/features/hadith/widgets/hadith_bottom_sheets.dart';
 import 'package:selawathub/features/hadith/widgets/hadith_error_view.dart';
 import 'package:selawathub/features/hadith/widgets/hadith_loading_view.dart';
 import 'package:selawathub/features/hadith/widgets/horizontal_zikr_list.dart';
+import 'package:selawathub/l10n/generated/app_localizations.dart';
 
 // ─────────────────────────────────────────────────────────
 //  Daily Page — Hadith, Doa, Adkar, Post-Salaah from API
@@ -85,6 +86,7 @@ class _HadithPageState extends State<HadithPage> {
   Widget build(BuildContext context) {
     final dark = Theme.of(context).brightness == Brightness.dark;
     final tt = Theme.of(context).textTheme;
+    final l = AppL10n.of(context);
 
     if (_loading) return HadithLoadingView(dark: dark);
     if (_error) return HadithErrorView(dark: dark, tt: tt, onRetry: _fetchAll);
@@ -140,16 +142,14 @@ class _HadithPageState extends State<HadithPage> {
                       delay: const Duration(milliseconds: 240),
                       child: Row(
                         children: [
-                          Text('Daily Adkar', style: tt.titleLarge),
+                          Text(l.hadithDailyAdkar, style: tt.titleLarge),
                           const SizedBox(width: S.s8),
                           GestureDetector(
                             onTap: () => showSourceInfoSheet(
                               context: context,
-                              title: 'Daily Adkar',
-                              sourceName: 'Daily Adkar',
-                              description:
-                                  'Morning & evening remembrance (أذكار) to be '
-                                  'recited daily as part of a Muslim\'s spiritual routine.',
+                              title: l.hadithDailyAdkar,
+                              sourceName: l.hadithDailyAdkar,
+                              description: l.hadithDailyAdkarDesc,
                               endpoint: '/dailyAdkar',
                               accentColor: C.primary,
                             ),
@@ -166,7 +166,7 @@ class _HadithPageState extends State<HadithPage> {
                     FadeIn(
                       delay: const Duration(milliseconds: 240),
                       child: Text(
-                        'Morning & evening remembrance',
+                        l.hadithDailyAdkarSubtitle,
                         style: tt.bodyMedium,
                       ),
                     ),
@@ -200,16 +200,14 @@ class _HadithPageState extends State<HadithPage> {
                       delay: const Duration(milliseconds: 360),
                       child: Row(
                         children: [
-                          Text('Post-Salaah', style: tt.titleLarge),
+                          Text(l.hadithPostSalaah, style: tt.titleLarge),
                           const SizedBox(width: S.s8),
                           GestureDetector(
                             onTap: () => showSourceInfoSheet(
                               context: context,
-                              title: 'Post-Salaah',
-                              sourceName: 'Post-Salaah Zikr',
-                              description:
-                                  'Remembrance and supplications to be recited '
-                                  'after the five daily prayers.',
+                              title: l.hadithPostSalaah,
+                              sourceName: l.hadithPostSalaahName,
+                              description: l.hadithPostSalaahDesc,
                               endpoint: '/postSalaah',
                               accentColor: C.primary,
                             ),
@@ -226,7 +224,7 @@ class _HadithPageState extends State<HadithPage> {
                     FadeIn(
                       delay: const Duration(milliseconds: 360),
                       child: Text(
-                        'Remembrance after prayer',
+                        l.hadithPostSalaahSubtitle,
                         style: tt.bodyMedium,
                       ),
                     ),
@@ -259,16 +257,14 @@ class _HadithPageState extends State<HadithPage> {
                       delay: const Duration(milliseconds: 480),
                       child: Row(
                         children: [
-                          Text('Doa Collection', style: tt.titleLarge),
+                          Text(l.hadithDoaCollection, style: tt.titleLarge),
                           const SizedBox(width: S.s8),
                           GestureDetector(
                             onTap: () => showSourceInfoSheet(
                               context: context,
-                              title: 'Doa Collection',
-                              sourceName: 'Useful Duas Collection',
-                              description:
-                                  '102 supplications sourced from the Quran & Sunnah, '
-                                  'categorized by topic for easy reference.',
+                              title: l.hadithDoaCollection,
+                              sourceName: l.hadithDoaCollectionName,
+                              description: l.hadithDoaCollectionDesc,
                               endpoint: '/usefulDuas',
                               accentColor: C.primary,
                             ),
@@ -285,7 +281,7 @@ class _HadithPageState extends State<HadithPage> {
                     FadeIn(
                       delay: const Duration(milliseconds: 480),
                       child: Text(
-                        'Browse supplications by category',
+                        l.hadithDoaCollectionSubtitle,
                         style: tt.bodyMedium,
                       ),
                     ),
@@ -352,10 +348,10 @@ class _HadithPageState extends State<HadithPage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('Daily', style: tt.headlineLarge),
+                          Text(l.hadithDailyTitle, style: tt.headlineLarge),
                           const SizedBox(height: S.s4),
                           Text(
-                            'Your spiritual companion',
+                            l.hadithDailySubtitle,
                             style: tt.bodyMedium,
                           ),
                         ],

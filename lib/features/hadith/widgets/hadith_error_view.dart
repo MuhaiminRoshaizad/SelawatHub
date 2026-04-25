@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:selawathub/core/animations/bounce_tap.dart';
 import 'package:selawathub/core/constants.dart';
 import 'package:selawathub/core/theme/colors.dart';
+import 'package:selawathub/l10n/generated/app_localizations.dart';
 
 // ─────────────────────────────────────────────────────────
 //  Error view with retry
@@ -21,6 +22,7 @@ class HadithErrorView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppL10n.of(context);
     return SafeArea(
       bottom: false,
       child: Center(
@@ -36,14 +38,14 @@ class HadithErrorView extends StatelessWidget {
               ),
               const SizedBox(height: S.s16),
               Text(
-                'Unable to load',
+                l.hadithErrorTitle,
                 style: tt.titleMedium?.copyWith(
                   color: dark ? C.onDark1 : C.onLight1,
                 ),
               ),
               const SizedBox(height: S.s8),
               Text(
-                'Check your connection and try again',
+                l.hadithErrorBody,
                 style: tt.bodyMedium?.copyWith(
                   color: dark ? C.onDark2 : C.onLight2,
                 ),
@@ -58,9 +60,9 @@ class HadithErrorView extends StatelessWidget {
                     color: C.primary,
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Text(
-                    'Retry',
-                    style: TextStyle(
+                  child: Text(
+                    l.commonRetry,
+                    style: const TextStyle(
                       color: C.white,
                       fontWeight: FontWeight.w600,
                     ),

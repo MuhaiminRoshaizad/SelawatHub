@@ -7,6 +7,7 @@ import 'package:selawathub/core/widgets/app_snackbar.dart';
 import 'package:selawathub/core/widgets/confirmation_dialog.dart';
 import 'package:selawathub/core/widgets/frosted_app_bar.dart';
 import 'package:selawathub/features/group/models/group_role.dart';
+import 'package:selawathub/l10n/generated/app_localizations.dart';
 
 // ─────────────────────────────────────────────────────────
 //  Remove Member Page (multi-select)
@@ -41,19 +42,20 @@ class _RemoveMemberPageState extends State<RemoveMemberPage> {
   void _confirmRemove() {
     if (_selectedIds.isEmpty) return;
     final count = _selectedIds.length;
+    final l = AppL10n.of(context);
     showConfirmDialog(
       context: context,
-      title: 'Remove $count member${count > 1 ? 's' : ''}?',
-      message: 'The following will be removed:\n${_selectedNames()}',
-      actionLabel: 'Remove',
-      errorMessage: 'Failed to remove members',
+      title: l.removeMemberConfirmTitle(count),
+      message: l.removeMemberConfirmBody(_selectedNames()),
+      actionLabel: l.groupRemoveCta,
+      errorMessage: l.removeMemberFailed,
       onConfirm: () async {
         for (final userId in _selectedIds) {
           await GroupService.removeMember(widget.groupId, userId);
         }
         if (!mounted) return;
         Navigator.of(context).pop();
-        showAppSnackBar(context, '$count member${count > 1 ? 's' : ''} removed');
+        showAppSnackBar(context, l.removeMemberSuccess(count));
       },
     );
   }
@@ -62,6 +64,7 @@ class _RemoveMemberPageState extends State<RemoveMemberPage> {
   Widget build(BuildContext context) {
     final dark = Theme.of(context).brightness == Brightness.dark;
     final tt = Theme.of(context).textTheme;
+    final l = AppL10n.of(context);
 
     return Scaffold(
       backgroundColor: dark ? C.dark1 : C.light1,
@@ -77,7 +80,7 @@ class _RemoveMemberPageState extends State<RemoveMemberPage> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: S.page),
                 child: Text(
-                  'Select members to remove from the group.',
+                  l.removeMemberIntro,
                   style: tt.bodyMedium?.copyWith(
                     color: dark ? C.onDark2 : C.onLight2,
                   ),
@@ -146,8 +149,8 @@ class _RemoveMemberPageState extends State<RemoveMemberPage> {
                     child: Center(
                       child: Text(
                         _selectedIds.isEmpty
-                            ? 'Select members'
-                            : 'Remove ${_selectedIds.length} member${_selectedIds.length > 1 ? 's' : ''}',
+                            ? l.removeMemberSelectCta
+                            : l.removeMemberCtaCount(_selectedIds.length),
                         style: tt.bodyLarge?.copyWith(
                           fontWeight: FontWeight.w600,
                           color: _selectedIds.isNotEmpty
@@ -170,7 +173,7 @@ class _RemoveMemberPageState extends State<RemoveMemberPage> {
             top: 0,
             left: 0,
             right: 0,
-            child: FrostedAppBar(title: 'Remove Member'),
+            child: FrostedAppBar(title: l.groupRemoveMemberTitle),
           ),
         ],
       ),

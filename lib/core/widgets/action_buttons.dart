@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:selawathub/core/animations/bounce_tap.dart';
 import 'package:selawathub/core/constants.dart';
 import 'package:selawathub/core/theme/colors.dart';
+import 'package:selawathub/l10n/generated/app_localizations.dart';
 
 /// Standardized Cancel/Save (or any two-action) button row.
 class ActionButtons extends StatelessWidget {
@@ -9,21 +10,24 @@ class ActionButtons extends StatelessWidget {
     super.key,
     required this.onCancel,
     required this.onConfirm,
-    this.cancelLabel = 'Cancel',
-    this.confirmLabel = 'Save',
+    this.cancelLabel,
+    this.confirmLabel,
     this.saving = false,
   });
 
   final VoidCallback onCancel;
   final VoidCallback onConfirm;
-  final String cancelLabel;
-  final String confirmLabel;
+  final String? cancelLabel;
+  final String? confirmLabel;
   final bool saving;
 
   @override
   Widget build(BuildContext context) {
     final dark = Theme.of(context).brightness == Brightness.dark;
     final tt = Theme.of(context).textTheme;
+    final l = AppL10n.of(context);
+    final cancelText = cancelLabel ?? l.commonCancel;
+    final confirmText = confirmLabel ?? l.commonSave;
     return Row(
       children: [
         Expanded(
@@ -37,7 +41,7 @@ class ActionButtons extends StatelessWidget {
               ),
               child: Center(
                 child: Text(
-                  cancelLabel,
+                  cancelText,
                   style: tt.bodyMedium?.copyWith(
                     fontWeight: FontWeight.w600,
                     color: dark ? C.onDark2 : C.onLight2,
@@ -68,7 +72,7 @@ class ActionButtons extends StatelessWidget {
                         ),
                       )
                     : Text(
-                        confirmLabel,
+                        confirmText,
                         style: tt.bodyMedium?.copyWith(
                           fontWeight: FontWeight.w600,
                           color: C.white,

@@ -5,6 +5,7 @@ import 'package:selawathub/core/animations/bounce_tap.dart';
 import 'package:selawathub/core/constants.dart';
 import 'package:selawathub/core/theme/colors.dart';
 import 'package:selawathub/features/counter/models/dhikr.dart';
+import 'package:selawathub/l10n/generated/app_localizations.dart';
 
 /// Callback signature for committing an edit. Returns true on success.
 typedef TodayLogEdit = Future<bool> Function(Dhikr dhikr, int newCount);
@@ -92,6 +93,7 @@ class _TodayLogBodyState extends State<_TodayLogBody> {
     final dark = Theme.of(context).brightness == Brightness.dark;
     final tt = Theme.of(context).textTheme;
     final accent = dark ? C.primarySoft : C.primary;
+    final l = AppL10n.of(context);
 
     final entries = _counts.entries
         .where((e) => e.value > 0)
@@ -120,7 +122,7 @@ class _TodayLogBodyState extends State<_TodayLogBody> {
               ),
               const SizedBox(height: S.s20),
               Text(
-                "Today's log",
+                l.todayLogTitle,
                 style: tt.titleMedium?.copyWith(
                   fontWeight: FontWeight.w700,
                   color: dark ? C.onDark1 : C.onLight1,
@@ -128,7 +130,7 @@ class _TodayLogBodyState extends State<_TodayLogBody> {
               ),
               const SizedBox(height: S.s4),
               Text(
-                'Tap a row to set the exact count',
+                l.todayLogTapHint,
                 style: tt.bodySmall?.copyWith(
                   color: dark ? C.onDark3 : C.onLight3,
                 ),
@@ -139,7 +141,7 @@ class _TodayLogBodyState extends State<_TodayLogBody> {
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: S.s32),
                   child: Text(
-                    'Nothing counted today yet.',
+                    l.todayLogEmpty,
                     style: tt.bodyMedium?.copyWith(
                       color: dark ? C.onDark3 : C.onLight3,
                     ),
@@ -321,6 +323,7 @@ class _EditCountSheetState extends State<_EditCountSheet> {
     final dark = Theme.of(context).brightness == Brightness.dark;
     final accent = dark ? C.primarySoft : C.primary;
     final bottomInset = MediaQuery.of(context).viewInsets.bottom;
+    final l = AppL10n.of(context);
 
     return Padding(
       padding: EdgeInsets.only(bottom: bottomInset),
@@ -351,7 +354,7 @@ class _EditCountSheetState extends State<_EditCountSheet> {
             ),
             const SizedBox(height: S.s16),
             Text(
-              'Edit count',
+              l.todayLogEditCount,
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w700,
@@ -407,7 +410,7 @@ class _EditCountSheetState extends State<_EditCountSheet> {
                       backgroundColor: dark ? C.dark3 : C.light3,
                     ),
                     child: Text(
-                      'Cancel',
+                      l.commonCancel,
                       style: TextStyle(
                         color: dark ? C.onDark2 : C.onLight2,
                         fontWeight: FontWeight.w600,
@@ -426,9 +429,9 @@ class _EditCountSheetState extends State<_EditCountSheet> {
                         borderRadius: BorderRadius.circular(14),
                       ),
                     ),
-                    child: const Text(
-                      'Save',
-                      style: TextStyle(fontWeight: FontWeight.w700),
+                    child: Text(
+                      l.commonSave,
+                      style: const TextStyle(fontWeight: FontWeight.w700),
                     ),
                   ),
                 ),

@@ -4,6 +4,7 @@ import 'package:selawathub/core/constants.dart';
 import 'package:selawathub/core/theme/colors.dart';
 import 'package:selawathub/features/profile/privacy_policy_page.dart';
 import 'package:selawathub/features/profile/terms_of_service_page.dart';
+import 'package:selawathub/l10n/generated/app_localizations.dart';
 
 class AboutPage extends StatelessWidget {
   const AboutPage({super.key});
@@ -12,11 +13,12 @@ class AboutPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final dark = Theme.of(context).brightness == Brightness.dark;
     final tt = Theme.of(context).textTheme;
+    final l = AppL10n.of(context);
 
     return Scaffold(
       backgroundColor: dark ? C.dark1 : C.light1,
       appBar: AppBar(
-        title: const Text('About'),
+        title: Text(l.aboutTitle),
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.only(
@@ -63,7 +65,7 @@ class AboutPage extends StatelessWidget {
             FadeIn(
               delay: const Duration(milliseconds: 150),
               child: Text(
-                'v1.0.0',
+                l.aboutVersion('1.0.0'),
                 style: tt.bodySmall?.copyWith(
                   color: dark ? C.onDark3 : C.onLight3,
                 ),
@@ -76,10 +78,7 @@ class AboutPage extends StatelessWidget {
             FadeIn(
               delay: const Duration(milliseconds: 200),
               child: Text(
-                'SelawatHub is your companion for daily selawat and zikir. '
-                'Count your dhikr with a beautiful digital tasbih, track your '
-                'streaks and progress over time, set personal daily goals, and '
-                'grow together with your community through group features.',
+                l.aboutDescription,
                 style: tt.bodyMedium?.copyWith(
                   color: dark ? C.onDark2 : C.onLight2,
                   height: 1.5,
@@ -96,19 +95,19 @@ class AboutPage extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _FeatureRow(icon: Icons.touch_app, label: 'Digital tasbih with multiple dhikr types', dark: dark, tt: tt),
+                  _FeatureRow(icon: Icons.touch_app, label: l.aboutFeature1, dark: dark, tt: tt),
                   const SizedBox(height: S.s12),
-                  _FeatureRow(icon: Icons.edit_outlined, label: 'Manual count entry & custom dhikr', dark: dark, tt: tt),
+                  _FeatureRow(icon: Icons.edit_outlined, label: l.aboutFeature2, dark: dark, tt: tt),
                   const SizedBox(height: S.s12),
-                  _FeatureRow(icon: Icons.bar_chart, label: 'Personal statistics & streak tracking', dark: dark, tt: tt),
+                  _FeatureRow(icon: Icons.bar_chart, label: l.aboutFeature3, dark: dark, tt: tt),
                   const SizedBox(height: S.s12),
-                  _FeatureRow(icon: Icons.flag, label: 'Configurable daily goals', dark: dark, tt: tt),
+                  _FeatureRow(icon: Icons.flag, label: l.aboutFeature4, dark: dark, tt: tt),
                   const SizedBox(height: S.s12),
-                  _FeatureRow(icon: Icons.group, label: 'Group dhikr with leaderboards', dark: dark, tt: tt),
+                  _FeatureRow(icon: Icons.group, label: l.aboutFeature5, dark: dark, tt: tt),
                   const SizedBox(height: S.s12),
-                  _FeatureRow(icon: Icons.menu_book, label: 'Daily hadith collection', dark: dark, tt: tt),
+                  _FeatureRow(icon: Icons.menu_book, label: l.aboutFeature6, dark: dark, tt: tt),
                   const SizedBox(height: S.s12),
-                  _FeatureRow(icon: Icons.person_outline, label: 'Guest mode — no account required', dark: dark, tt: tt),
+                  _FeatureRow(icon: Icons.person_outline, label: l.aboutFeature7, dark: dark, tt: tt),
                 ],
               ),
             ),
@@ -119,7 +118,7 @@ class AboutPage extends StatelessWidget {
             FadeIn(
               delay: const Duration(milliseconds: 300),
               child: Text(
-                'Made by MuhaiminRoshaizad',
+                l.aboutMadeBy,
                 style: tt.bodySmall?.copyWith(
                   color: dark ? C.onDark3 : C.onLight3,
                 ),
@@ -134,7 +133,7 @@ class AboutPage extends StatelessWidget {
               child: Column(
                 children: [
                   _MenuRow(
-                    label: 'Privacy Policy',
+                    label: l.profilePrivacyPolicy,
                     dark: dark,
                     tt: tt,
                     onTap: () => Navigator.push(context,
@@ -142,7 +141,7 @@ class AboutPage extends StatelessWidget {
                   ),
                   const SizedBox(height: S.s12),
                   _MenuRow(
-                    label: 'Terms of Service',
+                    label: l.profileTermsOfService,
                     dark: dark,
                     tt: tt,
                     onTap: () => Navigator.push(context,

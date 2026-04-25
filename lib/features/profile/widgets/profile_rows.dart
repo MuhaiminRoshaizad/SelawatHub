@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:selawathub/core/animations/bounce_tap.dart';
 import 'package:selawathub/core/constants.dart';
 import 'package:selawathub/core/theme/colors.dart';
+import 'package:selawathub/l10n/generated/app_localizations.dart';
 
 // ─────────────────────────────────────────────────────────
 //  Info row (label + value)
@@ -291,7 +292,7 @@ class DarkModeRow extends StatelessWidget {
             ),
           ),
           const SizedBox(width: S.s12),
-          Expanded(child: Text('Dark Mode', style: tt.titleSmall)),
+          Expanded(child: Text(AppL10n.of(context).profileTheme, style: tt.titleSmall)),
           Switch.adaptive(
             value: value,
             onChanged: onChanged,
