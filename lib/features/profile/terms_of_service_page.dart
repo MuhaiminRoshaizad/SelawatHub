@@ -6,7 +6,7 @@ import 'package:selawathub/core/theme/colors.dart';
 class TermsOfServicePage extends StatelessWidget {
   const TermsOfServicePage({super.key});
 
-  static const _lastUpdated = '19 April 2026';
+  static const _lastUpdated = '25 April 2026';
 
   @override
   Widget build(BuildContext context) {
@@ -58,6 +58,12 @@ class TermsOfServicePage extends StatelessWidget {
                 'SelawatHub is a mobile application that provides:\n\n'
                     '• A digital tasbih (counter) for selawat and zikir with '
                     'customisable dhikr types and target counts\n'
+                    '• Manual count entry for dhikr completed using a physical '
+                    'tasbih, including add and subtract modes\n'
+                    '• User-defined custom selawat and zikir entries (registered '
+                    'users only)\n'
+                    '• Correction tools — undo, subtract, and "Edit today\'s log" '
+                    '— to fix mistaken entries\n'
                     '• Personal statistics tracking including daily, weekly, monthly, '
                     'and yearly progress with streaks and configurable daily goals\n'
                     '• Group features allowing users to create or join groups, share '
@@ -95,11 +101,13 @@ class TermsOfServicePage extends StatelessWidget {
                     'facilitating Islamic devotional practices. You must not:\n\n'
                     '• Use the app for any unlawful or prohibited purpose\n'
                     '• Upload inappropriate, offensive, or non-Islamic content as '
-                    'your profile picture or bio\n'
+                    'your profile picture, bio, or custom dhikr names\n'
                     '• Attempt to interfere with the app\'s functionality, security, '
                     'or infrastructure\n'
                     '• Create multiple accounts for the purpose of manipulating '
                     'group statistics or leaderboards\n'
+                    '• Submit false or inflated dhikr counts to manipulate '
+                    'leaderboards or streaks\n'
                     '• Share group invite codes publicly without the group '
                     'administrator\'s consent\n'
                     '• Harass, intimidate, or harm other users through group '
@@ -128,10 +136,24 @@ class TermsOfServicePage extends StatelessWidget {
                 dark,
                 '5. User Content',
                 'You retain ownership of content you provide (display name, bio, '
-                    'profile picture). By uploading content, you grant SelawatHub a '
-                    'non-exclusive licence to display that content within the app '
-                    'for the purpose of providing the service (e.g., showing your '
-                    'profile picture to group members).\n\n'
+                    'profile picture, custom dhikr names, and dhikr counts you '
+                    'log). By submitting content, you grant SelawatHub a '
+                    'non-exclusive, royalty-free licence to store, process, and '
+                    'display that content within the app for the sole purpose of '
+                    'providing the service (e.g., showing your profile picture to '
+                    'group members or rendering your custom dhikr in your own '
+                    'list).\n\n'
+                    'Custom Dhikr\n'
+                    'Custom selawat and zikir names you create are visible only to '
+                    'you and are not displayed to other users or group members. '
+                    'You are responsible for ensuring that any name you save is '
+                    'accurate, respectful, and does not violate the Acceptable Use '
+                    'rules in Section 3.\n\n'
+                    'Manual Counts\n'
+                    'You are solely responsible for the accuracy of counts you '
+                    'enter manually. You may correct mistaken entries at any time '
+                    'using the in-app undo, subtract, or "Edit today\'s log" '
+                    'tools.\n\n'
                     'We reserve the right to remove content that violates these '
                     'Terms or is deemed inappropriate.',
               ),
@@ -192,9 +214,11 @@ class TermsOfServicePage extends StatelessWidget {
                 dark,
                 '11. Governing Law',
                 'These Terms shall be governed by and construed in accordance with '
-                    'the laws of Malaysia. Any disputes arising from these Terms '
-                    'shall be subject to the exclusive jurisdiction of the courts '
-                    'of Malaysia.',
+                    'the laws of Malaysia, including the Personal Data Protection '
+                    'Act 2010 (as amended by the Personal Data Protection '
+                    '(Amendment) Act 2024) and the Consumer Protection Act 1999. '
+                    'Any disputes arising from these Terms shall be subject to the '
+                    'exclusive jurisdiction of the courts of Malaysia.',
               ),
               _section(
                 tt,

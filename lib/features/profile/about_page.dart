@@ -98,6 +98,8 @@ class AboutPage extends StatelessWidget {
                 children: [
                   _FeatureRow(icon: Icons.touch_app, label: 'Digital tasbih with multiple dhikr types', dark: dark, tt: tt),
                   const SizedBox(height: S.s12),
+                  _FeatureRow(icon: Icons.edit_outlined, label: 'Manual count entry & custom dhikr', dark: dark, tt: tt),
+                  const SizedBox(height: S.s12),
                   _FeatureRow(icon: Icons.bar_chart, label: 'Personal statistics & streak tracking', dark: dark, tt: tt),
                   const SizedBox(height: S.s12),
                   _FeatureRow(icon: Icons.flag, label: 'Configurable daily goals', dark: dark, tt: tt),

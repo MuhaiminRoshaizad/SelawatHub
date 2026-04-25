@@ -12,7 +12,7 @@ Built with **Flutter** + **Supabase** (Auth, Database, Storage).
 
 | Feature | Description |
 |---------|-------------|
-| 🧿 **Tasbih Counter** | 17 dhikr items (10 selawat, 7 zikir) with 3 visualisation styles & 6 color themes |
+| 🧿 **Tasbih Counter** | 17 built-in dhikr items (10 selawat, 7 zikir) plus user-defined custom entries, manual count entry, 3 visualisation styles & 6 color themes |
 | 📊 **Statistics** | 52-week heatmap, streaks with fire tiers, weekly chart, daily goal tracking |
 | 👥 **Groups** | Create/join groups, leaderboard, role hierarchy (leader/co-leader/member) |
 | 📖 **Daily Content** | Nawawi hadiths, duas, adkar, and post-salaah zikr |

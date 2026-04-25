@@ -12,7 +12,7 @@ The core feature — a digital tasbih (prayer bead counter) for counting selawat
 
 ### Dhikr Library
 
-17 pre-built dhikr items split into two categories:
+17 pre-built dhikr items split into two categories. Registered users can also create their own **custom selawat or zikir entries** that appear alongside the built-in list (visible only to the creator).
 
 **Selawat (10 items, default target: 100 each)**
 | ID | Name | Arabic |
@@ -45,6 +45,32 @@ Three visualization modes (user selectable in settings):
 - **Dual persistence** — Supabase (cloud) + SharedPreferences (offline backup)
 - **Target tracking** — Progress shown relative to custom or default target
 - **Round tracking** — Counts rounds when target is reached, resets to 0
+
+### Manual Count Entry
+
+For dhikr completed using a physical tasbih (or any time the user wants to record counts without tapping). Accessed via the **⋮ overflow menu** at the top of the counter page → "Add manual count".
+
+- **Add or Subtract mode** — toggle inside the sheet; subtract is clamped so totals never go negative
+- **Per-dhikr selection** — pick any built-in or custom dhikr from your list
+- **Custom dhikr creation** — registered users can save new selawat/zikir entries from the same sheet (guests cannot)
+- **Toast confirmation** — every save shows a "verb · subject · value/change" toast (e.g. `Updated · Selawat Jibril · 100 → 120`)
+
+### Correction Flows
+
+Three ways to fix a mistaken count:
+
+1. **Undo toast** — immediately after a manual entry, tap **Undo** in the toast (6s window)
+2. **Subtract mode** — re-open Add manual count, switch to Subtract, enter the offset
+3. **Edit today's log** — ⋮ menu → "Edit today's log" opens a bottom sheet listing every dhikr counted today; tap a row to overwrite the exact value. Also accessible from the Stats page under the streak card.
+
+### Counter Header Menu (⋮)
+
+Tap the ⋮ button at the top of the counter to open a labeled action sheet with:
+- Add manual count
+- Edit today's log
+- Counter settings
+
+Long-press ⋮ as a shortcut to "Edit today's log".
 
 ### Counter Settings
 

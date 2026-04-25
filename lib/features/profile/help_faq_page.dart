@@ -24,7 +24,38 @@ class HelpFaqPage extends StatelessWidget {
         (
           question: 'Can I set a target count for my dhikr?',
           answer:
-              'Yes! Go to the counter settings (gear icon on the Tasbih tab) and set your desired target count. The counter will track your progress toward that target. The target must be a whole number greater than zero.',
+              'Yes! Go to the counter settings (⋮ menu on the Tasbih tab) and set your desired target count. The counter will track your progress toward that target. The target must be a whole number greater than zero.',
+        ),
+        (
+          question: 'What is the ⋮ button at the top of the counter?',
+          answer:
+              'The ⋮ (more) button opens an action menu with three options:\n\n• Add manual count — log dhikr you completed on a physical tasbih\n• Edit today\'s log — fix a mistake in any of today\'s counts\n• Counter settings — bead style, haptics, target counts, and the daily goal\n\nLong-press the ⋮ to jump straight to today\'s log.',
+        ),
+      ],
+    ),
+    (
+      title: 'Manual Entry & Corrections',
+      icon: Icons.edit_outlined,
+      faqs: [
+        (
+          question: 'I use a physical tasbih. Can I still log my counts?',
+          answer:
+              'Yes. Open the ⋮ menu on the Tasbih tab and choose "Add manual count". Pick the dhikr, enter how many you completed, and tap Save. The amount is added to today\'s total — exactly as if you had tapped the counter that many times.\n\nYou can use this multiple times a day. Each save is added on top of what is already counted.',
+        ),
+        (
+          question: 'My selawat / zikir is not in the built-in list. Can I add my own?',
+          answer:
+              'Yes — but only if you are signed in. In the manual count sheet, tap "Add custom" and enter the name of your selawat or zikir, then choose whether it is a selawat or zikir. Your custom entry is saved to your account and shows up alongside the built-in list every time you open the manual count sheet.\n\nGuest users cannot create custom dhikr because the data needs to be saved to your account.',
+        ),
+        (
+          question: 'I entered the wrong number. How do I fix it?',
+          answer:
+              'There are three ways to correct a manual count:\n\n• Undo (immediate) — right after you save a manual count, a toast appears at the top with an UNDO button. Tap it within 6 seconds to reverse the change.\n• Subtract mode — open the manual count sheet again, switch the toggle to "Subtract", and enter the amount you want to remove. The total is clamped at 0 so you can\'t go negative.\n• Edit today\'s log — open the ⋮ menu and pick "Edit today\'s log". Tap any row to set its exact total for today. This is the easiest fix if you missed the undo toast.\n\nThe stats page also has an "Edit today\'s log" shortcut card under the streak.',
+        ),
+        (
+          question: 'How is "Add manual count" different from tapping the counter?',
+          answer:
+              'They are functionally the same — both add to your today\'s total for the chosen dhikr. The counter tap is a 1-by-1 increment for use during live dhikr. Manual count is for batches you completed away from the app (on a physical tasbih, in your head, etc.) and lets you choose any positive number in one go.',
         ),
       ],
     ),
