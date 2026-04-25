@@ -200,6 +200,7 @@ class _ProfilePageState extends State<ProfilePage> {
     return Skeletonizer(
       enabled: _loading,
       child: AppRefreshIndicator(
+        topOffset: topPad,
         onRefresh: () async {
           await _loadProfile();
         },
