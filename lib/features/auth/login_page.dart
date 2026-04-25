@@ -101,7 +101,25 @@ class _LoginPageState extends State<LoginPage> {
           name: name,
         );
         if (!mounted) return;
-        if (res.user != null && res.user!.emailConfirmedAt == null) {
+        // Supabase returns a "fake" user with an empty identities list when
+        // signing up with an email that is already registered (this is a
+        // deliberate anti-enumeration measure when email confirmations are
+        // enabled). Detect that and surface a real error instead of the
+        // misleading "Check your email" message.
+        final user = res.user;
+        final identities = user?.identities;
+        final alreadyRegistered =
+            user != null && (identities == null || identities.isEmpty);
+        if (alreadyRegistered) {
+          showAppSnackBar(
+            context,
+            'An account with this email already exists. Try signing in instead.',
+            backgroundColor: C.error,
+          );
+          setState(() => _loading = false);
+          return;
+        }
+        if (user != null && user.emailConfirmedAt == null) {
           showAppSnackBar(context, 'Check your email to verify your account');
           setState(() => _loading = false);
           return;
